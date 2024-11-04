@@ -22,11 +22,11 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 ## Screenshots
 
 <p align="center">
-    <img src="./assets/screenshots/Mod_home.png" width=200>
-    <img src="./assets/screenshots/Mod_player.png" width=200>
-    <img src="./assets/screenshots/Mod_search.png" width=200>
-    <img src="./assets/screenshots/Mod_favorites.png" width=200>
-    <img src="./assets/screenshots/Mod_playlists.png" width=200>
+    <img src="./assets/screenshots/Mod_home.png" width=150>
+    <img src="./assets/screenshots/Mod_player.png" width=150>
+    <img src="./assets/screenshots/Mod_search.png" width=150>
+    <img src="./assets/screenshots/Mod_favorites.png" width=150>
+    <img src="./assets/screenshots/Mod_playlists.png" width=150>
 </p>
 
 <details><summary><b>Original ReFreezer App</b></summary>
