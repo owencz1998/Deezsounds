@@ -159,4 +159,12 @@ class DeezerIcons {
       IconData(0xe8c1, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData more_vert =
       IconData(0xe831, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData clock_fill =
+      IconData(0xe8c2, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData clock_fill_small =
+      IconData(0xe8c3, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData clock_small =
+      IconData(0xe8c4, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData clock =
+      IconData(0xe8c5, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

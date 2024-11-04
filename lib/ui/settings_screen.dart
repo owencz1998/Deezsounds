@@ -1716,41 +1716,38 @@ class _CreditsScreenState extends State<CreditsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: FreezerAppBar('About'.i18n),
-      body: Container(
-        padding: EdgeInsets.only(bottom: 80),
-        child: ListView(
-          children: [
-            const FreezerTitle(),
-            Text(
-              _version + '-MOD',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontStyle: FontStyle.italic),
-            ),
-            const FreezerDivider(),
-            ListTile(
-              title: Text('DJDoubleD'.i18n),
-              subtitle: Text(
-                  'Developer, tester, new icon & logo, some translations, ...'
-                      .i18n),
-              leading:
-                  Image.asset('assets/DJDoubleD.jpg', width: 36, height: 36),
-              onTap: () {
-                launchUrlString('https://github.com/DJDoubleD');
-              },
-            ),
-            const FreezerDivider(),
-            ListTile(
-              title: Text('PetitPrince'.i18n),
-              subtitle: Text(
-                  'Developer, tester, new icon & logo, style mod, ...'.i18n),
-              leading:
-                  Image.asset('assets/PetitPrince.png', width: 36, height: 36),
-              onTap: () {
-                launchUrlString('https://github.com/PetitPrinc3');
-              },
-            ),
-            const FreezerDivider(),
-            /*ListTile(
+      body: ListView(
+        children: [
+          const FreezerTitle(),
+          Text(
+            _version + '-MOD',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontStyle: FontStyle.italic),
+          ),
+          const FreezerDivider(),
+          ListTile(
+            title: Text('DJDoubleD'.i18n),
+            subtitle: Text(
+                'Developer, tester, new icon & logo, some translations, ...'
+                    .i18n),
+            leading: Image.asset('assets/DJDoubleD.jpg', width: 36, height: 36),
+            onTap: () {
+              launchUrlString('https://github.com/DJDoubleD');
+            },
+          ),
+          const FreezerDivider(),
+          ListTile(
+            title: Text('PetitPrince'.i18n),
+            subtitle:
+                Text('Developer, tester, new icon & logo, style mod, ...'.i18n),
+            leading:
+                Image.asset('assets/PetitPrince.png', width: 36, height: 36),
+            onTap: () {
+              launchUrlString('https://github.com/PetitPrinc3');
+            },
+          ),
+          const FreezerDivider(),
+          /*ListTile(
             title: Text('Telegram Channel'.i18n),
             subtitle: Text('To get latest releases'.i18n),
             leading: const Icon(FontAwesome5.telegram, color: Color(0xFF27A2DF), size: 36.0),
@@ -1774,159 +1771,158 @@ class _CreditsScreenState extends State<CreditsScreen> {
               launchUrlString('https://discord.gg/qwJpa3r4dQ');
             },
           ),*/
-            ListTile(
-              title: Text('Repository'.i18n),
-              subtitle: Text('Source code, report issues there.'.i18n),
-              leading: const Icon(Icons.code, color: Colors.green, size: 36.0),
-              onTap: () {
-                launchUrlString('https://github.com/DJDoubleD/ReFreezer');
-              },
-            ),
-            ListTile(
-              title: Text('Crowdin'.i18n),
-              subtitle: Text('Help translating this app on Crowdin!'.i18n),
-              leading: const Icon(ReFreezerIcons.crowdin,
-                  color: Color(0xffbdc1c6), size: 36.0),
-              onTap: () {
-                launchUrlString('https://crowdin.com/project/refreezer');
-              },
-            ),
-            ListTile(
-              isThreeLine: true,
-              title: Text('Donate'.i18n),
-              subtitle: Text(
-                  'You should rather support your favorite artists, instead of this app!'
-                      .i18n),
-              leading: const Icon(FontAwesome5.paypal,
-                  color: Colors.blue, size: 36.0),
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text('Donate'.i18n),
-                        content: Text(
-                            'No really, go support your favorite artists instead ;)'
-                                .i18n),
-                        actions: [
-                          TextButton(
-                            child: const Text('OK'),
-                            onPressed: () {
-                              if (context.mounted) Navigator.of(context).pop();
-                            },
-                          )
-                        ],
-                      );
-                    });
-                // launchUrlString('https://paypal.me/exttex');
-              },
-            ),
-            const FreezerDivider(),
-            ...List.generate(
-                translators.length,
-                (i) => ListTile(
-                      title: Text(translators[i][0]),
-                      subtitle: Text(translators[i][1]),
-                    )),
-            const Padding(padding: EdgeInsets.all(8.0)),
-            const FreezerDivider(),
-            ExpansionTile(
-              title: LayoutBuilder(
-                builder: (context, constraints) {
-                  return Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Image.asset('assets/icon_legacy.png',
-                              width: 24, height: 24),
-                          Expanded(
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Text(
-                                'The original freezer development team'.i18n,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                softWrap: true,
-                                overflow: TextOverflow.visible,
+          ListTile(
+            title: Text('Repository'.i18n),
+            subtitle: Text('Source code, report issues there.'.i18n),
+            leading: const Icon(Icons.code, color: Colors.green, size: 36.0),
+            onTap: () {
+              launchUrlString('https://github.com/DJDoubleD/ReFreezer');
+            },
+          ),
+          ListTile(
+            title: Text('Crowdin'.i18n),
+            subtitle: Text('Help translating this app on Crowdin!'.i18n),
+            leading: const Icon(ReFreezerIcons.crowdin,
+                color: Color(0xffbdc1c6), size: 36.0),
+            onTap: () {
+              launchUrlString('https://crowdin.com/project/refreezer');
+            },
+          ),
+          ListTile(
+            isThreeLine: true,
+            title: Text('Donate'.i18n),
+            subtitle: Text(
+                'You should rather support your favorite artists, instead of this app!'
+                    .i18n),
+            leading:
+                const Icon(FontAwesome5.paypal, color: Colors.blue, size: 36.0),
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text('Donate'.i18n),
+                      content: Text(
+                          'No really, go support your favorite artists instead ;)'
+                              .i18n),
+                      actions: [
+                        TextButton(
+                          child: const Text('OK'),
+                          onPressed: () {
+                            if (context.mounted) Navigator.of(context).pop();
+                          },
+                        )
+                      ],
+                    );
+                  });
+              // launchUrlString('https://paypal.me/exttex');
+            },
+          ),
+          const FreezerDivider(),
+          ...List.generate(
+              translators.length,
+              (i) => ListTile(
+                    title: Text(translators[i][0]),
+                    subtitle: Text(translators[i][1]),
+                  )),
+          const Padding(padding: EdgeInsets.all(8.0)),
+          const FreezerDivider(),
+          ExpansionTile(
+            title: LayoutBuilder(
+              builder: (context, constraints) {
+                return Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.asset('assets/icon_legacy.png',
+                            width: 24, height: 24),
+                        Expanded(
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              'The original freezer development team'.i18n,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w600,
                               ),
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
                             ),
                           ),
-                          Image.asset('assets/icon_legacy.png',
-                              width: 24, height: 24),
-                        ],
-                      ),
-                    ],
-                  );
+                        ),
+                        Image.asset('assets/icon_legacy.png',
+                            width: 24, height: 24),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+            textColor: Theme.of(context).primaryColor,
+            iconColor: Theme.of(context).primaryColor,
+            tilePadding: const EdgeInsets.symmetric(horizontal: 16.0),
+            shape: const Border(),
+            children: [
+              const FreezerDivider(),
+              const ListTile(
+                title: Text('exttex'),
+                subtitle: Text('Developer'),
+              ),
+              const ListTile(
+                title: Text('Bas Curtiz'),
+                subtitle:
+                    Text('Icon, logo, banner, design suggestions, tester'),
+              ),
+              const ListTile(
+                title: Text('Tobs'),
+                subtitle: Text('Alpha testers'),
+              ),
+              const ListTile(
+                title: Text('Deemix'),
+                subtitle: Text('Better app <3'),
+              ),
+              const ListTile(
+                title: Text('Xandar Null'),
+                subtitle: Text('Tester, translations help'),
+              ),
+              ListTile(
+                title: const Text('Francesco'),
+                subtitle: const Text('Tester'),
+                onTap: () {
+                  setState(() {
+                    settings.primaryColor = const Color(0xff333333);
+                  });
+                  updateTheme();
+                  settings.save();
                 },
               ),
-              textColor: Theme.of(context).primaryColor,
-              iconColor: Theme.of(context).primaryColor,
-              tilePadding: const EdgeInsets.symmetric(horizontal: 16.0),
-              shape: const Border(),
-              children: [
-                const FreezerDivider(),
-                const ListTile(
-                  title: Text('exttex'),
-                  subtitle: Text('Developer'),
-                ),
-                const ListTile(
-                  title: Text('Bas Curtiz'),
-                  subtitle:
-                      Text('Icon, logo, banner, design suggestions, tester'),
-                ),
-                const ListTile(
-                  title: Text('Tobs'),
-                  subtitle: Text('Alpha testers'),
-                ),
-                const ListTile(
-                  title: Text('Deemix'),
-                  subtitle: Text('Better app <3'),
-                ),
-                const ListTile(
-                  title: Text('Xandar Null'),
-                  subtitle: Text('Tester, translations help'),
-                ),
-                ListTile(
-                  title: const Text('Francesco'),
-                  subtitle: const Text('Tester'),
-                  onTap: () {
-                    setState(() {
-                      settings.primaryColor = const Color(0xff333333);
-                    });
-                    updateTheme();
-                    settings.save();
-                  },
-                ),
-                const ListTile(
-                  title: Text('Annexhack'),
-                  subtitle: Text('Android Auto help'),
-                ),
-                const FreezerDivider(),
-                ...List.generate(
-                    freezerTranslators.length,
-                    (i) => ListTile(
-                          title: Text(freezerTranslators[i][0]),
-                          subtitle: Text(freezerTranslators[i][1]),
-                        )),
-              ],
-            ),
-            const FreezerDivider(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 4, 0, 8),
-              child: Text(
-                'Huge thanks to all the contributors! <3'.i18n,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16.0),
+              const ListTile(
+                title: Text('Annexhack'),
+                subtitle: Text('Android Auto help'),
               ),
+              const FreezerDivider(),
+              ...List.generate(
+                  freezerTranslators.length,
+                  (i) => ListTile(
+                        title: Text(freezerTranslators[i][0]),
+                        subtitle: Text(freezerTranslators[i][1]),
+                      )),
+            ],
+          ),
+          const FreezerDivider(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 4, 0, 8),
+            child: Text(
+              'Huge thanks to all the contributors! <3'.i18n,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16.0),
             ),
-            const FreezerDivider(),
-          ],
-        ),
+          ),
+          const FreezerDivider(),
+        ],
       ),
     );
   }

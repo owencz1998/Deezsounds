@@ -5,6 +5,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
+import 'package:refreezer/ui/player_screen.dart';
+import 'package:refreezer/ui/router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -33,6 +35,8 @@ class MenuSheet {
 
   void show(BuildContext context, List<Widget> options) {
     showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        useRootNavigator: true,
         isScrollControlled: true,
         context: context,
         builder: (BuildContext context) {
@@ -43,8 +47,18 @@ class MenuSheet {
                       ? 220
                       : 350,
             ),
-            child: SingleChildScrollView(
-              child: Column(children: options),
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 12.0),
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                  color: scaffoldBackgroundColor,
+                  border: Border.all(color: Colors.transparent),
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(18),
+                      topRight: Radius.circular(18))),
+              child: SingleChildScrollView(
+                child: Column(children: options),
+              ),
             ),
           );
         });
@@ -56,16 +70,20 @@ class MenuSheet {
 
   void showWithTrack(BuildContext context, Track track, List<Widget> options) {
     showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        useRootNavigator: true,
         isScrollControlled: true,
         context: context,
         builder: (BuildContext context) {
           return Container(
+              padding: EdgeInsets.symmetric(vertical: 12.0),
               clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
+                  color: scaffoldBackgroundColor,
                   border: Border.all(color: Colors.transparent),
                   borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15))),
+                      topLeft: Radius.circular(18),
+                      topRight: Radius.circular(18))),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -488,7 +506,6 @@ class MenuSheet {
           ? removePlaylistLibrary(playlist, context, onRemove: onRemove)
           : addPlaylistLibrary(playlist, context),
       addPlaylistOffline(playlist, context),
-      downloadPlaylist(playlist, context),
       shareTile('playlist', playlist.id!),
       if (playlist.user?.id == deezerAPI.userId)
         editPlaylist(playlist, context: context, onUpdate: onUpdate),
@@ -532,7 +549,7 @@ class MenuSheet {
       );
 
   Widget addPlaylistOffline(Playlist p, BuildContext context) => ListTile(
-        title: Text('Make playlist offline'.i18n),
+        title: Text('Download playlist'.i18n),
         leading: const Icon(Icons.offline_pin),
         onTap: () async {
           //Add to library
@@ -540,18 +557,6 @@ class MenuSheet {
           downloadManager.addOfflinePlaylist(p, private: true);
           if (context.mounted) _close(context);
           showDownloadStartedToast();
-        },
-      );
-
-  Widget downloadPlaylist(Playlist p, BuildContext context) => ListTile(
-        title: Text('Download playlist'.i18n),
-        leading: const Icon(DeezerIcons.download),
-        onTap: () async {
-          if (context.mounted) _close(context);
-          if (await downloadManager.addOfflinePlaylist(p, private: false) !=
-              false) {
-            showDownloadStartedToast();
-          }
         },
       );
 

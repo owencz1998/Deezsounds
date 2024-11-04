@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
+import 'package:refreezer/main.dart';
 
 import '../service/audio_service.dart';
 import '../settings.dart';
@@ -28,7 +29,7 @@ class _PlayerBarState extends State<PlayerBar> {
   AudioPlayerHandler audioHandler = GetIt.I<AudioPlayerHandler>();
   Color? _bgColor;
   StreamSubscription? _mediaItemSub;
-  final double iconSize = 20;
+  final double iconSize = 15;
   //bool _gestureRegistered = false;
 
   //Recover dominant color
@@ -45,6 +46,7 @@ class _PlayerBarState extends State<PlayerBar> {
 
   @override
   void initState() {
+    isPlayerBarActive = true;
     _updateColor;
     _mediaItemSub = audioHandler.mediaItem.listen((event) {
       _updateColor();
@@ -56,6 +58,7 @@ class _PlayerBarState extends State<PlayerBar> {
 
   @override
   void dispose() {
+    isPlayerBarActive = false;
     _mediaItemSub?.cancel();
     super.dispose();
   }
@@ -77,53 +80,55 @@ class _PlayerBarState extends State<PlayerBar> {
   @override
   Widget build(BuildContext context) {
     scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
-
+    isPlayerBarActive = true;
     var focusNode = FocusNode();
-    return Container(
-      clipBehavior: Clip.hardEdge,
-      decoration: BoxDecoration(
-          color: scaffoldBackgroundColor,
-          border: Border.all(
-              color: _bgColor != null
-                  ? _bgColor!.withOpacity(0.7)
-                  : Theme.of(context).scaffoldBackgroundColor),
-          borderRadius: BorderRadius.circular(15)),
-      child: GestureDetector(
-        key: UniqueKey(),
-        onHorizontalDragEnd: (DragEndDetails details) async {
-          if ((details.primaryVelocity ?? 0) < -100) {
-            // Swiped left
-            await GetIt.I<AudioPlayerHandler>().skipToNext();
-            updateColor();
-          } else if ((details.primaryVelocity ?? 0) > 100) {
-            // Swiped right
-            await GetIt.I<AudioPlayerHandler>().skipToPrevious();
-            updateColor();
-          }
-        },
-        onVerticalDragEnd: (DragEndDetails details) async {
-          if ((details.primaryVelocity ?? 0) < -100) {
-            // Swiped up
-            Navigator.of(context)
-                .push(SlideBottomRoute(widget: const PlayerScreen()));
-            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-              systemNavigationBarColor: _bgColor,
-            ));
-          } /*else if ((details.primaryVelocity ?? 0) > 100) {
-          // Swiped down => no action
-        }*/
+    return GestureDetector(
+      key: UniqueKey(),
+      onHorizontalDragEnd: (DragEndDetails details) async {
+        if ((details.primaryVelocity ?? 0) < -100) {
+          // Swiped left
+          await GetIt.I<AudioPlayerHandler>().skipToNext();
           updateColor();
-        },
-        child: StreamBuilder(
-            stream: Stream.periodic(const Duration(milliseconds: 250)),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (GetIt.I<AudioPlayerHandler>().mediaItem.value == null) {
-                return const SizedBox(
-                  width: 0,
-                  height: 0,
-                );
-              }
-              return Container(
+        } else if ((details.primaryVelocity ?? 0) > 100) {
+          // Swiped right
+          await GetIt.I<AudioPlayerHandler>().skipToPrevious();
+          updateColor();
+        }
+      },
+      onVerticalDragEnd: (DragEndDetails details) async {
+        if ((details.primaryVelocity ?? 0) < -100) {
+          // Swiped up
+          Navigator.of(context)
+              .push(SlideBottomRoute(widget: const PlayerScreen()));
+          SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+            systemNavigationBarColor: _bgColor,
+          ));
+        } else if ((details.primaryVelocity ?? 0) > 100) {
+          // Swiped down => close
+          dispose();
+          await audioHandler.clearQueue();
+        }
+        updateColor();
+      },
+      child: StreamBuilder(
+          stream: Stream.periodic(const Duration(milliseconds: 250)),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (GetIt.I<AudioPlayerHandler>().mediaItem.value == null) {
+              return const SizedBox(
+                width: 0,
+                height: 0,
+              );
+            }
+            return Container(
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                  color: scaffoldBackgroundColor,
+                  border: Border.all(
+                      color: _bgColor != null
+                          ? _bgColor!.withOpacity(0.7)
+                          : Theme.of(context).scaffoldBackgroundColor),
+                  borderRadius: BorderRadius.circular(17)),
+              child: Container(
                   decoration: BoxDecoration(
                     color: _bgColor?.withOpacity(0.7),
                   ),
@@ -132,6 +137,7 @@ class _PlayerBarState extends State<PlayerBar> {
                     children: <Widget>[
                       ListTile(
                           dense: true,
+                          horizontalTitleGap: 4.0,
                           focusNode: focusNode,
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 8.0),
@@ -144,8 +150,8 @@ class _PlayerBarState extends State<PlayerBar> {
                             ));
                           },
                           leading: CachedImage(
-                            width: 50,
-                            height: 50,
+                            width: 40,
+                            height: 40,
                             url: GetIt.I<AudioPlayerHandler>()
                                     .mediaItem
                                     .value
@@ -162,6 +168,8 @@ class _PlayerBarState extends State<PlayerBar> {
                                     ?.displayTitle ??
                                 '',
                             overflow: TextOverflow.clip,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 12),
                             maxLines: 1,
                           ),
                           subtitle: Text(
@@ -171,6 +179,7 @@ class _PlayerBarState extends State<PlayerBar> {
                                     ?.displaySubtitle ??
                                 '',
                             overflow: TextOverflow.clip,
+                            style: TextStyle(fontSize: 10),
                             maxLines: 1,
                           ),
                           trailing: IconTheme(
@@ -192,7 +201,7 @@ class _PlayerBarState extends State<PlayerBar> {
                             ),
                           )),
                       SizedBox(
-                        height: 3.0,
+                        height: 2.0,
                         child: LinearProgressIndicator(
                           backgroundColor: _bgColor!.withOpacity(0.1),
                           color: _bgColor,
@@ -200,9 +209,9 @@ class _PlayerBarState extends State<PlayerBar> {
                         ),
                       )
                     ],
-                  ));
-            }),
-      ),
+                  )),
+            );
+          }),
     );
   }
 }

@@ -24,18 +24,19 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
         appBar: const HomeAppBar(),
         body: SingleChildScrollView(
-            child: Container(
-          padding: EdgeInsets.only(bottom: 80.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               SafeArea(child: Container()),
               const Flexible(
-                child: HomePageScreen(),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  child: HomePageScreen(),
+                ),
               )
             ],
           ),
-        )));
+        ));
   }
 }
 

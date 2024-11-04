@@ -39,7 +39,10 @@ class Cache {
   StreamSubscription? sleepTimer;
 
   //Search history
-  @JsonKey(name: 'searchHistory2', toJson: _searchHistoryToJson, fromJson: _searchHistoryFromJson)
+  @JsonKey(
+      name: 'searchHistory2',
+      toJson: _searchHistoryToJson,
+      fromJson: _searchHistoryFromJson)
   List<SearchHistoryItem>? searchHistory;
 
   //If download threads warning was shown
@@ -83,7 +86,8 @@ class Cache {
       searchHistory!.add(SearchHistoryItem(item, SearchHistoryItemType.ARTIST));
     }
     if (item is Playlist) {
-      searchHistory!.add(SearchHistoryItem(item, SearchHistoryItemType.PLAYLIST));
+      searchHistory!
+          .add(SearchHistoryItem(item, SearchHistoryItemType.PLAYLIST));
     }
 
     await save();
@@ -91,7 +95,8 @@ class Cache {
 
   //Save, load
   static Future<String> getPath() async {
-    return p.join((await getApplicationDocumentsDirectory()).path, 'metacache.json');
+    return p.join(
+        (await getApplicationDocumentsDirectory()).path, 'metacache.json');
   }
 
   static Future wipe() async {
@@ -128,10 +133,13 @@ class Cache {
 
   //Search History JSON
   static List<SearchHistoryItem> _searchHistoryFromJson(List<dynamic>? json) {
-    return (json ?? []).map<SearchHistoryItem>((i) => _searchHistoryItemFromJson(i)).toList();
+    return (json ?? [])
+        .map<SearchHistoryItem>((i) => _searchHistoryItemFromJson(i))
+        .toList();
   }
 
-  static SearchHistoryItem _searchHistoryItemFromJson(Map<String, dynamic> json) {
+  static SearchHistoryItem _searchHistoryItemFromJson(
+      Map<String, dynamic> json) {
     SearchHistoryItemType type = SearchHistoryItemType.values[json['type']];
     dynamic data;
     switch (type) {
@@ -151,8 +159,12 @@ class Cache {
     return SearchHistoryItem(data, type);
   }
 
-  static List<Map<String, dynamic>> _searchHistoryToJson(List<SearchHistoryItem>? data) =>
-      (data ?? []).map<Map<String, dynamic>>((i) => {'type': i.type.index, 'data': i.data.toJson()}).toList();
+  static List<Map<String, dynamic>> _searchHistoryToJson(
+          List<SearchHistoryItem>? data) =>
+      (data ?? [])
+          .map<Map<String, dynamic>>(
+              (i) => {'type': i.type.index, 'data': i.data.toJson()})
+          .toList();
 }
 
 @JsonSerializable()

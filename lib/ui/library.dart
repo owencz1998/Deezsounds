@@ -585,7 +585,8 @@ class _LibraryTracksState extends State<LibraryTracks> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 2.0),
                         child: CircularProgressIndicator(),
                       )
                     ],

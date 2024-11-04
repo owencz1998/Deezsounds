@@ -25,6 +25,8 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
     <img src="./assets/screenshots/Mod_home.png" width=200>
     <img src="./assets/screenshots/Mod_player.png" width=200>
     <img src="./assets/screenshots/Mod_search.png" width=200>
+    <img src="./assets/screenshots/Mod_favorites.png" width=200>
+    <img src="./assets/screenshots/Mod_playlists.png" width=200>
 </p>
 
 <details><summary><b>Original ReFreezer App</b></summary>
@@ -58,8 +60,12 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 ## Features & changes
 
 ### Not working / On going
-- Offline playlist / titles access
-- Explore / Favorites page
+- Explore page
+- Caching information to avoid reloading every time (eg. favorites screen)
+- Offline handling for the favorite screen
+- Dynamic padding when player_bar is up
+- Carousel with playlist info (number of tracks, duration, etc.)
+- I Think I found a bug in handling offline files when download is interrupted...
 
 ### ReFreezer :
 - Restored all features of the old Freezer app, most notably:

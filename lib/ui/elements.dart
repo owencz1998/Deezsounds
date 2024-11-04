@@ -62,14 +62,13 @@ class FreezerAppBar extends StatelessWidget implements PreferredSizeWidget {
         foregroundColor: (Theme.of(context).brightness == Brightness.light)
             ? Colors.black
             : Colors.white,
-        title: Container(
-            child: Text(
+        title: Text(
           title,
           style: const TextStyle(
             fontWeight: FontWeight.w900,
             fontSize: 48,
           ),
-        )),
+        ),
         actions: actions,
         bottom: bottom as PreferredSizeWidget?,
       ),
