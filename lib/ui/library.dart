@@ -34,7 +34,7 @@ class LibraryAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return FreezerAppBar(
-      'Library'.i18n,
+      'Explore'.i18n,
       actions: <Widget>[
         IconButton(
           icon: Icon(

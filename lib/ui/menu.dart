@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:fluttericon/octicons_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
+import 'package:refreezer/settings.dart';
 import 'package:refreezer/ui/player_screen.dart';
 import 'package:refreezer/ui/router.dart';
 import 'package:share_plus/share_plus.dart';
@@ -69,6 +72,10 @@ class MenuSheet {
   //===================
 
   void showWithTrack(BuildContext context, Track track, List<Widget> options) {
+    bool isOffline = false;
+    downloadManager
+        .checkOffline(track: track)
+        .then((managerAnswer) => isOffline = managerAnswer);
     showModalBottomSheet(
         backgroundColor: Colors.transparent,
         useRootNavigator: true,
@@ -87,13 +94,52 @@ class MenuSheet {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Container(
-                    height: 16.0,
-                  ),
                   Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  track.title ?? '',
+                                  maxLines: 1,
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                if (isOffline)
+                                  Icon(
+                                    Octicons.primitive_dot,
+                                    color: Colors.green,
+                                    size: 12.0,
+                                  ),
+                              ],
+                            ),
+                            Padding(padding: EdgeInsets.only(top: 4.0)),
+                            Text(
+                              track.artistString ?? '',
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                  fontSize: 14.0,
+                                  color: Settings.secondaryText),
+                            ),
+                          ],
+                        ),
+                      ),
                       Semantics(
                         label: 'Album art'.i18n,
                         image: true,
@@ -104,38 +150,20 @@ class MenuSheet {
                           circular: true,
                         ),
                       ),
-                      Container(
-                        height: 8,
-                      ),
-                      SizedBox(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text(
-                              track.title ?? '',
-                              maxLines: 1,
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  fontSize: 18.0, fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              track.artistString ?? '',
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: const TextStyle(fontSize: 14.0),
-                            ),
-                            Container(
-                              height: 8.0,
-                            ),
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
                             Text(
                               track.album?.title ?? '',
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                             ),
-                            Text(track.durationString ?? '')
+                            Text(' (' + (track.durationString ?? '') + ')')
                           ],
                         ),
                       ),
@@ -173,7 +201,6 @@ class MenuSheet {
           : addTrackFavorite(track, context),
       addToPlaylist(track, context),
       downloadTrack(track, context),
-      offlineTrack(track, context),
       shareTile('track', track.id ?? ''),
       playMix(track, context),
       showAlbum(track.album!, context),
@@ -226,18 +253,32 @@ class MenuSheet {
         if (context.mounted) _close(context);
       });
 
-  Widget downloadTrack(Track t, BuildContext context) => ListTile(
-        title: Text('Download'.i18n),
-        leading: const Icon(DeezerIcons.download),
-        onTap: () async {
-          if (await downloadManager.addOfflineTrack(t,
-                  private: false, isSingleton: true) !=
-              false) {
-            showDownloadStartedToast();
-          }
-          if (context.mounted) _close(context);
-        },
-      );
+  Widget downloadTrack(Track t, BuildContext context) {
+    bool isOffline = false;
+    downloadManager
+        .checkOffline(track: t)
+        .then((managerAnswer) => isOffline = managerAnswer);
+
+    return ListTile(
+      title: Text((isOffline) ? 'Remove from storage' : 'Download'.i18n),
+      leading: (isOffline)
+          ? Icon(
+              DeezerIcons.download_fill,
+              color: Theme.of(context).primaryColor,
+            )
+          : Icon(DeezerIcons.download),
+      onTap: () async {
+        bool isDownloaded = await downloadManager.checkOffline(track: t);
+        if (isDownloaded) {}
+        if (await downloadManager.addOfflineTrack(t,
+                private: false, isSingleton: true) !=
+            false) {
+          showDownloadStartedToast();
+        }
+        if (context.mounted) _close(context);
+      },
+    );
+  }
 
   Widget addToPlaylist(Track t, BuildContext context) => ListTile(
         title: Text('Add to playlist'.i18n),
@@ -284,7 +325,10 @@ class MenuSheet {
   Widget removeFavoriteTrack(Track t, BuildContext context, {onUpdate}) =>
       ListTile(
         title: Text('Remove favorite'.i18n),
-        leading: const Icon(DeezerIcons.trash),
+        leading: Icon(
+          DeezerIcons.heart_fill,
+          color: Theme.of(context).primaryColor,
+        ),
         onTap: () async {
           await deezerAPI.removeFavorite(t.id!);
           //Check if favorites playlist is offline, update it
@@ -345,29 +389,6 @@ class MenuSheet {
         },
       );
 
-  Widget offlineTrack(Track track, BuildContext context) => FutureBuilder(
-        future: downloadManager.checkOffline(track: track),
-        builder: (innerContext, snapshot) {
-          bool isOffline = snapshot.data ?? (track.offline ?? false);
-          return ListTile(
-            title: Text(isOffline ? 'Remove offline'.i18n : 'Offline'.i18n),
-            leading: const Icon(Icons.offline_pin),
-            onTap: () async {
-              if (isOffline) {
-                await downloadManager.removeOfflineTracks([track]);
-                Fluttertoast.showToast(
-                    msg: 'Track removed from offline!'.i18n,
-                    gravity: ToastGravity.BOTTOM,
-                    toastLength: Toast.LENGTH_SHORT);
-              } else {
-                await downloadManager.addOfflineTrack(track, private: true);
-              }
-              if (context.mounted) _close(context);
-            },
-          );
-        },
-      );
-
   //===================
   // ALBUM
   //===================
@@ -407,7 +428,7 @@ class MenuSheet {
         leading: const Icon(Icons.offline_pin),
         onTap: () async {
           await deezerAPI.addFavoriteAlbum(a.id!);
-          await downloadManager.addOfflineAlbum(a, private: true);
+          await downloadManager.addOfflineAlbum(a, private: false);
           if (context.mounted) _close(context);
           showDownloadStartedToast();
         },
@@ -554,7 +575,7 @@ class MenuSheet {
         onTap: () async {
           //Add to library
           await deezerAPI.addPlaylist(p.id!);
-          downloadManager.addOfflinePlaylist(p, private: true);
+          downloadManager.addOfflinePlaylist(p, private: false);
           if (context.mounted) _close(context);
           showDownloadStartedToast();
         },

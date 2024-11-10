@@ -167,7 +167,6 @@ class FavoriteTracks extends StatefulWidget {
 
 class _FavoriteTracksState extends State<FavoriteTracks> {
   bool _loading = false;
-  bool _loadingTracks = false;
   Playlist? favoritePlaylist;
   List<Track> tracks = [];
   List<Track> allTracks = [];
@@ -188,6 +187,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
 
     setState(() {
       randomTracks = List.from(tcopy);
+      _loading = false;
     });
   }
 
@@ -214,7 +214,6 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
     if (connectivity.isNotEmpty &&
         !connectivity.contains(ConnectivityResult.none)) {
       if (mounted) setState(() => _loading = true);
-      int pos = tracks.length;
 
       if (tracks.isEmpty) {
         //Load tracks as a playlist
@@ -245,34 +244,8 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
         }
         return;
       }
-
-      //Load another page of tracks from deezer
-      if (_loadingTracks) return;
-      _loadingTracks = true;
-
-      List<Track>? t;
-      try {
-        t = await deezerAPI.playlistTracksPage(
-            deezerAPI.favoritesPlaylistId ?? '', pos);
-      } catch (e) {
-        if (kDebugMode) {
-          print(e);
-        }
-      }
-      //On error load offline
-      if (t == null) {
-        await _loadOffline();
-        return;
-      }
-      if (mounted) {
-        setState(() {
-          tracks.addAll(t!);
-          _makeFavorite();
-          selectRandom3(tracks);
-          _loading = false;
-          _loadingTracks = false;
-        });
-      }
+    } else {
+      _loadOffline();
     }
   }
 
@@ -282,18 +255,25 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
     if (mounted) {
       setState(() {
         tracks = p?.tracks ?? [];
+        trackCount = p?.tracks!.length;
         favoritePlaylist = p;
         selectRandom3(tracks);
       });
-    }
-  }
-
-  Future _loadAllOffline() async {
-    List<Track> tracks = await downloadManager.allOfflineTracks();
-    if (mounted) {
-      setState(() {
-        allTracks = tracks;
-      });
+    } else {
+      List<Track> tracks = await downloadManager.allOfflineTracks();
+      if (mounted) {
+        setState(() {
+          allTracks = tracks;
+          trackCount = tracks.length;
+          favoritePlaylist = Playlist(
+            id: null,
+            title: 'Offline Tracks',
+            tracks: tracks,
+            trackCount: tracks.length,
+          );
+          selectRandom3(allTracks);
+        });
+      }
     }
   }
 
@@ -307,7 +287,9 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
   void initState() {
     _load();
     //Load all offline tracks
-    _loadAllOffline();
+    if (randomTracks.isEmpty) {
+      _loadOffline();
+    }
 
     super.initState();
   }
@@ -494,8 +476,22 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
   bool _loading = false;
 
   Future _load() async {
-    _loading = true;
-    if (!settings.offlineMode) {
+    setState(() => _loading = true);
+
+    //load offline playlists
+    List<Playlist> playlists = await downloadManager.getOfflinePlaylists();
+    if (mounted) {
+      setState(() {
+        _playlists = playlists;
+        _loading = false;
+      });
+    }
+
+    //update if online
+    List<ConnectivityResult> connectivity =
+        await Connectivity().checkConnectivity();
+    if (connectivity.isNotEmpty &&
+        !connectivity.contains(ConnectivityResult.none)) {
       try {
         List<Playlist> playlists = await deezerAPI.getPlaylists();
         if (mounted) setState(() => _playlists = playlists);
@@ -643,75 +639,77 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
                           ],
                         )),
                     for (int i = 0; i < _playlists!.length; i++)
-                      Container(
-                          padding: EdgeInsets.symmetric(horizontal: 4),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              InkWell(
-                                onTap: () => Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            PlaylistDetails(_playlists![i]))),
-                                onLongPress: () {
-                                  MenuSheet m = MenuSheet();
-                                  m.defaultPlaylistMenu(_playlists![i],
-                                      context: context);
-                                },
-                                child: Container(
-                                  clipBehavior: Clip.hardEdge,
-                                  decoration: BoxDecoration(
-                                      border:
-                                          Border.all(color: Colors.transparent),
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: CachedImage(
-                                    url: _playlists?[i].image?.fullUrl ?? '',
-                                    height: 180,
-                                    width: 180,
+                      if (_playlists?[i] != null)
+                        Container(
+                            padding: EdgeInsets.symmetric(horizontal: 4),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                InkWell(
+                                  onTap: () => Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              PlaylistDetails(_playlists![i]))),
+                                  onLongPress: () {
+                                    MenuSheet m = MenuSheet();
+                                    m.defaultPlaylistMenu(_playlists![i],
+                                        context: context);
+                                  },
+                                  child: Container(
+                                    clipBehavior: Clip.hardEdge,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Colors.transparent),
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: CachedImage(
+                                      url: _playlists?[i].image?.fullUrl ?? '',
+                                      height: 180,
+                                      width: 180,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 2.0, vertical: 6.0),
-                                child: Text(_playlists?[i].title ?? '',
-                                    maxLines: 1,
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12)),
-                              ),
-                              if (_playlists?[i].user?.name != null &&
-                                  _playlists?[i].user?.name != '')
                                 Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 4.0),
-                                  child: Text(
-                                      'By '.i18n +
-                                          (_playlists?[i].user?.name ?? ''),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 2.0, vertical: 6.0),
+                                  child: Text(_playlists?[i].title ?? '',
                                       maxLines: 1,
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
-                                          color: Settings.secondaryText,
-                                          fontSize: 8)),
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12)),
                                 ),
-                              if (_playlists?[i].user?.name == null ||
-                                  _playlists?[i].user?.name == '')
-                                Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 4.0),
-                                  child: Text(
-                                      'By '.i18n + (deezerAPI.userName ?? ''),
-                                      maxLines: 1,
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                          color: Settings.secondaryText,
-                                          fontSize: 8)),
-                                )
-                            ],
-                          ))
+                                if (_playlists?[i].user?.name != null &&
+                                    _playlists?[i].user?.name != '')
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 4.0),
+                                    child: Text(
+                                        'By '.i18n +
+                                            (_playlists?[i].user?.name ?? ''),
+                                        maxLines: 1,
+                                        textAlign: TextAlign.start,
+                                        style: TextStyle(
+                                            color: Settings.secondaryText,
+                                            fontSize: 8)),
+                                  ),
+                                if (_playlists?[i].user?.name == null ||
+                                    _playlists?[i].user?.name == '')
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 4.0),
+                                    child: Text(
+                                        'By '.i18n + (deezerAPI.userName ?? ''),
+                                        maxLines: 1,
+                                        textAlign: TextAlign.start,
+                                        style: TextStyle(
+                                            color: Settings.secondaryText,
+                                            fontSize: 8)),
+                                  )
+                              ],
+                            ))
                   ])
             ],
           ));

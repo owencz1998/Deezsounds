@@ -100,7 +100,7 @@ class Settings {
   late List<String> tags;
 
   //Appearance
-  @JsonKey(defaultValue: Themes.Dark)
+  @JsonKey(defaultValue: Themes.Deezer)
   late Themes theme;
   @JsonKey(defaultValue: false)
   late bool useSystemTheme;

@@ -15,37 +15,39 @@
 
 ---
 
-This repo is a MOD of the [ReFreezer](https://github.com/DJDoubleD/ReFreezer) app by @DJDoubleD.
+This repo is a MOD of the [ReFreezer](https://github.com/DJDoubleD/ReFreezer) app by @DJDoubleD.  
 My goal is to have a style closer to Deezer's original app.
 To apply the Deezer theme, select it under Settings > Appearance > Theme.
+
+```
+I am looking for contributors, feel free to reach out !  
+:mailbox: [e-mail me](mailto:gavrochebackups@gmail.com)  
+:space_invader: [Discord : @petitprinc3#1380](https://discordapp.com/users/PetitPrince#1380)
+```
 
 ## Screenshots
 
 <p align="center">
-    <img src="./assets/screenshots/Mod_home.png" width=150>
-    <img src="./assets/screenshots/Mod_player.png" width=150>
-    <img src="./assets/screenshots/Mod_search.png" width=150>
-    <img src="./assets/screenshots/Mod_favorites.png" width=150>
-    <img src="./assets/screenshots/Mod_playlists.png" width=150>
+    <img src="./assets/screenshots/Mod_home.png" width=100>
+    <img src="./assets/screenshots/Mod_player.png" width=100>
+    <img src="./assets/screenshots/Mod_search.png" width=100>
+    <img src="./assets/screenshots/Mod_favorites.png" width=100>
+    <img src="./assets/screenshots/Mod_playlists.png" width=100>
+    <img src="./assets/screenshots/Mod_menu.png" width=100>
 </p>
 
 <details><summary><b>Original ReFreezer App</b></summary>
 <p align="center">
-    <img src="./assets/screenshots/Login.jpg" width=200>
-    <img src="./assets/screenshots/Home.jpg" width=200>
-    <img src="./assets/screenshots/Player.jpg" width=200>
-    <img src="./assets/screenshots/Lyrics.jpg" width=200>
-</p>
-</details>
-
-<details><summary><b>More Android Phone</b></summary>
-<p align="center">
-    <img src="./assets/screenshots/Search.jpg" width=200>
-    <img src="./assets/screenshots/SearchResults.jpg" width=200>
-    <img src="./assets/screenshots/Library.jpg" width=200>
-    <img src="./assets/screenshots/DownloadRunning.jpg" width=200>
-    <!---<img src="./assets/screenshots/DownloadFinished.jpg" width=200>--->
-    <img src="./assets/screenshots/PlayerHorizontal.jpg" height=200>
+    <img src="./assets/screenshots/Login.jpg" width=150>
+    <img src="./assets/screenshots/Home.jpg" width=150>
+    <img src="./assets/screenshots/Player.jpg" width=150>
+    <img src="./assets/screenshots/Lyrics.jpg" width=150>
+    <img src="./assets/screenshots/Search.jpg" width=150>
+    <img src="./assets/screenshots/SearchResults.jpg" width=150>
+    <img src="./assets/screenshots/Library.jpg" width=150>
+    <img src="./assets/screenshots/DownloadRunning.jpg" width=150>
+    <img src="./assets/screenshots/DownloadFinished.jpg" width=150>
+    <img src="./assets/screenshots/PlayerHorizontal.jpg" height=150>
 </p>
 </details>
 <details><summary><b>Android Auto</b></summary>
@@ -60,12 +62,21 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 ## Features & changes
 
 ### Not working / On going
-- Explore page
+- Downloads : found a weird bug where offline downloads are not available anymore when there are "too many" downloads. [Issue #41](https://github.com/DJDoubleD/refreezer/issues/41)
+- Merge offline tracks and online tracks under tracks (same for playlists, albums, etc.)
 - Caching information to avoid reloading every time (eg. favorites screen)
-- Offline handling for the favorite screen
 - Dynamic padding when player_bar is up
-- Carousel with playlist info (number of tracks, duration, etc.)
-- I Think I found a bug in handling offline files when download is interrupted...
+- Re-think the offline/download scheme. Currently :
+  - Offline = downloaded "within" the app and accessible ofline through the app only
+  - Download = donwloaded to local storage and accessible as such, but not accessible through the app in offline mode
+
+### MOD :
+- Floating player bar with background color based on title artwork
+- Deezer original icons
+- Deezer original navigation menu (+ settings)
+- Deezer clone player screen
+- Deezer similar info menu
+- Deezer favorite style screen (Offline : offline playlists and random offline tracks)
 
 ### ReFreezer :
 - Restored all features of the old Freezer app, most notably:
@@ -84,13 +95,6 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 - Implemented null-safety
 - Removed the need of custom just_audio & audio_service plugin versions & refactored source code to use the latest version of the official plugins
 - Multiple other fixes
-
-### MOD :
-- Floating player bar with background color based on title artwork
-- Deezer original icons
-- Deezer original navigation menu (+ settings)
-- Deezer clone player screen
-- Deezer similar info menu
 
 ## Compile from source
 

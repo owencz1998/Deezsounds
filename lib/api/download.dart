@@ -34,6 +34,12 @@ class DownloadManager {
   String? offlinePath;
   Database? db;
 
+  Future exportDb() async {
+    String dbPath = p.join((await getDatabasesPath()), 'offline2.db');
+    String destPath = p.join(settings.downloadPath!, 'offline.db');
+    File(dbPath).copy(destPath);
+  }
+
   //Start/Resume downloads
   Future start() async {
     //Returns whether service is bound or not, the delay is really shitty/hacky way, until i find a real solution
@@ -248,6 +254,8 @@ class DownloadManager {
       track = await deezerAPI.track(track.id!);
     }
 
+    String path = _generatePath(track, private, isSingleton: isSingleton);
+
     //Add to DB
     if (private) {
       Batch b = db!.batch();
@@ -260,7 +268,6 @@ class DownloadManager {
     }
 
     //Get path
-    String path = _generatePath(track, private, isSingleton: isSingleton);
     await platform.invokeMethod('addDownloads', [
       await Download.jsonFromTrack(track, path,
           private: private, quality: quality)
@@ -310,6 +317,8 @@ class DownloadManager {
     await start();
   }
 
+  Future updateOfflinePlaylist(Playlist playlist) async {}
+
   Future addOfflinePlaylist(Playlist playlist,
       {private = true, AudioQuality? quality}) async {
     //Permission
@@ -330,34 +339,28 @@ class DownloadManager {
     }
 
     //Add to DB
-    if (private) {
-      Batch b = db!.batch();
-      b.insert('Playlists', playlist.toSQL(),
-          conflictAlgorithm: ConflictAlgorithm.replace);
-      for (Track t in (playlist.tracks ?? [])) {
-        b = await _addTrackToDB(b, t, false);
-        //Cache art
-        DefaultCacheManager().getSingleFile(t.albumArt?.thumb ?? '');
-        DefaultCacheManager().getSingleFile(t.albumArt?.full ?? '');
-      }
-      await b.commit();
+    Batch b = db!.batch();
+    b.insert('Playlists', playlist.toSQL(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+
+    List<Map> out = [];
+    for (Track t in (playlist.tracks ?? [])) {
+      String path = _generatePath(
+        t,
+        false,
+        playlistName: playlist.title,
+        playlistTrackNumber: playlist.tracks!.indexOf(t),
+      );
+      out.add(await Download.jsonFromTrack(t, path,
+          private: false, quality: quality));
+      b = await _addTrackToDB(b, t, false);
+      //Cache art
+      DefaultCacheManager().getSingleFile(t.albumArt?.thumb ?? '');
+      DefaultCacheManager().getSingleFile(t.albumArt?.full ?? '');
     }
+    await b.commit();
 
     //Generate downloads
-    List<Map> out = [];
-    for (int i = 0; i < (playlist.tracks?.length ?? 0); i++) {
-      Track t = playlist.tracks![i];
-      out.add(await Download.jsonFromTrack(
-          t,
-          _generatePath(
-            t,
-            private,
-            playlistName: playlist.title,
-            playlistTrackNumber: i,
-          ),
-          private: private,
-          quality: quality));
-    }
     await platform.invokeMethod('addDownloads', out);
     await start();
   }
