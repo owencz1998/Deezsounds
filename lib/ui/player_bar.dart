@@ -41,18 +41,19 @@ class _PlayerBarState extends State<PlayerBar> {
             audioHandler.mediaItem.value?.extras?['thumb'] ??
                 audioHandler.mediaItem.value?.artUri));
 
-    setState(() => _bgColor = palette.dominantColor!.color.withOpacity(1));
+    setState(() => _bgColor = palette.dominantColor?.color.withOpacity(1));
   }
 
   @override
   void initState() {
-    isPlayerBarActive = true;
+    isPlayerBarActive = false;
     _updateColor;
     _mediaItemSub = audioHandler.mediaItem.listen((event) {
       _updateColor();
     });
 
     updateColor = _updateColor;
+    isPlayerBarActive = true;
     super.initState();
   }
 
@@ -67,14 +68,15 @@ class _PlayerBarState extends State<PlayerBar> {
     if (GetIt.I<AudioPlayerHandler>().playbackState.value.processingState ==
         AudioProcessingState.idle) return 0.0;
     if (GetIt.I<AudioPlayerHandler>().mediaItem.value == null) return 0.0;
-    if (GetIt.I<AudioPlayerHandler>().mediaItem.value!.duration!.inSeconds == 0)
+    if (GetIt.I<AudioPlayerHandler>().mediaItem.value?.duration?.inSeconds == 0)
       return 0.0; //Division by 0
     return GetIt.I<AudioPlayerHandler>()
             .playbackState
             .value
             .position
             .inSeconds /
-        GetIt.I<AudioPlayerHandler>().mediaItem.value!.duration!.inSeconds;
+        (GetIt.I<AudioPlayerHandler>().mediaItem.value?.duration?.inSeconds ??
+            1);
   }
 
   @override
@@ -124,13 +126,13 @@ class _PlayerBarState extends State<PlayerBar> {
               decoration: BoxDecoration(
                   color: scaffoldBackgroundColor,
                   border: Border.all(
-                      color: _bgColor != null
-                          ? _bgColor!.withOpacity(0.7)
-                          : Theme.of(context).scaffoldBackgroundColor),
+                      color: _bgColor?.withOpacity(0.7) ??
+                          Theme.of(context).scaffoldBackgroundColor),
                   borderRadius: BorderRadius.circular(17)),
               child: Container(
                   decoration: BoxDecoration(
-                    color: _bgColor?.withOpacity(0.7),
+                    color: _bgColor?.withOpacity(0.7) ??
+                        Theme.of(context).scaffoldBackgroundColor,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -203,8 +205,10 @@ class _PlayerBarState extends State<PlayerBar> {
                       SizedBox(
                         height: 2.0,
                         child: LinearProgressIndicator(
-                          backgroundColor: _bgColor!.withOpacity(0.1),
-                          color: _bgColor,
+                          backgroundColor:
+                              (_bgColor ?? Theme.of(context).primaryColor)
+                                  .withOpacity(0.1),
+                          color: _bgColor ?? Theme.of(context).primaryColor,
                           value: _progress,
                         ),
                       )

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:refreezer/api/deezer.dart';
 
 import '../api/cache.dart';
 import '../translations.i18n.dart';
@@ -85,6 +86,9 @@ class Track {
     Album album = Album(title: mi.album);
     List<Artist> artists = [Artist(name: mi.displaySubtitle ?? mi.artist)];
     album.id = mi.extras?['albumId'];
+    if (album.id != null) {
+      deezerAPI.album(album.id!).then((Album a) => album = a);
+    }
     if (mi.extras?['artists'] != null) {
       artists = jsonDecode(mi.extras?['artists'])
           .map<Artist>((j) => Artist.fromJson(j))
@@ -492,6 +496,15 @@ class Playlist {
   factory Playlist.fromJson(Map<String, dynamic> json) =>
       _$PlaylistFromJson(json);
   Map<String, dynamic> toJson() => _$PlaylistToJson(this);
+
+  bool isIn(List<Playlist> listOfPlaylists) {
+    for (Playlist candidate in listOfPlaylists) {
+      if (id == candidate.id) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 @JsonSerializable()

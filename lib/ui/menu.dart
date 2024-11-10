@@ -193,6 +193,22 @@ class MenuSheet {
       {required BuildContext context,
       List<Widget> options = const [],
       Function? onRemove}) {
+    Album elevatedAlbum = track.album ?? Album();
+
+    if (elevatedAlbum.id != null) {
+      deezerAPI.album(elevatedAlbum.id ?? '').then((Album a) {
+        elevatedAlbum = a;
+      });
+    } else {
+      Track elevatedTrack = track;
+      deezerAPI.track(track.id ?? '').then((Track t) {
+        elevatedTrack = t;
+      });
+      deezerAPI.album(elevatedTrack.album?.id ?? '').then((Album a) {
+        elevatedAlbum = a;
+      });
+    }
+
     showWithTrack(context, track, [
       addToQueueNext(track, context),
       addToQueue(track, context),
@@ -203,9 +219,9 @@ class MenuSheet {
       downloadTrack(track, context),
       shareTile('track', track.id ?? ''),
       playMix(track, context),
-      showAlbum(track.album!, context),
+      showAlbum(elevatedAlbum, context),
       ...List.generate(track.artists?.length ?? 0,
-          (i) => showArtist(track.artists![i], context)),
+          (i) => showArtist(track.artists?[i] ?? Artist(), context)),
       ...options
     ]);
   }
@@ -303,7 +319,7 @@ class MenuSheet {
                       );
                     });
               });
-          if (context.mounted) _close(context);
+          //if (context.mounted) _close(context);
         },
       );
 
@@ -318,7 +334,7 @@ class MenuSheet {
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
           );
-          if (context.mounted) _close(context);
+          //if (context.mounted) _close(context);
         },
       );
 
@@ -371,7 +387,7 @@ class MenuSheet {
           overflow: TextOverflow.ellipsis,
         ),
         leading: const Icon(Icons.album),
-        onTap: () {
+        onTap: () async {
           if (context.mounted) _close(context);
           customNavigatorKey.currentState
               ?.push(MaterialPageRoute(builder: (context) => AlbumDetails(a)));

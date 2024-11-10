@@ -152,7 +152,10 @@ class FavoriteScreen extends StatelessWidget {
               );
             }),
         Padding(
-            padding: EdgeInsets.only(bottom: isPlayerBarActive ? 150.0 : 0.0))
+            padding: EdgeInsets.only(
+                bottom: GetIt.I<AudioPlayerHandler>().mediaItem.value != null
+                    ? 80
+                    : 0)),
       ]),
     );
   }
@@ -193,6 +196,8 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
 
   //Load all tracks
   Future _load() async {
+    if (mounted) setState(() => _loading = true);
+
     //Already loaded
     if (trackCount != null && (tracks.length >= (trackCount ?? 0))) {
       //Update favorite tracks cache when fully loaded
@@ -204,52 +209,11 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
           await cache.save();
         }
       }
-
       selectRandom3(tracks);
       return;
     }
 
-    List<ConnectivityResult> connectivity =
-        await Connectivity().checkConnectivity();
-    if (connectivity.isNotEmpty &&
-        !connectivity.contains(ConnectivityResult.none)) {
-      if (mounted) setState(() => _loading = true);
-
-      if (tracks.isEmpty) {
-        //Load tracks as a playlist
-        Playlist? favPlaylist;
-        try {
-          favPlaylist =
-              await deezerAPI.playlist(deezerAPI.favoritesPlaylistId ?? '');
-        } catch (e) {
-          if (kDebugMode) {
-            print(e);
-          }
-        }
-        //Error loading
-        if (favPlaylist == null) {
-          if (mounted) setState(() => _loading = false);
-          return;
-        }
-        //Update
-        if (mounted) {
-          setState(() {
-            trackCount = favPlaylist!.trackCount;
-            if (tracks.isEmpty) tracks = favPlaylist.tracks!;
-            _makeFavorite();
-            favoritePlaylist = favPlaylist;
-            selectRandom3(tracks);
-            _loading = false;
-          });
-        }
-        return;
-      }
-    } else {
-      _loadOffline();
-    }
-  }
-
-  Future _loadOffline() async {
+    //if favorite Playlist is offline
     Playlist? p = await downloadManager
         .getOfflinePlaylist(deezerAPI.favoritesPlaylistId ?? '');
     if (mounted) {
@@ -259,20 +223,54 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
         favoritePlaylist = p;
         selectRandom3(tracks);
       });
-    } else {
-      List<Track> tracks = await downloadManager.allOfflineTracks();
+    }
+
+    List<ConnectivityResult> connectivity =
+        await Connectivity().checkConnectivity();
+    if (connectivity.isNotEmpty &&
+        !connectivity.contains(ConnectivityResult.none)) {
+      //Load tracks as a playlist
+      Playlist? favPlaylist;
+      try {
+        favPlaylist =
+            await deezerAPI.playlist(deezerAPI.favoritesPlaylistId ?? '');
+      } catch (e) {
+        if (kDebugMode) {
+          print(e);
+        }
+      }
+      //Error loading
+      if (favPlaylist == null) {
+        if (mounted) setState(() => _loading = false);
+        return;
+      }
+      //Update
       if (mounted) {
         setState(() {
-          allTracks = tracks;
-          trackCount = tracks.length;
-          favoritePlaylist = Playlist(
-            id: null,
-            title: 'Offline Tracks',
-            tracks: tracks,
-            trackCount: tracks.length,
-          );
-          selectRandom3(allTracks);
+          trackCount = favPlaylist!.trackCount;
+          if (tracks.isEmpty) tracks = favPlaylist.tracks!;
+          _makeFavorite();
+          favoritePlaylist = favPlaylist;
         });
+        selectRandom3(tracks);
+        return;
+      }
+    } else {
+      if (randomTracks.isEmpty) {
+        List<Track> tracks = await downloadManager.allOfflineTracks();
+        if (mounted) {
+          setState(() {
+            allTracks = tracks;
+            trackCount = tracks.length;
+            favoritePlaylist = Playlist(
+              id: null,
+              title: 'Offline Tracks',
+              tracks: tracks,
+              trackCount: tracks.length,
+            );
+            selectRandom3(allTracks);
+          });
+        }
       }
     }
   }
@@ -286,10 +284,6 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
   @override
   void initState() {
     _load();
-    //Load all offline tracks
-    if (randomTracks.isEmpty) {
-      _loadOffline();
-    }
 
     super.initState();
   }
@@ -346,7 +340,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(trackCount.toString(),
+                    Text((trackCount ?? 0).toString(),
                         style: TextStyle(color: Settings.secondaryText)),
                     Icon(
                       Icons.chevron_right,
@@ -718,7 +712,7 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
 }
 
 class PlayerMenuButton extends StatelessWidget {
-  final Track? track;
+  final Track track;
   const PlayerMenuButton(this.track, {super.key});
 
   @override
@@ -730,12 +724,8 @@ class PlayerMenuButton extends StatelessWidget {
         semanticLabel: 'Options'.i18n,
       ),
       onPressed: () {
-        MenuSheet m = MenuSheet(navigateCallback: () {
-          Navigator.of(context).pop();
-        });
-        m.defaultTrackMenu(track!,
-            context: context,
-            options: [m.sleepTimer(context), m.wakelock(context)]);
+        MenuSheet m = MenuSheet();
+        m.defaultTrackMenu(track, context: context);
       },
     );
   }

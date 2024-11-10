@@ -454,7 +454,13 @@ class _SearchScreenState extends State<SearchScreen> {
                         setState(() => _query = _suggestions[i]);
                         _submit(context);
                       },
-                    ))
+                    )),
+            Padding(
+                padding: EdgeInsets.only(
+                    bottom:
+                        GetIt.I<AudioPlayerHandler>().mediaItem.value != null
+                            ? 80
+                            : 0)),
           ],
         ),
       ),
@@ -860,7 +866,13 @@ class SearchResultsScreen extends StatelessWidget {
                 Container(
                   height: 8.0,
                 ),
-                ...episodes
+                ...episodes,
+                Padding(
+                    padding: EdgeInsets.only(
+                        bottom: GetIt.I<AudioPlayerHandler>().mediaItem.value !=
+                                null
+                            ? 80
+                            : 0)),
               ],
             );
           },

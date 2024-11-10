@@ -250,7 +250,12 @@ class LibraryScreen extends StatelessWidget {
                 },
               )
             ],
-          )
+          ),
+          Padding(
+              padding: EdgeInsets.only(
+                  bottom: GetIt.I<AudioPlayerHandler>().mediaItem.value != null
+                      ? 80
+                      : 0)),
         ],
       ),
     );

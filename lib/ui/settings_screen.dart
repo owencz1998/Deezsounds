@@ -142,11 +142,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   MaterialPageRoute(
                       builder: (context) => const CreditsScreen())),
             ),
-            ListTile(
+            /*ListTile(
               title: Text('Export'.i18n),
               leading: const LeadingIcon(Icons.info, color: Colors.grey),
               onTap: () => downloadManager.exportDb(),
-            ),
+            ),*/
             Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -1726,7 +1726,7 @@ class _CreditsScreenState extends State<CreditsScreen> {
         children: [
           const FreezerTitle(),
           Text(
-            _version + '-MOD',
+            _version,
             textAlign: TextAlign.center,
             style: const TextStyle(fontStyle: FontStyle.italic),
           ),

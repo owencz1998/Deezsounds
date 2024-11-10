@@ -167,4 +167,8 @@ class DeezerIcons {
       IconData(0xe8c4, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData clock =
       IconData(0xe8c5, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData calendar =
+      IconData(0xe90f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData calendar_small =
+      IconData(0xe910, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

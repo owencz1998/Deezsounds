@@ -2,8 +2,8 @@
 
 [![Latest Version](https://img.shields.io/github/v/release/PetitPrinc3/Deezer?color=blue)](../../releases/latest)
 [![Release date](https://img.shields.io/github/release-date/PetitPrinc3/Deezer)](../../releases/latest)
-[![Downloads Original](https://img.shields.io/github/downloads/DJDoubleD/ReFreezer/total?color=blue&label=downloads%20total)](../../releases)
-[![Downloads MOD](https://img.shields.io/github/downloads/PetitPrinc3/Deezer/total?color=blue&label=downloads%20total)](../../releases)
+[![Downloads Original](https://img.shields.io/github/downloads/DJDoubleD/ReFreezer/total?color=blue&label=ReFreezer%20downloads)](../../releases)
+[![Downloads MOD](https://img.shields.io/github/downloads/PetitPrinc3/Deezer/total?color=blue&label=MOD%20downloads)](../../releases)
 [![Flutter Version](https://shields.io/badge/Flutter-v3.24.4-darkgreen.svg)](https://docs.flutter.dev/tools/sdk)
 [![Dart Version](https://shields.io/badge/Dart-v3.5.4-darkgreen.svg)](https://dart.dev/get-dart)
 [![Crowdin](https://badges.crowdin.net/refreezer/localized.svg)](https://crowdin.com/project/refreezer)
@@ -60,7 +60,12 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 ## Features & changes
 
 ### Not working / On going
+
+:lady_beetle:
 - Downloads : found a weird bug where offline downloads are not available anymore when there are "too many" downloads. [Issue #41](https://github.com/DJDoubleD/refreezer/issues/41)
+- Menu doesn't close when track is added/removed from playlist (wrong navigation context ?)
+
+:building_construction:
 - Merge offline tracks and online tracks under tracks (same for playlists, albums, etc.)
 - Caching information to avoid reloading every time (eg. favorites screen)
 - Dynamic padding when player_bar is up
@@ -68,7 +73,7 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
   - Offline = downloaded "within" the app and accessible ofline through the app only
   - Download = donwloaded to local storage and accessible as such, but not accessible through the app in offline mode
 
-### MOD :
+### :rocket: MOD Features :
 - Floating player bar with background color based on title artwork
 - Deezer original icons
 - Deezer original navigation menu (+ settings)
@@ -76,7 +81,7 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 - Deezer similar info menu
 - Deezer favorite style screen (Offline : offline playlists and random offline tracks)
 
-### ReFreezer :
+### :rocket: ReFreezer Features :
 - Restored all features of the old Freezer app, most notably:
   - Restored all login options
   - Restored Highest quality streaming and download options (premium account required, free accounts limited to MP3 128kbps)
@@ -96,75 +101,7 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 
 ## Compile from source
 
-Install the latest flutter SDK: <https://flutter.dev/docs/get-started/install>  
-(Optional) Generate keys for release build: <https://flutter.dev/docs/deployment/android>
-
-Download source:
-
-```powershell
-git clone https://github.com/DJDoubleD/ReFreezer
-git submodule init
-git submodule update
-```
-
-Create a `.env` file in the `lib` folder of the project and add the following content:
-
-```text
-# Deezer API credentials
-deezerClientId = '<Your_Deezer_Client_Id>';
-deezerClientSecret = '<Your_Deezer_Client_Secret>';
-
-# LastFM API credentials
-lastFmApiKey = '<Your_LastFM_API_Key>'
-lastFmApiSecret = 'Your_LastFM_API_Secret'
-```
-
-Build generated files:
-
-Use following script to (re)build generated classes in submodules and main project:
-
-```powershell
-.\run_build_runner.ps1
-```
-
-or run these commands manually in the relevant submodules to (re)build the generated files:
-
-```powershell
-flutter pub get
-dart run build_runner clean
-dart run build_runner build --delete-conflicting-outputs
-```
-
-Compile:
-
-```powershell
- flutter build apk --split-per-abi --release
-```
-
-NOTE: You have to use own keys, or build debug using `flutter build apk --debug`
-
-### Generate your own keys
-
-#### Step 1: create a JKS file
-
-Make sure your Java JDK folder is in your PATH variable and execute the following command in the ./android folder of the project:
-
-```bash
-keytool -genkey -v -keystore ./keys.jks -keyalg RSA -keysize 2048 -validity 10000 -alias <YourKeyAlias>
-```
-
-Follow the instructions show in the commandline to fill out the desired fields of your keystore.
-
-#### Step 2: create a key.properties file
-
-Inside the ./android (next to the keys.jks file from step 1), create a file `key.properties` with the following contents:
-
-```text
-storePassword=<storePassword>
-keyPassword=<keyPassword>
-keyAlias=<YourKeyAlias>
-storeFile=../keys.jks
-```
+Follow the steps from [@DJDoubleD](https://github.com/DJDoubleD/refreezer).
 
 ## Disclaimer & Legal
 

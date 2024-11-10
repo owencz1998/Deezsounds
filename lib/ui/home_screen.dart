@@ -28,9 +28,13 @@ class HomeScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               SafeArea(child: Container()),
-              const Flexible(
+              Flexible(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: EdgeInsets.only(
+                      bottom:
+                          GetIt.I<AudioPlayerHandler>().mediaItem.value != null
+                              ? 80
+                              : 0),
                   child: HomePageScreen(),
                 ),
               )
