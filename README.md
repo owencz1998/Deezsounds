@@ -19,11 +19,9 @@ This repo is a MOD of the [ReFreezer](https://github.com/DJDoubleD/ReFreezer) ap
 My goal is to have a style closer to Deezer's original app.
 To apply the Deezer theme, select it under Settings > Appearance > Theme.
 
-```
-I am looking for contributors, feel free to reach out !  
-:mailbox: [e-mail me](mailto:gavrochebackups@gmail.com)  
-:space_invader: [Discord : @petitprinc3#1380](https://discordapp.com/users/PetitPrince#1380)
-```
+> I am looking for contributors, feel free to reach out !  
+> :mailbox: [e-mail me](mailto:gavrochebackups@gmail.com)  
+> :space_invader: [Discord : @petitprinc3#1380](https://discordapp.com/users/PetitPrince#1380)
 
 ## Screenshots
 
