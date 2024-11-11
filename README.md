@@ -26,13 +26,13 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 ## Screenshots
 
 <p align="center">
-    <img src="./assets/screenshots/Mod_home.png" width=200>
-    <img src="./assets/screenshots/Mod_player.png" width=200>
-    <img src="./assets/screenshots/Mod_search.png" width=200>
-    <img src="./assets/screenshots/Mod_favorites.png" width=200>
-    <img src="./assets/screenshots/Mod_playlists.png" width=200>
-    <img src="./assets/screenshots/Mod_artists.png" width=200>
-    <img src="./assets/screenshots/Mod_menu.png" width=200>
+    <img src="./assets/screenshots/Mod_home.png" width=100>
+    <img src="./assets/screenshots/Mod_player.png" width=100>
+    <img src="./assets/screenshots/Mod_search.png" width=100>
+    <img src="./assets/screenshots/Mod_favorites.png" width=100>
+    <img src="./assets/screenshots/Mod_playlists.png" width=100>
+    <img src="./assets/screenshots/Mod_artists.png" width=100>
+    <img src="./assets/screenshots/Mod_menu.png" width=100>
 </p>
 
 <details><summary><b>Original ReFreezer App</b></summary>
@@ -77,10 +77,12 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 ### :rocket: MOD Features :
 - Floating player bar with background color based on title artwork
 - Deezer original icons
+- Deezer font
 - Deezer original navigation menu (+ settings)
-- Deezer clone player screen
-- Deezer similar info menu
-- Deezer favorite style screen (Offline : offline playlists and random offline tracks)
+- Deezer like player screen
+- Deezer like info menu
+- Deezer like favorite screen (Offline : offline playlists and random offline tracks)
+- Most deezer pages (artists, playlists, albums)
 
 ### :rocket: ReFreezer Features :
 - Restored all features of the old Freezer app, most notably:
