@@ -18,7 +18,7 @@ import 'package:flutter/widgets.dart';
 class DeezerIcons {
   DeezerIcons._();
 
-  static const _kFontFam = 'Deezer';
+  static const _kFontFam = 'DeezerIcons';
   static const String? _kFontPkg = null;
 
   static const IconData skip_back =

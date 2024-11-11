@@ -295,6 +295,15 @@ class Album {
 
   factory Album.fromJson(Map<String, dynamic> json) => _$AlbumFromJson(json);
   Map<String, dynamic> toJson() => _$AlbumToJson(this);
+
+  bool isIn(List<Album> listOfAlbums) {
+    for (Album candidate in listOfAlbums) {
+      if (id == candidate.id) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 enum ArtistHighlightType { ALBUM }
@@ -354,7 +363,7 @@ class Artist {
       this.favoriteDate,
       this.highlight});
 
-  String get fansString => NumberFormat.compact().format(fans);
+  String get fansString => NumberFormat.decimalPattern().format(fans);
 
   //JSON
   factory Artist.fromPrivateJson(Map<dynamic, dynamic> json,
@@ -417,6 +426,15 @@ class Artist {
 
   factory Artist.fromJson(Map<String, dynamic> json) => _$ArtistFromJson(json);
   Map<String, dynamic> toJson() => _$ArtistToJson(this);
+
+  bool isIn(List<Artist> listOfArtists) {
+    for (Artist candidate in listOfArtists) {
+      if (id == candidate.id) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 @JsonSerializable()

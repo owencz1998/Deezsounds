@@ -119,7 +119,7 @@ class Settings {
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
   Color primaryColor = Color(0xFFA238FF);
   static const deezerBg = Color(0xFF0F0D13);
-  static const deezerBottom = Color(0xFF1B191F);
+  Color deezerBottom = Color(0xFF1B191F);
   static const secondaryText = Color(0xFFA9A6AA);
 
   static _colorToJson(Color c) => c.value;
@@ -410,7 +410,7 @@ class Settings {
             sliderTheme: _sliderTheme,
             scaffoldBackgroundColor: deezerBg,
             dialogBackgroundColor: deezerBg,
-            hintColor: secondaryText,
+            hintColor: deezerBottom,
             inputDecorationTheme: const InputDecorationTheme(
               hintStyle: TextStyle(color: secondaryText),
               labelStyle: TextStyle(color: secondaryText),
@@ -478,6 +478,7 @@ class Settings {
             fontFamily: _fontFamily,
             primaryColor: primaryColor,
             scaffoldBackgroundColor: deezerBg,
+            hintColor: Colors.grey.shade700,
             dialogBackgroundColor: deezerBg,
             sliderTheme: _sliderTheme,
             bottomSheetTheme: const BottomSheetThemeData(

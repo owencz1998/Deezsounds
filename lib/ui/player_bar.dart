@@ -148,7 +148,7 @@ class _PlayerBarState extends State<PlayerBar> {
                                 SlideBottomRoute(widget: const PlayerScreen()));
                             SystemChrome.setSystemUIOverlayStyle(
                                 SystemUiOverlayStyle(
-                              systemNavigationBarColor: Settings.deezerBottom,
+                              systemNavigationBarColor: scaffoldBackgroundColor,
                             ));
                           },
                           leading: CachedImage(

@@ -176,9 +176,20 @@ flutter:
     - family: ReFreezerIcons
       fonts:
         - asset: assets/fonts/ReFreezerIcons.ttf
+    - family: DeezerIcons
+      fonts:
+        - asset: assets/fonts/DeezerIcons.ttf
     - family: Deezer
       fonts:
-        - asset: assets/fonts/Deezer.ttf
+        - asset: assets/fonts/deezer_regular.ttf
+        - asset: assets/fonts/deezer_light.ttf
+          style: italic
+        - asset: assets/fonts/deezer_medium.ttf
+          weight: 500
+        - asset: assets/fonts/deezer_bold.ttf
+          weight: 700
+        - asset: assets/fonts/deezer_extrabold.ttf
+          weight: 900
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -12,6 +12,7 @@ import 'package:refreezer/ui/details_screens.dart';
 import 'package:refreezer/ui/error.dart';
 import 'package:refreezer/ui/library.dart';
 import 'package:refreezer/ui/menu.dart';
+import 'package:refreezer/ui/tiles.dart';
 
 import '../api/cache.dart';
 import '../api/deezer.dart';
@@ -83,7 +84,7 @@ class FavoriteScreen extends StatelessWidget {
     return Scaffold(
       appBar: const FavoriteAppBar(),
       body: ListView(padding: EdgeInsets.only(top: 12.0), children: <Widget>[
-        Container(height: 24.0),
+        Container(height: 12.0),
         FavoriteTracks(),
         Container(height: 24.0),
         FavoritePlaylists(),
@@ -634,76 +635,7 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
                         )),
                     for (int i = 0; i < _playlists!.length; i++)
                       if (_playlists?[i] != null)
-                        Container(
-                            padding: EdgeInsets.symmetric(horizontal: 4),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                InkWell(
-                                  onTap: () => Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              PlaylistDetails(_playlists![i]))),
-                                  onLongPress: () {
-                                    MenuSheet m = MenuSheet();
-                                    m.defaultPlaylistMenu(_playlists![i],
-                                        context: context);
-                                  },
-                                  child: Container(
-                                    clipBehavior: Clip.hardEdge,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: Colors.transparent),
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: CachedImage(
-                                      url: _playlists?[i].image?.fullUrl ?? '',
-                                      height: 180,
-                                      width: 180,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 2.0, vertical: 6.0),
-                                  child: Text(_playlists?[i].title ?? '',
-                                      maxLines: 1,
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12)),
-                                ),
-                                if (_playlists?[i].user?.name != null &&
-                                    _playlists?[i].user?.name != '')
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 4.0),
-                                    child: Text(
-                                        'By '.i18n +
-                                            (_playlists?[i].user?.name ?? ''),
-                                        maxLines: 1,
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                            color: Settings.secondaryText,
-                                            fontSize: 8)),
-                                  ),
-                                if (_playlists?[i].user?.name == null ||
-                                    _playlists?[i].user?.name == '')
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 4.0),
-                                    child: Text(
-                                        'By '.i18n + (deezerAPI.userName ?? ''),
-                                        maxLines: 1,
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                            color: Settings.secondaryText,
-                                            fontSize: 8)),
-                                  )
-                              ],
-                            ))
+                        LargePlaylistTile(_playlists?[i])
                   ])
             ],
           ));
