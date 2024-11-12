@@ -63,7 +63,6 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 ### Not working / On going
 
 :lady_beetle:
-- Downloads : found a weird bug where offline downloads are not available anymore when there are "too many" downloads. [Issue #41](https://github.com/DJDoubleD/refreezer/issues/41)
 - Menu doesn't close when track is added/removed from playlist (wrong navigation context ?)
 
 :building_construction:
