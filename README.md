@@ -63,6 +63,8 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 ### Not working / On going
 
 :lady_beetle:
+- Downloaded tracks don't play in app in offline mode (check out the :building_construction: section to find out why)
+- Offline playlist details are not accessible
 - Menu doesn't close when track is added/removed from playlist (wrong navigation context ?)
 
 :building_construction:
