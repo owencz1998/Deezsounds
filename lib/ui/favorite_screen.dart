@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
@@ -217,7 +218,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
     //if favorite Playlist is offline
     Playlist? p = await downloadManager
         .getOfflinePlaylist(deezerAPI.favoritesPlaylistId ?? '');
-    if (mounted) {
+    if (p?.tracks?.isNotEmpty ?? false) {
       setState(() {
         tracks = p?.tracks ?? [];
         trackCount = p?.tracks!.length;
@@ -263,12 +264,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
           setState(() {
             allTracks = tracks;
             trackCount = tracks.length;
-            favoritePlaylist = Playlist(
-              id: null,
-              title: 'Offline Tracks',
-              tracks: tracks,
-              trackCount: tracks.length,
-            );
+            favoritePlaylist = null;
             selectRandom3(allTracks);
           });
         }
@@ -312,148 +308,52 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
                 child: CircularProgressIndicator(
                   color: Theme.of(context).primaryColor,
                 )),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => PlaylistDetails(favoritePlaylist!))),
+            onTap: () => (favoritePlaylist != null)
+                ? Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) =>
+                        PlaylistDetails(favoritePlaylist ?? Playlist())))
+                : {},
           ),
         ),
       ]);
     } else {
       return SizedBox(
         height: 200,
-        child: Column(
-          children: [
-            SizedBox(
-              height: 46,
-              child: ListTile(
-                leading: Icon(
-                  DeezerIcons.heart_fill,
-                  color: Theme.of(context).primaryColor,
-                ),
-                title: Text(
-                  'Favorite tracks'.i18n,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text((trackCount ?? 0).toString(),
-                        style: TextStyle(color: Settings.secondaryText)),
-                    Icon(
-                      Icons.chevron_right,
-                      color: Colors.white,
-                    )
-                  ],
-                ),
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => PlaylistDetails(favoritePlaylist!))),
-              ),
+        child: Column(children: [
+          ListTile(
+            leading: Icon(
+              DeezerIcons.heart_fill,
+              color: Theme.of(context).primaryColor,
             ),
-            if (randomTracks.isNotEmpty)
-              SizedBox(
-                height: 48.0,
-                child: ListTile(
-                  leading: CachedImage(
-                    url: randomTracks[0].albumArt?.full ?? '',
-                    height: 40,
-                    width: 40,
-                  ),
-                  title: Text(randomTracks[0].title ?? '',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold)),
-                  subtitle: Text(randomTracks[0].artistString ?? '',
-                      style: TextStyle(
-                          color: Settings.secondaryText, fontSize: 12)),
-                  trailing: PlayerMenuButton(randomTracks[0]),
-                  onTap: () {
-                    GetIt.I<AudioPlayerHandler>().playFromTrackList(
-                        tracks,
-                        randomTracks[0].id ?? '',
-                        QueueSource(
-                            id: deezerAPI.favoritesPlaylistId,
-                            text: 'Favorites'.i18n,
-                            source: 'playlist'));
-                  },
-                  onLongPress: () {
-                    MenuSheet m = MenuSheet();
-                    m.defaultTrackMenu(randomTracks[0], context: context);
-                  },
-                ),
-              ),
-            if (randomTracks.length > 1)
-              SizedBox(
-                height: 44,
-                child: ListTile(
-                  leading: CachedImage(
-                    url: randomTracks[1].albumArt?.full ?? '',
-                    height: 40,
-                    width: 40,
-                  ),
-                  title: Text(randomTracks[1].title ?? '',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold)),
-                  subtitle: Text(randomTracks[1].artistString ?? '',
-                      style: TextStyle(
-                          color: Settings.secondaryText, fontSize: 12)),
-                  trailing: PlayerMenuButton(randomTracks[1]),
-                  onTap: () {
-                    GetIt.I<AudioPlayerHandler>().playFromTrackList(
-                        tracks,
-                        randomTracks[1].id ?? '',
-                        QueueSource(
-                            id: deezerAPI.favoritesPlaylistId,
-                            text: 'Favorites'.i18n,
-                            source: 'playlist'));
-                  },
-                  onLongPress: () {
-                    MenuSheet m = MenuSheet();
-                    m.defaultTrackMenu(randomTracks[1], context: context);
-                  },
-                ),
-              ),
-            if (randomTracks.length > 2)
-              SizedBox(
-                height: 44,
-                child: ListTile(
-                  leading: CachedImage(
-                    url: randomTracks[2].albumArt?.full ?? '',
-                    height: 40,
-                    width: 40,
-                  ),
-                  title: Text(randomTracks[2].title ?? '',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold)),
-                  subtitle: Text(randomTracks[2].artistString ?? '',
-                      style: TextStyle(
-                          color: Settings.secondaryText, fontSize: 12)),
-                  trailing: PlayerMenuButton(randomTracks[2]),
-                  onTap: () {
-                    GetIt.I<AudioPlayerHandler>().playFromTrackList(
-                        tracks,
-                        randomTracks[2].id ?? '',
-                        QueueSource(
-                            id: deezerAPI.favoritesPlaylistId,
-                            text: 'Favorites'.i18n,
-                            source: 'playlist'));
-                  },
-                  onLongPress: () {
-                    MenuSheet m = MenuSheet();
-                    m.defaultTrackMenu(randomTracks[2], context: context);
-                  },
-                ),
-              ),
-          ],
-        ),
+            title: Text(
+              'Favorite tracks'.i18n,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text((trackCount ?? 0).toString(),
+                    style: TextStyle(color: Settings.secondaryText)),
+                Icon(
+                  Icons.chevron_right,
+                  color: Colors.white,
+                )
+              ],
+            ),
+            onTap: () => (favoritePlaylist != null)
+                ? Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) =>
+                        PlaylistDetails(favoritePlaylist ?? Playlist())))
+                : {},
+          ),
+          ...List.generate(randomTracks.length,
+              (int index) => SimpleTrackTile(randomTracks[index])),
+        ]),
       );
     }
   }
@@ -468,6 +368,7 @@ class FavoritePlaylists extends StatefulWidget {
 
 class _FavoritePlaylistsState extends State<FavoritePlaylists> {
   List<Playlist>? _playlists;
+  Playlist? favoritesPlaylist;
   bool _loading = false;
 
   Future _load() async {
@@ -494,23 +395,36 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
         Logger.root.severe('Error loading playlists: $e');
       }
     }
-    _loading = false;
+    setState(() {
+      _loading = false;
+    });
+  }
+
+  Future _loadFavorite() async {
+    Playlist? favPlaylist = await downloadManager
+        .getOfflinePlaylist(deezerAPI.favoritesPlaylistId ?? '');
+    if (favPlaylist != null) {
+      setState(() {
+        favoritesPlaylist = favPlaylist;
+      });
+    }
+
+    favPlaylist =
+        await deezerAPI.fullPlaylist(deezerAPI.favoritesPlaylistId ?? '');
+
+    if (favPlaylist.tracks?.isNotEmpty ?? false) {
+      setState(() {
+        favoritesPlaylist = favPlaylist;
+      });
+    }
   }
 
   @override
   void initState() {
     _load();
+    _loadFavorite();
     super.initState();
   }
-
-  Playlist get favoritesPlaylist => Playlist(
-      id: deezerAPI.favoritesPlaylistId,
-      title: 'Favorites'.i18n,
-      user: User(name: deezerAPI.userName),
-      image: ImageDetails(thumbUrl: 'assets/favorites_thumb.jpg'),
-      tracks: [],
-      trackCount: 1,
-      duration: const Duration(seconds: 0));
 
   @override
   Widget build(BuildContext context) {
@@ -573,70 +487,70 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
                       builder: (context) => const LibraryPlaylists()))
                 },
               ),
-              ListView(
+              SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: ClampingScrollPhysics(),
-                  shrinkWrap: true,
-                  children: [
-                    Container(
-                        padding: EdgeInsets.symmetric(horizontal: 4),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            InkWell(
-                              onTap: () => Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          PlaylistDetails(favoritesPlaylist))),
-                              onLongPress: () {
-                                MenuSheet m = MenuSheet();
-                                m.defaultPlaylistMenu(favoritesPlaylist,
-                                    context: context);
-                              },
-                              child: Container(
-                                clipBehavior: Clip.hardEdge,
-                                decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.transparent),
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: SizedBox(
-                                  height: 180,
-                                  width: 180,
-                                  child: Container(
-                                    color: Colors.deepOrange.shade100,
-                                    child: Icon(DeezerIcons.heart_fill,
-                                        color: Colors.deepOrange.shade400,
-                                        size: 100.0),
+                  child: Row(children: [
+                    if (favoritesPlaylist?.tracks?.isNotEmpty ?? false)
+                      Container(
+                          padding: EdgeInsets.symmetric(horizontal: 4),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              InkWell(
+                                onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (context) => PlaylistDetails(
+                                            favoritesPlaylist!))),
+                                onLongPress: () {
+                                  MenuSheet m = MenuSheet();
+                                  m.defaultPlaylistMenu(favoritesPlaylist!,
+                                      context: context);
+                                },
+                                child: Container(
+                                  clipBehavior: Clip.hardEdge,
+                                  decoration: BoxDecoration(
+                                      border:
+                                          Border.all(color: Colors.transparent),
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: SizedBox(
+                                    height: 180,
+                                    width: 180,
+                                    child: Container(
+                                      color: Colors.deepOrange.shade100,
+                                      child: Icon(DeezerIcons.heart_fill,
+                                          color: Colors.deepOrange.shade400,
+                                          size: 100.0),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 4.0, vertical: 6.0),
-                              child: Text('Favorite tracks'.i18n,
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12)),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 4.0),
-                              child: Text(
-                                  'By '.i18n + (deezerAPI.userName ?? ''),
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      color: Settings.secondaryText,
-                                      fontSize: 8)),
-                            )
-                          ],
-                        )),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 4.0, vertical: 6.0),
+                                child: Text('Favorite tracks'.i18n,
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12)),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 4.0),
+                                child: Text(
+                                    'By '.i18n + (deezerAPI.userName ?? ''),
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                        color: Settings.secondaryText,
+                                        fontSize: 8)),
+                              )
+                            ],
+                          )),
                     for (int i = 0; i < _playlists!.length; i++)
                       if (_playlists?[i] != null)
-                        LargePlaylistTile(_playlists?[i])
-                  ])
+                        LargePlaylistTile(_playlists![i])
+                  ]))
             ],
           ));
     }

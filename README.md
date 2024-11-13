@@ -60,16 +60,14 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 
 ## Features & changes
 
-### Not working / On going
-
-:lady_beetle:
-- Downloads : found a weird bug where offline downloads are not available anymore when there are "too many" downloads. [Issue #41](https://github.com/DJDoubleD/refreezer/issues/41)
+### :lady_beetle: Bugs
 - Menu doesn't close when track is added/removed from playlist (wrong navigation context ?)
 
-:building_construction:
+### :building_construction: Upcoming features
 - Merge offline tracks and online tracks under tracks (same for playlists, albums, etc.)
 - Caching information to avoid reloading every time (eg. favorites screen)
 - Dynamic padding when player_bar is up
+- Responsive layout for screens
 - Re-think the offline/download scheme. Currently :
   - Offline = downloaded "within" the app and accessible ofline through the app only
   - Download = donwloaded to local storage and accessible as such, but not accessible through the app in offline mode

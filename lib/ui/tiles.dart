@@ -5,6 +5,7 @@ import 'package:fluttericon/octicons_icons.dart';
 import 'package:get_it/get_it.dart';
 import 'package:refreezer/settings.dart';
 import 'package:refreezer/ui/details_screens.dart';
+import 'package:refreezer/ui/favorite_screen.dart';
 import 'package:refreezer/ui/menu.dart';
 
 import '../api/deezer.dart';
@@ -114,6 +115,47 @@ class _TrackTileState extends State<TrackTile> {
           widget.trailing ?? const SizedBox(width: 0, height: 0)
         ],
       ),
+    );
+  }
+}
+
+class SimpleTrackTile extends StatelessWidget {
+  final Track track;
+
+  const SimpleTrackTile(this.track, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      dense: true,
+      minVerticalPadding: 0,
+      visualDensity: VisualDensity.compact,
+      leading: CachedImage(
+        url: track.albumArt?.full ?? '',
+        height: 40,
+        width: 40,
+      ),
+      title: Text(track.title ?? '',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+              color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+      subtitle: Text(track.artistString ?? '',
+          style: TextStyle(color: Settings.secondaryText, fontSize: 12)),
+      trailing: PlayerMenuButton(track),
+      onTap: () {
+        GetIt.I<AudioPlayerHandler>().playFromTrackList(
+            [],
+            track.id ?? '',
+            QueueSource(
+                id: deezerAPI.favoritesPlaylistId,
+                text: 'Favorites'.i18n,
+                source: 'playlist'));
+      },
+      onLongPress: () {
+        MenuSheet m = MenuSheet();
+        m.defaultTrackMenu(track, context: context);
+      },
     );
   }
 }
@@ -672,7 +714,7 @@ class ShowEpisodeTile extends StatelessWidget {
 }
 
 class LargePlaylistTile extends StatelessWidget {
-  final Playlist? playlist;
+  final Playlist playlist;
 
   const LargePlaylistTile(this.playlist, {super.key});
 
@@ -686,10 +728,10 @@ class LargePlaylistTile extends StatelessWidget {
           children: [
             InkWell(
               onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => PlaylistDetails(playlist!))),
+                  builder: (context) => PlaylistDetails(playlist))),
               onLongPress: () {
                 MenuSheet m = MenuSheet();
-                m.defaultPlaylistMenu(playlist!, context: context);
+                m.defaultPlaylistMenu(playlist, context: context);
               },
               child: Container(
                 clipBehavior: Clip.hardEdge,
@@ -697,7 +739,7 @@ class LargePlaylistTile extends StatelessWidget {
                     border: Border.all(color: Colors.transparent),
                     borderRadius: BorderRadius.circular(10)),
                 child: CachedImage(
-                  url: playlist?.image?.fullUrl ?? '',
+                  url: playlist.image?.fullUrl ?? '',
                   height: 180,
                   width: 180,
                 ),
@@ -707,7 +749,7 @@ class LargePlaylistTile extends StatelessWidget {
               width: 180,
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 6.0),
-                child: Text(playlist?.title ?? '',
+                child: Text(playlist.title ?? '',
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     textAlign: TextAlign.start,
@@ -717,18 +759,18 @@ class LargePlaylistTile extends StatelessWidget {
                         fontSize: 12)),
               ),
             ),
-            if (playlist?.user?.name != null && playlist?.user?.name != '')
+            if (playlist.user?.name != null && playlist.user?.name != '')
               SizedBox(
                   width: 180,
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 4.0),
-                    child: Text('By '.i18n + (playlist?.user?.name ?? ''),
+                    child: Text('By '.i18n + (playlist.user?.name ?? ''),
                         maxLines: 1,
                         textAlign: TextAlign.start,
                         style: TextStyle(
                             color: Settings.secondaryText, fontSize: 8)),
                   )),
-            if (playlist?.user?.name == null || playlist?.user?.name == '')
+            if (playlist.user?.name == null || playlist.user?.name == '')
               SizedBox(
                   width: 180,
                   child: Padding(
@@ -745,7 +787,7 @@ class LargePlaylistTile extends StatelessWidget {
 }
 
 class LargeAlbumTile extends StatelessWidget {
-  final Album? album;
+  final Album album;
 
   const LargeAlbumTile(this.album, {super.key});
 
@@ -758,11 +800,11 @@ class LargeAlbumTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => AlbumDetails(album!))),
+              onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => AlbumDetails(album))),
               onLongPress: () {
                 MenuSheet m = MenuSheet();
-                m.defaultAlbumMenu(album!, context: context);
+                m.defaultAlbumMenu(album, context: context);
               },
               child: Container(
                 clipBehavior: Clip.hardEdge,
@@ -770,7 +812,7 @@ class LargeAlbumTile extends StatelessWidget {
                     border: Border.all(color: Colors.transparent),
                     borderRadius: BorderRadius.circular(10)),
                 child: CachedImage(
-                  url: album?.art?.fullUrl ?? '',
+                  url: album.art?.fullUrl ?? '',
                   height: 180,
                   width: 180,
                 ),
@@ -780,7 +822,7 @@ class LargeAlbumTile extends StatelessWidget {
                 width: 180,
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 6.0),
-                  child: Text(album?.title ?? '',
+                  child: Text(album.title ?? '',
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       textAlign: TextAlign.start,
@@ -793,7 +835,7 @@ class LargeAlbumTile extends StatelessWidget {
                 width: 180,
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 4.0),
-                  child: Text('By '.i18n + (album?.artistString ?? ''),
+                  child: Text('By '.i18n + (album.artistString ?? ''),
                       maxLines: 1,
                       textAlign: TextAlign.start,
                       style: TextStyle(
@@ -803,7 +845,7 @@ class LargeAlbumTile extends StatelessWidget {
                 width: 180,
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
-                  child: Text('Out on '.i18n + (album?.releaseDate ?? ''),
+                  child: Text('Out on '.i18n + (album.releaseDate ?? ''),
                       maxLines: 1,
                       textAlign: TextAlign.start,
                       style: TextStyle(

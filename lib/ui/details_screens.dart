@@ -35,14 +35,14 @@ class AlbumDetails extends StatefulWidget {
 
 class _AlbumDetailsState extends State<AlbumDetails> {
   Album album = Album();
-  bool _loading = true;
+  bool _isLoading = true;
   bool _error = false;
   final PageController _albumController = PageController();
   List<ConnectivityResult> connectivity = [ConnectivityResult.none];
   int _currentPage = 0;
 
   Future _loadAlbum() async {
-    setState(() => _loading = true);
+    setState(() => _isLoading = true);
     //Get album from API, if doesn't have tracks
     if ((album.tracks ?? []).isEmpty) {
       try {
@@ -54,7 +54,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
         setState(() => _error = true);
       }
     }
-    setState(() => _loading = false);
+    setState(() => _isLoading = false);
   }
 
   //Get count of CDs in album
@@ -89,7 +89,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     return Scaffold(
       body: _error
           ? const ErrorScreen()
-          : _loading
+          : _isLoading
               ? Center(
                   child: CircularProgressIndicator(
                       color: Theme.of(context).primaryColor))
@@ -98,10 +98,10 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                     Container(
                       height: 4.0,
                     ),
-                    if (_loading)
+                    if (_isLoading)
                       CircularProgressIndicator(
                           color: Theme.of(context).primaryColor),
-                    if (!_loading)
+                    if (!_isLoading)
                       SizedBox(
                           width: double.infinity,
                           height: MediaQuery.of(context).size.width,
@@ -494,7 +494,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                         m.defaultTrackMenu(t, context: context);
                       });
                     }),
-                    if (_loading &&
+                    if (_isLoading &&
                         connectivity.isNotEmpty &&
                         !connectivity.contains(ConnectivityResult.none))
                       Padding(
@@ -592,7 +592,7 @@ class ArtistDetails extends StatefulWidget {
 
 class _ArtistDetailsState extends State<ArtistDetails> {
   Artist artist = Artist();
-  bool _loading = true;
+  bool _isLoading = true;
   bool _error = false;
   bool isLibrary = false;
   List<ConnectivityResult> connectivity = [ConnectivityResult.none];
@@ -607,7 +607,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
         setState(() => _error = true);
       }
     }
-    setState(() => _loading = false);
+    setState(() => _isLoading = false);
   }
 
   Future _isLibrary() async {
@@ -637,7 +637,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
     return Scaffold(
         body: _error
             ? const ErrorScreen()
-            : _loading
+            : _isLoading
                 ? Center(
                     child: CircularProgressIndicator(
                         color: Theme.of(context).primaryColor))
@@ -993,7 +993,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                         ),
                       //Albums
                       SizedBox(
-                        height: 300,
+                        height: 320,
                         child: Column(children: [
                           ListTile(
                             title: Text(
@@ -1023,20 +1023,20 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                             },
                           ),
                           Padding(
-                            padding: EdgeInsets.fromLTRB(12.0, 8.0, 1.0, 8.0),
-                            child: ListView(
+                              padding: EdgeInsets.fromLTRB(12.0, 8.0, 1.0, 8.0),
+                              child: SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 physics: ClampingScrollPhysics(),
-                                shrinkWrap: true,
-                                children: List.generate(
-                                    artist.albums.length > 10
-                                        ? 10
-                                        : artist.albums.length, (i) {
+                                child: Row(
+                                    children: List.generate(
+                                        artist.albums.length > 10
+                                            ? 10
+                                            : artist.albums.length, (i) {
                                   //Top albums
                                   Album a = artist.albums[i];
                                   return LargeAlbumTile(a);
                                 })),
-                          )
+                              ))
                         ]),
                       ),
                       Padding(
@@ -1046,7 +1046,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                           .value !=
                                       null
                                   ? 80
-                                  : 12)),
+                                  : 5)),
                     ],
                   ));
   }
@@ -1062,7 +1062,7 @@ class DiscographyScreen extends StatefulWidget {
 
 class _DiscographyScreenState extends State<DiscographyScreen> {
   late Artist artist;
-  bool _loading = false;
+  bool _isLoading = false;
   bool _error = false;
   final List<ScrollController> _controllers = [
     ScrollController(),
@@ -1071,8 +1071,8 @@ class _DiscographyScreenState extends State<DiscographyScreen> {
   ];
 
   Future _load() async {
-    if (artist.albums.length >= (artist.albumCount ?? 0) || _loading) return;
-    setState(() => _loading = true);
+    if (artist.albums.length >= (artist.albumCount ?? 0) || _isLoading) return;
+    setState(() => _isLoading = true);
 
     //Fetch data
     List<Album> data;
@@ -1082,7 +1082,7 @@ class _DiscographyScreenState extends State<DiscographyScreen> {
     } catch (e) {
       setState(() {
         _error = true;
-        _loading = false;
+        _isLoading = false;
       });
       return;
     }
@@ -1090,7 +1090,7 @@ class _DiscographyScreenState extends State<DiscographyScreen> {
     //Save
     setState(() {
       artist.albums.addAll(data);
-      _loading = false;
+      _isLoading = false;
     });
   }
 
@@ -1105,8 +1105,8 @@ class _DiscographyScreenState extends State<DiscographyScreen> {
         },
       );
 
-  Widget get _loadingWidget {
-    if (_loading) {
+  Widget get _isLoadingWidget {
+    if (_isLoading) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 8.0),
         child: Row(
@@ -1153,7 +1153,7 @@ class _DiscographyScreenState extends State<DiscographyScreen> {
               int nFeatures = artist.albums
                   .where((a) => a.type == AlbumType.FEATURED)
                   .length;
-              if ((nSingles == 0 || nFeatures == 0) && !_loading) _load();
+              if ((nSingles == 0 || nFeatures == 0) && !_isLoading) _load();
             }
           });
 
@@ -1186,7 +1186,7 @@ class _DiscographyScreenState extends State<DiscographyScreen> {
                   controller: _controllers[0],
                   itemCount: artist.albums.length + 1,
                   itemBuilder: (context, i) {
-                    if (i == artist.albums.length) return _loadingWidget;
+                    if (i == artist.albums.length) return _isLoadingWidget;
                     if (artist.albums[i].type == AlbumType.ALBUM) {
                       return _tile(artist.albums[i]);
                     }
@@ -1201,7 +1201,7 @@ class _DiscographyScreenState extends State<DiscographyScreen> {
                   controller: _controllers[1],
                   itemCount: artist.albums.length + 1,
                   itemBuilder: (context, i) {
-                    if (i == artist.albums.length) return _loadingWidget;
+                    if (i == artist.albums.length) return _isLoadingWidget;
                     if (artist.albums[i].type == AlbumType.SINGLE) {
                       return _tile(artist.albums[i]);
                     }
@@ -1216,7 +1216,7 @@ class _DiscographyScreenState extends State<DiscographyScreen> {
                   controller: _controllers[2],
                   itemCount: artist.albums.length + 1,
                   itemBuilder: (context, i) {
-                    if (i == artist.albums.length) return _loadingWidget;
+                    if (i == artist.albums.length) return _isLoadingWidget;
                     if (artist.albums[i].type == AlbumType.FEATURED) {
                       return _tile(artist.albums[i]);
                     }
@@ -1243,7 +1243,8 @@ class PlaylistDetails extends StatefulWidget {
 
 class _PlaylistDetailsState extends State<PlaylistDetails> {
   late Playlist playlist;
-  bool _loading = false;
+  bool _isLoading = false;
+  bool _isLoadingTracks = false;
   bool _error = false;
   late Sorting _sort;
   final ScrollController _scrollController = ScrollController();
@@ -1307,12 +1308,96 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
   }
 
   Future _isLibrary() async {
-    if (playlist.isIn(await downloadManager.getOfflinePlaylists()) ||
-        playlist.isIn(await deezerAPI.getPlaylists())) {
+    if (playlist.isIn(await downloadManager.getOfflinePlaylists())) {
       setState(() {
         isLibrary = true;
       });
+      return;
     }
+    if (playlist.isIn(await deezerAPI.getPlaylists())) {
+      setState(() {
+        isLibrary = true;
+      });
+      return;
+    }
+  }
+
+  void _loadTracks() async {
+    // Got all tracks, return
+    if (_isLoadingTracks ||
+        playlist.tracks!.length >=
+            (playlist.trackCount ?? playlist.tracks!.length)) return;
+
+    setState(() => _isLoadingTracks = true);
+    int pos = playlist.tracks!.length;
+    //Get another page of tracks
+    List<Track> tracks;
+    try {
+      tracks = await deezerAPI.playlistTracksPage(playlist.id!, pos, nb: 25);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = true;
+          _isLoadingTracks = false;
+        });
+      }
+      return;
+    }
+
+    setState(() {
+      playlist.tracks!.addAll(tracks);
+      _isLoadingTracks = false;
+    });
+  }
+
+  Future _load() async {
+    setState(() => _isLoading = true);
+
+    // Initial load if no tracks
+    if (playlist.tracks?.isEmpty ?? true) {
+      //If playlist is offline
+      Playlist? offlinePlaylist = await downloadManager
+          .getOfflinePlaylist(playlist.id!)
+          .catchError((e) {
+        setState(() {
+          _error = true;
+        });
+        return null;
+      });
+      if (offlinePlaylist?.tracks?.isNotEmpty ?? false) {
+        setState(() {
+          playlist = offlinePlaylist!;
+          _isLoading = false;
+        });
+
+        //Try to update offline playlist
+        Playlist? fullPlaylist = await deezerAPI.fullPlaylist(playlist.id!);
+        if (fullPlaylist.tracks != offlinePlaylist?.tracks &&
+            (fullPlaylist.tracks?.isNotEmpty ?? false)) {
+          setState(() {
+            playlist = fullPlaylist;
+          });
+          await downloadManager.updateOfflinePlaylist(playlist);
+        }
+      } else {
+        //If playlist is not offline
+        Playlist? onlinePlaylist =
+            await deezerAPI.playlist(playlist.id!, nb: 25).catchError((e) {
+          setState(() {
+            _error = true;
+          });
+          return Playlist();
+        });
+        setState(() {
+          playlist = onlinePlaylist;
+          _isLoading = false;
+        });
+      }
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -1320,35 +1405,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
     playlist = widget.playlist;
     _sort = Sorting(sourceType: SortSourceTypes.PLAYLIST, id: playlist.id);
 
-    setState(() => _loading = true);
-
-    // Initial load if no tracks
-    if (playlist.tracks!.isEmpty) {
-      downloadManager.getOfflinePlaylist(playlist.id!).then((Playlist? p) => {
-            if (p != null)
-              {
-                setState(() {
-                  playlist = p;
-                  _loading = false;
-                })
-              }
-          });
-
-      //Get correct metadata
-      deezerAPI.fullPlaylist(playlist.id!).then((Playlist p) {
-        if (playlist.tracks != p.tracks) {
-          setState(() {
-            playlist = p;
-            _loading = false;
-            downloadManager.updateOfflinePlaylist(playlist);
-          });
-        }
-        //Load tracks
-        //_load();
-      }).catchError((e) {
-        if (mounted) setState(() => _error = true);
-      });
-    }
+    _load();
 
     Connectivity().checkConnectivity().then((con) => setState(() {
           connectivity = con;
@@ -1357,6 +1414,13 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
     _isLibrary();
     _restoreSort();
     super.initState();
+
+    _scrollController.addListener(() {
+      double off = _scrollController.position.maxScrollExtent * 0.90;
+      if (_scrollController.position.pixels > off) {
+        _loadTracks();
+      }
+    });
 
     _playlistController.addListener(() {
       setState(() {
@@ -1375,7 +1439,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
     return Scaffold(
       body: _error
           ? const ErrorScreen()
-          : _loading
+          : _isLoading
               ? Center(
                   child: CircularProgressIndicator(
                       color: Theme.of(context).primaryColor))
@@ -1385,10 +1449,10 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                     Container(
                       height: 4.0,
                     ),
-                    if (_loading)
+                    if (_isLoading)
                       CircularProgressIndicator(
                           color: Theme.of(context).primaryColor),
-                    if (!_loading)
+                    if (!_isLoading)
                       SizedBox(
                           width: double.infinity,
                           height: MediaQuery.of(context).size.width,
@@ -1500,7 +1564,10 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                   fontSize: 16),
                                             ),
                                             subtitle: Text(
-                                                (playlist.tracks?.length)
+                                                (playlist.trackCount ??
+                                                        playlist
+                                                            .tracks?.length ??
+                                                        0)
                                                     .toString(),
                                                 style: TextStyle(
                                                     color:
@@ -1774,7 +1841,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                         ]);
                       });
                     }),
-                    if (_loading &&
+                    if (_isLoadingTracks &&
                         connectivity.isNotEmpty &&
                         !connectivity.contains(ConnectivityResult.none))
                       Padding(
@@ -1874,7 +1941,7 @@ class ShowScreen extends StatefulWidget {
 
 class _ShowScreenState extends State<ShowScreen> {
   late Show _show;
-  bool _loading = true;
+  bool _isLoading = true;
   bool _error = false;
   late List<ShowEpisode> _episodes;
 
@@ -1885,14 +1952,14 @@ class _ShowScreenState extends State<ShowScreen> {
       e = await deezerAPI.allShowEpisodes(_show.id!);
     } catch (e) {
       setState(() {
-        _loading = false;
+        _isLoading = false;
         _error = true;
       });
       return;
     }
     setState(() {
       _episodes = e;
-      _loading = false;
+      _isLoading = false;
     });
   }
 
@@ -1952,7 +2019,7 @@ class _ShowScreenState extends State<ShowScreen> {
           if (_error) const ErrorScreen(),
 
           //Loading
-          if (_loading)
+          if (_isLoading)
             const Padding(
               padding: EdgeInsets.all(8.0),
               child: Row(
@@ -1962,7 +2029,7 @@ class _ShowScreenState extends State<ShowScreen> {
             ),
 
           //Data
-          if (!_loading && !_error)
+          if (!_isLoading && !_error)
             ...List.generate(_episodes.length, (i) {
               ShowEpisode e = _episodes[i];
               return ShowEpisodeTile(
