@@ -1902,7 +1902,7 @@ class _MakePlaylistOfflineState extends State<MakePlaylistOffline> {
             if (widget.playlist.user?.id != deezerAPI.userId) {
               await deezerAPI.addPlaylist(widget.playlist.id!);
             }
-            downloadManager.addOfflinePlaylist(widget.playlist, private: false);
+            downloadManager.addOfflinePlaylist(widget.playlist, private: true);
             MenuSheet().showDownloadStartedToast();
             setState(() {
               _offline = true;

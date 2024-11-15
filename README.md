@@ -62,16 +62,24 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 
 ### :lady_beetle: Bugs
 - Menu doesn't close when track is added/removed from playlist (wrong navigation context ?)
-- Downloaded tracks don't play in app in offline mode (check out the :building_construction: section to find out why)
+- Offline favorite screen "favorite tracks" won't play
+- Album state "liked" is not correctly displayed in album details screen
 
 ### :building_construction: Upcoming features
 - Merge offline tracks and online tracks under tracks (same for playlists, albums, etc.)
 - Caching information to avoid reloading every time (eg. favorites screen)
+- UpdateOfflinePlaylist() in downloadManager
 - Dynamic padding when player_bar is up
-- Responsive layout for screens
-- Re-think the offline/download scheme. Currently :
-  - Offline = downloaded "within" the app and accessible ofline through the app only
-  - Download = donwloaded to local storage and accessible as such, but not accessible through the app in offline mode
+- Responsive layout for screens (landscape mod)
+- Re-think the offline/download scheme. 
+  - Currently (ReFreezer) :
+    - Offline = downloaded "within" the app and accessible ofline through the app only
+    - Download = downloaded to local storage with art and lyrics and accessible as such, but not accessible through the app in offline mode
+  - Next :
+    - Downloaded within the app with art and lyrics
+    - Export button under settings to export tracks to local storage (file copy instead of second download)
+- Turn the mod into a skin for the official refreezer app
+
 
 ### :rocket: MOD Features :
 - Floating player bar with background color based on title artwork
