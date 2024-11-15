@@ -15,15 +15,17 @@
 
 ---
 
-This repo is a MOD of the [ReFreezer](https://github.com/DJDoubleD/ReFreezer) app by @DJDoubleD.  
-My goal is to have a style closer to Deezer's original app.
-To apply the Deezer theme, select it under Settings > Appearance > Theme.
+This is not a MOD of the official Deezer App.  
+This is an alternative to the Deezer App providing premium features to free accounts using both public and internal Deezer APIs.  
+
+This repo is based on [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD.  
+This branch focuses on the development of this app while the ReFreezer_Skin branch aims at turning this app into a skin for the official ReFreezer app.
 
 > I am looking for contributors, feel free to reach out !  
 > :mailbox: [e-mail me](mailto:gavrochebackups@gmail.com)  
 > :space_invader: [Discord : @petitprinc3#1380](https://discordapp.com/users/PetitPrince#1380)
 
-## Screenshots
+## :camera_flash: Screenshots
 
 <p align="center">
     <img src="./assets/screenshots/Mod_home.png" width=100>
@@ -58,11 +60,12 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
   </p>
 </details>
 
-## Features & changes
+## :star2: Features & changes
 
 ### :lady_beetle: Bugs
-- Menu doesn't close when track is added/removed from playlist (wrong navigation context ?)
-- Offline favorite screen "favorite tracks" won't play
+- Menu :
+  - Doesn't close when track is added/removed from playlist or queue (wrong navigation context ?)
+  - Add inkwell tiles ontap visual effect
 - Album state "liked" is not correctly displayed in album details screen
 
 ### :building_construction: Upcoming features
@@ -109,11 +112,11 @@ To apply the Deezer theme, select it under Settings > Appearance > Theme.
 - Removed the need of custom just_audio & audio_service plugin versions & refactored source code to use the latest version of the official plugins
 - Multiple other fixes
 
-## Compile from source
+## :pick: Compile from source
 
 Follow the steps from [@DJDoubleD](https://github.com/DJDoubleD/refreezer).
 
-## Disclaimer & Legal
+## :balance_scale: Disclaimer & Legal
 
 **ReFreezer** was not developed for piracy, but educational and private usage.
 It may be illegal to use this in your country!

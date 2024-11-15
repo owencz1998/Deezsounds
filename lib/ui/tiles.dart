@@ -121,8 +121,9 @@ class _TrackTileState extends State<TrackTile> {
 
 class SimpleTrackTile extends StatelessWidget {
   final Track track;
+  final Playlist? playlist;
 
-  const SimpleTrackTile(this.track, {super.key});
+  const SimpleTrackTile(this.track, this.playlist, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -145,12 +146,10 @@ class SimpleTrackTile extends StatelessWidget {
       trailing: PlayerMenuButton(track),
       onTap: () {
         GetIt.I<AudioPlayerHandler>().playFromTrackList(
-            [],
+            playlist?.tracks ?? [track],
             track.id ?? '',
             QueueSource(
-                id: deezerAPI.favoritesPlaylistId,
-                text: 'Favorites'.i18n,
-                source: 'playlist'));
+                id: playlist?.id, text: 'Favorites'.i18n, source: 'playlist'));
       },
       onLongPress: () {
         MenuSheet m = MenuSheet();

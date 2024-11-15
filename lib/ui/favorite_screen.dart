@@ -351,8 +351,10 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
                         PlaylistDetails(favoritePlaylist ?? Playlist())))
                 : {},
           ),
-          ...List.generate(randomTracks.length,
-              (int index) => SimpleTrackTile(randomTracks[index])),
+          ...List.generate(
+              randomTracks.length,
+              (int index) =>
+                  SimpleTrackTile(randomTracks[index], favoritePlaylist)),
         ]),
       );
     }
