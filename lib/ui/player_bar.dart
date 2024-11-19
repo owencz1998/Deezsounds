@@ -46,21 +46,19 @@ class _PlayerBarState extends State<PlayerBar> {
 
   @override
   void initState() {
-    isPlayerBarActive = false;
     _updateColor;
     _mediaItemSub = audioHandler.mediaItem.listen((event) {
       _updateColor();
     });
 
     updateColor = _updateColor;
-    isPlayerBarActive = true;
     super.initState();
   }
 
   @override
-  void dispose() {
-    isPlayerBarActive = false;
-    _mediaItemSub?.cancel();
+  void dispose() async {
+    await audioHandler.clearQueue();
+    await _mediaItemSub?.cancel();
     super.dispose();
   }
 
@@ -68,8 +66,10 @@ class _PlayerBarState extends State<PlayerBar> {
     if (GetIt.I<AudioPlayerHandler>().playbackState.value.processingState ==
         AudioProcessingState.idle) return 0.0;
     if (GetIt.I<AudioPlayerHandler>().mediaItem.value == null) return 0.0;
-    if (GetIt.I<AudioPlayerHandler>().mediaItem.value?.duration?.inSeconds == 0)
-      return 0.0; //Division by 0
+    if (GetIt.I<AudioPlayerHandler>().mediaItem.value?.duration?.inSeconds ==
+        0) {
+      return 0.0;
+    } //Division by 0
     return GetIt.I<AudioPlayerHandler>()
             .playbackState
             .value
@@ -82,7 +82,6 @@ class _PlayerBarState extends State<PlayerBar> {
   @override
   Widget build(BuildContext context) {
     scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
-    isPlayerBarActive = true;
     var focusNode = FocusNode();
     return GestureDetector(
       key: UniqueKey(),
@@ -108,7 +107,6 @@ class _PlayerBarState extends State<PlayerBar> {
         } else if ((details.primaryVelocity ?? 0) > 100) {
           // Swiped down => close
           dispose();
-          await audioHandler.clearQueue();
         }
         updateColor();
       },

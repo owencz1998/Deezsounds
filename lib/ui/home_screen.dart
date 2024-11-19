@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
+import 'package:refreezer/main.dart';
 
 import '../api/deezer.dart';
 import '../api/definitions.dart';
@@ -29,15 +30,16 @@ class HomeScreen extends StatelessWidget {
             children: <Widget>[
               SafeArea(child: Container()),
               Flexible(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      bottom:
-                          GetIt.I<AudioPlayerHandler>().mediaItem.value != null
-                              ? 80
-                              : 0),
-                  child: HomePageScreen(),
-                ),
-              )
+                  child: ListenableBuilder(
+                      listenable: playerBarState,
+                      builder: (BuildContext context, Widget? child) {
+                        return AnimatedPadding(
+                          duration: Duration(milliseconds: 200),
+                          padding: EdgeInsets.only(
+                              bottom: playerBarState.state ? 80 : 0),
+                          child: HomePageScreen(),
+                        );
+                      }))
             ],
           ),
         ));
@@ -91,15 +93,14 @@ class FreezerTitle extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Image.asset('assets/icon.png', width: 64, height: 64),
-              const Text(
-                'Deezer',
-                style: TextStyle(fontSize: 56, fontWeight: FontWeight.w900),
-              )
-            ],
+          Image.asset('assets/icon.png', width: 48, height: 48),
+          Container(width: 12.0),
+          const Text(
+            'Deezer',
+            style: TextStyle(
+                fontSize: 64,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Deezer'),
           )
         ],
       ),

@@ -74,3 +74,11 @@ lib/.env
 # Possible translations remnants
 translations/refreezer.zip
 translations/ReFreezer (translations).zip
+
+#Eternal modules
+custom_navigator
+equalizer_flutter
+external_path
+marquee
+move_to_background
+scrobblenaut

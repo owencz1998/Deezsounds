@@ -470,7 +470,9 @@ class Settings {
                 return null;
               }),
             ),
-            bottomAppBarTheme: const BottomAppBarTheme(color: deezerBg)),
+            bottomAppBarTheme: const BottomAppBarTheme(color: deezerBg),
+            progressIndicatorTheme:
+                ProgressIndicatorThemeData(color: primaryColor)),
         Themes.Black: ThemeData(
             useMaterial3: false,
             brightness: Brightness.dark,

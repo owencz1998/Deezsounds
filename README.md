@@ -63,16 +63,13 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
 ## :star2: Features & changes
 
 ### :lady_beetle: Bugs
-- Menu :
-  - Doesn't close when track is added/removed from playlist or queue (wrong navigation context ?)
-  - Add inkwell tiles ontap visual effect
-- Album state "liked" is not correctly displayed in album details screen
+- When the same track is added multiple times to queue, it does not display properly
 
 ### :building_construction: Upcoming features
+- Menu add inkwell tiles ontap visual effect
 - Merge offline tracks and online tracks under tracks (same for playlists, albums, etc.)
 - Caching information to avoid reloading every time (eg. favorites screen)
-- UpdateOfflinePlaylist() in downloadManager
-- Dynamic padding when player_bar is up
+- Implement UpdateOfflinePlaylist() in downloadManager
 - Responsive layout for screens (landscape mod)
 - Re-think the offline/download scheme. 
   - Currently (ReFreezer) :

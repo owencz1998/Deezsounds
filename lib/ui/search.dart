@@ -6,6 +6,7 @@ import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:fluttericon/typicons_icons.dart';
 import 'package:get_it/get_it.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
+import 'package:refreezer/main.dart';
 import 'package:refreezer/settings.dart';
 
 import '../api/cache.dart';
@@ -455,12 +456,15 @@ class _SearchScreenState extends State<SearchScreen> {
                         _submit(context);
                       },
                     )),
-            Padding(
-                padding: EdgeInsets.only(
-                    bottom:
-                        GetIt.I<AudioPlayerHandler>().mediaItem.value != null
-                            ? 80
-                            : 0)),
+            ListenableBuilder(
+                listenable: playerBarState,
+                builder: (BuildContext context, Widget? child) {
+                  return AnimatedPadding(
+                    duration: Duration(milliseconds: 200),
+                    padding:
+                        EdgeInsets.only(bottom: playerBarState.state ? 80 : 0),
+                  );
+                }),
           ],
         ),
       ),
@@ -867,12 +871,15 @@ class SearchResultsScreen extends StatelessWidget {
                   height: 8.0,
                 ),
                 ...episodes,
-                Padding(
-                    padding: EdgeInsets.only(
-                        bottom: GetIt.I<AudioPlayerHandler>().mediaItem.value !=
-                                null
-                            ? 80
-                            : 0)),
+                ListenableBuilder(
+                    listenable: playerBarState,
+                    builder: (BuildContext context, Widget? child) {
+                      return AnimatedPadding(
+                        duration: Duration(milliseconds: 200),
+                        padding: EdgeInsets.only(
+                            bottom: playerBarState.state ? 80 : 0),
+                      );
+                    }),
               ],
             );
           },

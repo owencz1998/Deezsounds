@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:fluttericon/octicons_icons.dart';
@@ -9,7 +8,6 @@ import 'package:numberpicker/numberpicker.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
 import 'package:refreezer/settings.dart';
 import 'package:refreezer/ui/player_screen.dart';
-import 'package:refreezer/ui/router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -706,7 +704,8 @@ class MenuSheet {
       );
 
   void _close(BuildContext context) => {
-        if (Navigator.of(context).canPop()) {Navigator.of(context).pop()}
+        if (Navigator.of(context, rootNavigator: true).canPop())
+          {Navigator.of(context, rootNavigator: true).pop()}
       };
 }
 

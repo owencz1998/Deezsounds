@@ -1,4 +1,3 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
+import 'package:refreezer/main.dart';
+import 'package:refreezer/utils/connectivity.dart';
 
 import '../api/cache.dart';
 import '../api/deezer.dart';
@@ -251,11 +252,15 @@ class LibraryScreen extends StatelessWidget {
               )
             ],
           ),
-          Padding(
-              padding: EdgeInsets.only(
-                  bottom: GetIt.I<AudioPlayerHandler>().mediaItem.value != null
-                      ? 80
-                      : 0)),
+          ListenableBuilder(
+              listenable: playerBarState,
+              builder: (BuildContext context, Widget? child) {
+                return AnimatedPadding(
+                  duration: Duration(milliseconds: 200),
+                  padding:
+                      EdgeInsets.only(bottom: playerBarState.state ? 80 : 0),
+                );
+              }),
         ],
       ),
     );
@@ -331,10 +336,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
       return;
     }
 
-    List<ConnectivityResult> connectivity =
-        await Connectivity().checkConnectivity();
-    if (connectivity.isNotEmpty &&
-        !connectivity.contains(ConnectivityResult.none)) {
+    if (await isConnected()) {
       if (mounted) setState(() => _isLoading = true);
       int pos = tracks.length;
 
@@ -624,7 +626,16 @@ class _LibraryTracksState extends State<LibraryTracks> {
                       m.defaultTrackMenu(t, context: context);
                     },
                   );
-                })
+                }),
+                ListenableBuilder(
+                    listenable: playerBarState,
+                    builder: (BuildContext context, Widget? child) {
+                      return AnimatedPadding(
+                        duration: Duration(milliseconds: 200),
+                        padding: EdgeInsets.only(
+                            bottom: playerBarState.state ? 80 : 0),
+                      );
+                    }),
               ],
             )));
   }
@@ -740,7 +751,16 @@ class _LibraryAlbumsState extends State<LibraryAlbums> {
                 loadAlbums: _loadOfflineAlbums,
                 sort: _sort,
                 offline: true,
-              )
+              ),
+              ListenableBuilder(
+                  listenable: playerBarState,
+                  builder: (BuildContext context, Widget? child) {
+                    return AnimatedPadding(
+                      duration: Duration(milliseconds: 200),
+                      padding: EdgeInsets.only(
+                          bottom: playerBarState.state ? 80 : 0),
+                    );
+                  }),
             ],
           ),
         ));
@@ -1044,6 +1064,15 @@ class _LibraryArtistsState extends State<LibraryArtists> {
                     },
                   );
                 }),
+              ListenableBuilder(
+                  listenable: playerBarState,
+                  builder: (BuildContext context, Widget? child) {
+                    return AnimatedPadding(
+                      duration: Duration(milliseconds: 200),
+                      padding: EdgeInsets.only(
+                          bottom: playerBarState.state ? 80 : 0),
+                    );
+                  }),
             ],
           ),
         ));
@@ -1314,7 +1343,16 @@ class _LibraryPlaylistsState extends State<LibraryPlaylists> {
                     ],
                   );
                 },
-              )
+              ),
+              ListenableBuilder(
+                  listenable: playerBarState,
+                  builder: (BuildContext context, Widget? child) {
+                    return AnimatedPadding(
+                      duration: Duration(milliseconds: 200),
+                      padding: EdgeInsets.only(
+                          bottom: playerBarState.state ? 80 : 0),
+                    );
+                  }),
             ],
           ),
         ));

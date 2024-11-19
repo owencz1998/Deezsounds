@@ -1,19 +1,17 @@
 import 'dart:math';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
 import 'package:refreezer/main.dart';
-import 'package:refreezer/ui/cached_image.dart';
 import 'package:refreezer/ui/details_screens.dart';
 import 'package:refreezer/ui/error.dart';
 import 'package:refreezer/ui/library.dart';
 import 'package:refreezer/ui/menu.dart';
 import 'package:refreezer/ui/tiles.dart';
+import 'package:refreezer/utils/connectivity.dart';
 
 import '../api/cache.dart';
 import '../api/deezer.dart';
@@ -153,11 +151,14 @@ class FavoriteScreen extends StatelessWidget {
                 ),
               );
             }),
-        Padding(
-            padding: EdgeInsets.only(
-                bottom: GetIt.I<AudioPlayerHandler>().mediaItem.value != null
-                    ? 80
-                    : 0)),
+        ListenableBuilder(
+            listenable: playerBarState,
+            builder: (BuildContext context, Widget? child) {
+              return AnimatedPadding(
+                duration: Duration(milliseconds: 200),
+                padding: EdgeInsets.only(bottom: playerBarState.state ? 80 : 0),
+              );
+            }),
       ]),
     );
   }
@@ -227,10 +228,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
       });
     }
 
-    List<ConnectivityResult> connectivity =
-        await Connectivity().checkConnectivity();
-    if (connectivity.isNotEmpty &&
-        !connectivity.contains(ConnectivityResult.none)) {
+    if (await isConnected()) {
       //Load tracks as a playlist
       Playlist? favPlaylist;
       try {
@@ -290,7 +288,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
     if (_loading) {
       return Column(children: [
         SizedBox(
-          height: 200,
+          height: 224,
           child: ListTile(
             leading: Icon(
               DeezerIcons.heart_fill,
@@ -318,7 +316,6 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
       ]);
     } else {
       return SizedBox(
-        height: 200,
         child: Column(children: [
           ListTile(
             leading: Icon(
@@ -386,10 +383,7 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
     }
 
     //update if online
-    List<ConnectivityResult> connectivity =
-        await Connectivity().checkConnectivity();
-    if (connectivity.isNotEmpty &&
-        !connectivity.contains(ConnectivityResult.none)) {
+    if (await isConnected()) {
       try {
         List<Playlist> playlists = await deezerAPI.getPlaylists();
         if (mounted) setState(() => _playlists = playlists);
