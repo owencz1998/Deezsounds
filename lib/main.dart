@@ -76,8 +76,12 @@ class _SplashScreenState extends State<SplashScreen> {
             repeat: false,
             frameRate: FrameRate(25),
             fit: BoxFit.cover,
-            width: MediaQuery.of(context).size.width * 0.5,
-            height: MediaQuery.of(context).size.width * 0.5));
+            width: MediaQuery.of(context).orientation == Orientation.portrait
+                ? MediaQuery.of(context).size.width * 0.5
+                : MediaQuery.of(context).size.height * 0.5,
+            height: MediaQuery.of(context).orientation == Orientation.portrait
+                ? MediaQuery.of(context).size.width * 0.5
+                : MediaQuery.of(context).size.height * 0.5));
   }
 }
 
@@ -568,7 +572,14 @@ class _MainScreenState extends State<MainScreen>
                       alignment: Alignment.bottomCenter,
                       child: Container(
                         color: Colors.transparent,
-                        margin: EdgeInsets.all(8),
+                        margin: MediaQuery.of(context).orientation ==
+                                Orientation.portrait
+                            ? EdgeInsets.all(8)
+                            : EdgeInsets.fromLTRB(
+                                MediaQuery.of(context).size.width * 0.4 + 8,
+                                8,
+                                8,
+                                8),
                         child: const PlayerBar(),
                       ),
                     ),

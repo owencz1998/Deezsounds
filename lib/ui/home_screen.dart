@@ -92,6 +92,7 @@ class FreezerTitle extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Image.asset('assets/icon.png', width: 48, height: 48),
           Container(width: 12.0),

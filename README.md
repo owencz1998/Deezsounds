@@ -36,6 +36,10 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
     <img src="./assets/screenshots/Mod_artists.png" width=100>
     <img src="./assets/screenshots/Mod_menu.png" width=100>
 </p>
+<p align="center">
+    <img src="./assets/screenshots/landscape_artist.png" height=150>
+    <img src="./assets/screenshots/landscape_playlist.png" height=150>
+</p>
 
 <details><summary><b>Original ReFreezer App</b></summary>
 <p align="center">
@@ -64,13 +68,13 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
 
 ### :lady_beetle: Bugs
 - When the same track is added multiple times to queue, it does not display properly
+- If queue is cleared and player bar is dismissed, it will not be brought back up if the user clicks back on the formerly playing track.
 
 ### :building_construction: Upcoming features
 - Menu add inkwell tiles ontap visual effect
 - Merge offline tracks and online tracks under tracks (same for playlists, albums, etc.)
 - Caching information to avoid reloading every time (eg. favorites screen)
 - Implement UpdateOfflinePlaylist() in downloadManager
-- Responsive layout for screens (landscape mod)
 - Re-think the offline/download scheme. 
   - Currently (ReFreezer) :
     - Offline = downloaded "within" the app and accessible ofline through the app only
@@ -79,6 +83,7 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
     - Downloaded within the app with art and lyrics
     - Export button under settings to export tracks to local storage (file copy instead of second download)
 - Turn the mod into a skin for the official refreezer app
+- NavigationRail for landscape mode on left side of screen
 
 
 ### :rocket: MOD Features :
