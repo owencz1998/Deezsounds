@@ -173,4 +173,8 @@ class DeezerIcons {
       IconData(0xe90f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData calendar_small =
       IconData(0xe910, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData shuffle_active =
+      IconData(0xe912, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData repeat_active =
+      IconData(0xe913, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

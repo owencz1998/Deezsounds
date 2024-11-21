@@ -101,9 +101,6 @@ class _PlayerBarState extends State<PlayerBar> {
           // Swiped up
           Navigator.of(context)
               .push(SlideBottomRoute(widget: const PlayerScreen()));
-          SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-            systemNavigationBarColor: _bgColor,
-          ));
         } else if ((details.primaryVelocity ?? 0) > 100) {
           // Swiped down => close
           dispose();

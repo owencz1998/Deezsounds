@@ -971,46 +971,50 @@ class _DownloadsSettingsState extends State<DownloadsSettings> {
               style: const TextStyle(fontSize: 16.0),
             ),
           ),
-          Slider(
-              min: 1,
-              max: 16,
-              divisions: 15,
-              value: _downloadThreads,
-              label: _downloadThreads.round().toString(),
-              onChanged: (double v) => setState(() => _downloadThreads = v),
-              onChangeEnd: (double val) async {
-                _downloadThreads = val;
-                setState(() {
-                  settings.downloadThreads = _downloadThreads.round();
-                  _downloadThreads = settings.downloadThreads.toDouble();
-                });
-                await settings.save();
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+            child: Slider(
+                min: 1,
+                max: 16,
+                divisions: 15,
+                value: _downloadThreads,
+                label: _downloadThreads.round().toString(),
+                onChanged: (double v) => setState(() => _downloadThreads = v),
+                onChangeEnd: (double val) async {
+                  _downloadThreads = val;
+                  setState(() {
+                    settings.downloadThreads = _downloadThreads.round();
+                    _downloadThreads = settings.downloadThreads.toDouble();
+                  });
+                  await settings.save();
 
-                //Prevent null
-                if (val > 8 &&
-                    cache.threadsWarning != true &&
-                    context.mounted) {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text('Warning'.i18n),
-                          content: Text(
-                              'Using too many concurrent downloads on older/weaker devices might cause crashes!'
-                                  .i18n),
-                          actions: [
-                            TextButton(
-                              child: Text('Dismiss'.i18n),
-                              onPressed: () => Navigator.of(context).pop(),
-                            )
-                          ],
-                        );
-                      });
+                  //Prevent null
+                  if (val > 8 &&
+                      cache.threadsWarning != true &&
+                      context.mounted) {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text('Warning'.i18n),
+                            content: Text(
+                                'Using too many concurrent downloads on older/weaker devices might cause crashes!'
+                                    .i18n),
+                            actions: [
+                              TextButton(
+                                child: Text('Dismiss'.i18n),
+                                onPressed: () => Navigator.of(context).pop(),
+                              )
+                            ],
+                          );
+                        });
 
-                  cache.threadsWarning = true;
-                  await cache.save();
-                }
-              }),
+                    cache.threadsWarning = true;
+                    await cache.save();
+                  }
+                }),
+          ),
           const FreezerDivider(),
           ListTile(
             title: Text('Tags'.i18n),

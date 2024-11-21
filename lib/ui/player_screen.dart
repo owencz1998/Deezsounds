@@ -229,7 +229,7 @@ class _PlayerScreenHorizontalState extends State<PlayerScreenHorizontal> {
                                   .value!
                                   .displayTitle!
                                   .length >=
-                              22
+                              52
                           ? Marquee(
                               text: GetIt.I<AudioPlayerHandler>()
                                   .mediaItem
@@ -268,7 +268,6 @@ class _PlayerScreenHorizontalState extends State<PlayerScreenHorizontal> {
                     overflow: TextOverflow.clip,
                     style: TextStyle(
                       fontSize: ScreenUtil().setSp(32),
-                      color: Theme.of(context).primaryColor,
                     ),
                   ),
                 ],
@@ -367,41 +366,44 @@ class _PlayerScreenVerticalState extends State<PlayerScreenVertical> {
               Container(
                 height: 8.0,
               ),
-              SizedBox(
-                  height: ScreenUtil().setSp(18),
-                  child: (GetIt.I<AudioPlayerHandler>()
-                                      .mediaItem
-                                      .value
-                                      ?.displayTitle ??
-                                  '')
-                              .length >=
-                          26
-                      ? Marquee(
-                          text: GetIt.I<AudioPlayerHandler>()
-                                  .mediaItem
-                                  .value
-                                  ?.displayTitle ??
-                              '',
-                          style: TextStyle(
-                              fontSize: ScreenUtil().setSp(16),
-                              fontWeight: FontWeight.bold),
-                          blankSpace: 32.0,
-                          startPadding: 0,
-                          accelerationDuration: const Duration(seconds: 1),
-                          pauseAfterRound: const Duration(seconds: 2),
-                        )
-                      : Text(
-                          GetIt.I<AudioPlayerHandler>()
-                                  .mediaItem
-                                  .value
-                                  ?.displayTitle ??
-                              '',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontSize: ScreenUtil().setSp(16),
-                              fontWeight: FontWeight.bold),
-                        )),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4.0),
+                child: SizedBox(
+                    height: ScreenUtil().setSp(18),
+                    child: (GetIt.I<AudioPlayerHandler>()
+                                        .mediaItem
+                                        .value
+                                        ?.displayTitle ??
+                                    '')
+                                .length >=
+                            42
+                        ? Marquee(
+                            text: GetIt.I<AudioPlayerHandler>()
+                                    .mediaItem
+                                    .value
+                                    ?.displayTitle ??
+                                '',
+                            style: TextStyle(
+                                fontSize: ScreenUtil().setSp(16),
+                                fontWeight: FontWeight.bold),
+                            blankSpace: 32.0,
+                            startPadding: 0,
+                            accelerationDuration: const Duration(seconds: 1),
+                            pauseAfterRound: const Duration(seconds: 2),
+                          )
+                        : Text(
+                            GetIt.I<AudioPlayerHandler>()
+                                    .mediaItem
+                                    .value
+                                    ?.displayTitle ??
+                                '',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: ScreenUtil().setSp(16),
+                                fontWeight: FontWeight.bold),
+                          )),
+              ),
               Container(
                 height: 4,
               ),
@@ -416,7 +418,7 @@ class _PlayerScreenVerticalState extends State<PlayerScreenVertical> {
                 overflow: TextOverflow.clip,
                 style: TextStyle(
                   fontSize: ScreenUtil().setSp(12),
-                  color: Theme.of(context).primaryColor,
+                  color: Colors.white,
                 ),
               ),
             ],
@@ -429,28 +431,8 @@ class _PlayerScreenVerticalState extends State<PlayerScreenVertical> {
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              LyricsIconButton(24, afterOnPressed: updateColor),
-              IconButton(
-                icon: Icon(
-                  DeezerIcons.download,
-                  size: ScreenUtil().setWidth(24),
-                  semanticLabel: 'Download'.i18n,
-                ),
-                onPressed: () async {
-                  Track t = Track.fromMediaItem(
-                      GetIt.I<AudioPlayerHandler>().mediaItem.value!);
-                  if (await downloadManager.addOfflineTrack(t,
-                          private: false, isSingleton: true) !=
-                      false) {
-                    Fluttertoast.showToast(
-                        msg: 'Downloads added!'.i18n,
-                        gravity: ToastGravity.BOTTOM,
-                        toastLength: Toast.LENGTH_SHORT);
-                  }
-                },
-              ),
-              const QualityInfoWidget(),
-              RepeatButton(ScreenUtil().setWidth(24)),
+              LyricsIconButton(ScreenUtil().setSp(25) * 0.6,
+                  afterOnPressed: updateColor),
               IconButton(
                 key: iconButtonKey,
                 icon: Icon(
@@ -458,7 +440,7 @@ class _PlayerScreenVerticalState extends State<PlayerScreenVertical> {
                   DeezerIcons.queue,
                   semanticLabel: 'Queue'.i18n,
                 ),
-                iconSize: ScreenUtil().setWidth(24),
+                iconSize: ScreenUtil().setSp(25) * 0.6,
                 onPressed: () async {
                   //Fix bottom buttons (Not needed anymore?)
                   SystemChrome.setSystemUIOverlayStyle(
@@ -667,15 +649,13 @@ class _RepeatButtonState extends State<RepeatButton> {
         );
       case LoopMode.all:
         return Icon(
-          DeezerIcons.repeat,
-          color: Theme.of(context).primaryColor,
+          DeezerIcons.repeat_active,
           size: widget.iconSize,
           semanticLabel: 'Repeat'.i18n,
         );
       case LoopMode.one:
         return Icon(
           DeezerIcons.repeat_one,
-          color: Theme.of(context).primaryColor,
           size: widget.iconSize,
           semanticLabel: 'Repeat one'.i18n,
         );
@@ -709,7 +689,6 @@ class _ActionControls extends State<ActionControls> {
         Track.fromMediaItem(audioHandler.mediaItem.value!))) {
       return Icon(
         DeezerIcons.heart_fill,
-        color: settings.primaryColor,
         size: widget.iconSize,
         semanticLabel: 'Unlove'.i18n,
       );
@@ -741,11 +720,12 @@ class _ActionControls extends State<ActionControls> {
                 semanticLabel: 'Share'.i18n,
               )),
           Container(
-            margin: EdgeInsets.fromLTRB(12, 0, 12, 0),
+            margin: EdgeInsets.symmetric(horizontal: 24),
             padding: EdgeInsets.all(2),
             decoration: BoxDecoration(
-              border: Border.all(color: Settings.secondaryText, width: 1),
-              borderRadius: BorderRadius.circular(100),
+              shape: BoxShape.circle,
+              border: Border.all(
+                  color: Settings.secondaryText.withOpacity(0.9), width: 0.5),
             ),
             alignment: Alignment.center,
             child: IconButton(
@@ -824,13 +804,23 @@ class _PlaybackControlsState extends State<PlaybackControls> {
 
   @override
   Widget build(BuildContext context) {
+    final queueState = audioHandler.queueState;
+    bool shuffleModeEnabled =
+        queueState.shuffleMode == AudioServiceShuffleMode.all;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 64.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          /*IconButton(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              RepeatButton(widget.iconSize * 0.6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  /*IconButton(
               icon: Icon(
                 DeezerIcons.angry_face,
                 size: widget.iconSize * 0.44,
@@ -842,18 +832,35 @@ class _PlaybackControlsState extends State<PlaybackControls> {
                   audioHandler.skipToNext();
                 }
               }),*/
-          Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: PrevNextButton(widget.iconSize, prev: true),
-          ),
-          PlayPauseButton(widget.iconSize),
-          Padding(
-            padding: EdgeInsets.only(left: 12),
-            child: PrevNextButton(widget.iconSize),
-          )
-        ],
-      ),
-    );
+                  Padding(
+                    padding: EdgeInsets.only(right: 12),
+                    child: PrevNextButton(widget.iconSize * 0.8, prev: true),
+                  ),
+                  PlayPauseButton(widget.iconSize),
+                  Padding(
+                    padding: EdgeInsets.only(left: 12),
+                    child: PrevNextButton(widget.iconSize * 0.8),
+                  )
+                ],
+              ),
+              IconButton(
+                icon: Icon(
+                  //cons.shuffle,
+                  shuffleModeEnabled
+                      ? DeezerIcons.shuffle
+                      : DeezerIcons.shuffle_active,
+                  semanticLabel: 'Shuffle'.i18n,
+                  color: Colors.white,
+                  size: widget.iconSize * 0.6,
+                ),
+                onPressed: () async {
+                  await audioHandler.toggleShuffle();
+                  setState(() {
+                    shuffleModeEnabled = true;
+                  });
+                },
+              )
+            ]));
   }
 }
 
@@ -1091,7 +1098,7 @@ class _SeekBarState extends State<SeekBar> {
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                      vertical: 0.0, horizontal: 24.0),
+                      vertical: 4.0, horizontal: 4.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -1208,10 +1215,10 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
             child: IconButton(
               icon: Icon(
                 //cons.shuffle,
-                DeezerIcons.shuffle,
+                shuffleModeEnabled
+                    ? DeezerIcons.shuffle
+                    : DeezerIcons.shuffle_active,
                 semanticLabel: 'Shuffle'.i18n,
-                color:
-                    shuffleModeEnabled ? Theme.of(context).primaryColor : null,
               ),
               onPressed: () async {
                 await audioHandler.toggleShuffle();
