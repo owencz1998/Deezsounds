@@ -340,27 +340,22 @@ public class DownloadService extends Service {
                 qualityInfo.quality = 3;
             }
 
-            if (!download.priv) {
-                //Check file
-                try {
-                    if (download.isUserUploaded()) {
-                        outFile = new File(Deezer.generateUserUploadedMP3Filename(download.path, download.title));
-                    } else {
-                        outFile = new File(Deezer.generateFilename(download.path, trackJson, albumJson, qualityInfo.quality));
-                    }
-                    parentDir = new File(outFile.getParent());
-                } catch (Exception e) {
-                    logger.error("Error generating track filename (" + download.path + "): " + e.toString(), download);
-                    e.printStackTrace();
-                    download.state = Download.DownloadState.ERROR;
-                    exit();
-                    return;
+            //Check file
+            try {
+                if (download.isUserUploaded()) {
+                    outFile = new File(Deezer.generateUserUploadedMP3Filename(download.path, download.title));
+                } else {
+                    outFile = new File(Deezer.generateFilename(download.path, trackJson, albumJson, qualityInfo.quality));
                 }
-            } else {
-                //Private track
-                outFile = new File(download.path);
                 parentDir = new File(outFile.getParent());
+            } catch (Exception e) {
+                logger.error("Error generating track filename (" + download.path + "): " + e.toString(), download);
+                e.printStackTrace();
+                download.state = Download.DownloadState.ERROR;
+                exit();
+                return;
             }
+
             //File already exists
             if (outFile.exists()) {
                 //Delete if overwriting enabled
@@ -501,7 +496,7 @@ public class DownloadService extends Service {
             }
 
             //Cover & Tags, ignore on user uploaded
-            if (!download.priv && !download.isUserUploaded()) {
+            if (!download.isUserUploaded()) {
 
                 //Download cover for each track
                 File coverFile = new File(outFile.getPath().substring(0, outFile.getPath().lastIndexOf('.')) + ".jpg");
@@ -589,6 +584,14 @@ public class DownloadService extends Service {
                 //Album cover
                 if (settings.albumCover)
                     downloadAlbumCover(albumJson);
+
+                //Rename to trackId
+                if (download.priv) {
+                    File oldFile = new File(outFile.getPath());
+                    File newFile = new File(outFile.getPath().substring(0, outFile.getPath().lastIndexOf(".")));
+                    if (oldFile.exists()) oldFile.renameTo(newFile);
+                    
+                }
             }
 
             download.state = Download.DownloadState.DONE;

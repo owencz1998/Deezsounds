@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
-import 'package:refreezer/main.dart';
 
 import '../service/audio_service.dart';
 import '../settings.dart';
@@ -198,7 +197,6 @@ class _PlayerBarState extends State<PlayerBar> {
                             ),
                           )),
                       SizedBox(
-                        height: 2.0,
                         child: LinearProgressIndicator(
                           backgroundColor:
                               (_bgColor ?? Theme.of(context).primaryColor)

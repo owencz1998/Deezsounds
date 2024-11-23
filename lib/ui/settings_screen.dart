@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:clipboard/clipboard.dart';
 import 'package:country_currency_pickers/country.dart';
@@ -8,8 +9,8 @@ import 'package:disk_space_plus/disk_space_plus.dart';
 import 'package:external_path/external_path.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 import 'package:flutter_displaymode/flutter_displaymode.dart';
-//import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:fluttericon/web_symbols_icons.dart';
@@ -20,9 +21,12 @@ import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:refreezer/api/definitions.dart';
+import 'package:refreezer/api/download.dart';
 import 'package:refreezer/ui/log_screen.dart';
 import 'package:scrobblenaut/scrobblenaut.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:refreezer/fonts/deezer_icons.dart';
 
 import '../api/cache.dart';
 import '../api/deezer.dart';
@@ -40,11 +44,73 @@ import '../ui/home_screen.dart';
 import '../ui/updater.dart';
 import '../utils/file_utils.dart';
 
+String sanitize(String input) {
+  RegExp sanitize = RegExp(r'[\/\\\?\%\*\:\|\"\<\>]');
+  return input.replaceAll(sanitize, '');
+}
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
+}
+
+String generateFilename(Track track) {
+  String path = settings.downloadPath ?? '';
+
+  if (settings.artistFolder) path = p.join(path, '%albumArtist%');
+
+  //Album folder / with disk number
+  if (settings.albumFolder) {
+    if (settings.albumDiscFolder) {
+      path = p.join(
+          path, '%album%' + ' - Disk ' + (track.diskNumber ?? 1).toString());
+    } else {
+      path = p.join(path, '%album%');
+    }
+  }
+  String original = p.join(path, settings.downloadFilename);
+  original = original.replaceAll('%title%', sanitize(track.title ?? ''));
+  original = original.replaceAll('%album%', sanitize(track.album?.title ?? ''));
+  original =
+      original.replaceAll('%artist%', sanitize(track.artists?[0].name ?? ''));
+  // Album might not be available
+  try {
+    original = original.replaceAll(
+        '%albumArtist%',
+        sanitize(
+            track.album?.artists?[0].name ?? track.artists?[0].name ?? ''));
+  } catch (e) {
+    original = original.replaceAll(
+        '%albumArtist%', sanitize(track.artists?[0].name ?? ''));
+  }
+
+  //Artists
+  String artists = '';
+  String feats = '';
+  for (int i = 0; i < (track.artists?.length ?? 0); i++) {
+    String artist = track.artists?[i].name ?? '';
+    if (!artists.contains(artist)) artists += ', ' + artist;
+    if (i > 0 && !artists.contains(artist) && !feats.contains(artist)) {
+      feats += ', ' + artist;
+    }
+  }
+  original = original.replaceAll('%artists%', sanitize(artists).substring(2));
+  if (feats.length >= 2) {
+    original = original.replaceAll('%feats%', sanitize(feats).substring(2));
+  }
+  //Track number
+  int trackNumber = track.trackNumber ?? 0;
+  original = original.replaceAll('%trackNumber%', trackNumber.toString());
+
+  //Remove leading dots
+  original = original.replaceAll('/\\.+', '/');
+
+  String header = File(original).openRead(0, 4).toString();
+
+  if (header == 'fLaC') return original + '.flac';
+  return original + '.mp3';
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
@@ -55,14 +121,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         body: ListView(children: <Widget>[
           ListTile(
             title: Text('General'.i18n),
-            leading:
-                const LeadingIcon(Icons.settings, color: Color(0xffeca704)),
+            leading: const LeadingIcon(DeezerIcons.settings,
+                color: Color(0xffeca704)),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => const GeneralSettings())),
           ),
           ListTile(
             title: Text('Download Settings'.i18n),
-            leading: const LeadingIcon(Icons.cloud_download,
+            leading: const LeadingIcon(DeezerIcons.download_fill,
                 color: Color(0xffbe3266)),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => const DownloadsSettings())),
@@ -129,16 +195,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 MaterialPageRoute(builder: (context) => const UpdaterScreen())),
           ),
           ListTile(
+            title: Text('Export tracks'.i18n),
+            leading: Transform.rotate(
+              angle: -pi / 2,
+              child: LeadingIcon(DeezerIcons.import,
+                  color: Color.fromARGB(255, 0, 207, 62)),
+            ),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const ExportsSettings())),
+          ),
+          ListTile(
             title: Text('About'.i18n),
             leading: const LeadingIcon(Icons.info, color: Colors.grey),
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const CreditsScreen())),
           ),
-          /*ListTile(
-              title: Text('Export'.i18n),
-              leading: const LeadingIcon(Icons.info, color: Colors.grey),
-              onTap: () => downloadManager.exportDb(),
-            ),*/
           Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -884,24 +955,24 @@ class _FilenameTemplateDialogState extends State<FilenameTemplateDialog> {
   }
 }
 
-class DownloadsSettings extends StatefulWidget {
-  const DownloadsSettings({super.key});
+class ExportsSettings extends StatefulWidget {
+  const ExportsSettings({super.key});
 
   @override
-  _DownloadsSettingsState createState() => _DownloadsSettingsState();
+  _ExportsSettingsState createState() => _ExportsSettingsState();
 }
 
-class _DownloadsSettingsState extends State<DownloadsSettings> {
-  double _downloadThreads = settings.downloadThreads.toDouble();
+class _ExportsSettingsState extends State<ExportsSettings> {
   final TextEditingController _artistSeparatorController =
       TextEditingController(text: settings.artistSeparator);
+  double? _progress;
+  bool _errors = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: FreezerAppBar('Download Settings'.i18n),
-      body: ListView(
-        children: [
+        appBar: FreezerAppBar('Export Settings'.i18n),
+        body: ListView(children: [
           ListTile(
             title: Text('Download path'.i18n),
             leading: const Icon(Icons.folder),
@@ -931,7 +1002,58 @@ class _DownloadsSettingsState extends State<DownloadsSettings> {
             },
           ),
           ListTile(
-            title: Text('Downloads naming'.i18n),
+              title: Text('Exports tracks'.i18n),
+              subtitle: Text('Export all tracks to internal storage.'.i18n),
+              leading: Transform.rotate(
+                angle: -pi / 2,
+                child: Icon(
+                  DeezerIcons.import,
+                ),
+              ),
+              onTap: () async {
+                List<Track> allTracks =
+                    await downloadManager.allOfflineTracks();
+                String dirPath = p.join(
+                    (await getExternalStorageDirectory())?.path ?? '',
+                    'offline/');
+                for (Track track in allTracks) {
+                  try {
+                    String destinationPath = generateFilename(track);
+                    if (!(await Directory(p.dirname(destinationPath))
+                        .exists())) {
+                      await Directory(p.dirname(destinationPath))
+                          .create(recursive: true);
+                    }
+                    if (await File(p.join(dirPath, track.id)).exists()) {
+                      await File(p.join(dirPath, track.id))
+                          .copy(destinationPath);
+                    }
+                  } catch (e) {
+                    setState(() {
+                      _errors = true;
+                    });
+                  }
+                  setState(() {
+                    _progress =
+                        (allTracks.indexOf(track) + 1) / allTracks.length;
+                  });
+                }
+                Fluttertoast.showToast(
+                    msg: _errors ? 'Done. Some errors occured.' : 'Done !');
+              }),
+          if (_progress != null)
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                child: LinearProgressIndicator(
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  color: _errors
+                      ? Colors.red.shade600
+                      : Colors.greenAccent.shade400,
+                  value: _progress,
+                )),
+          const FreezerDivider(),
+          ListTile(
+            title: Text('Exports naming'.i18n),
             subtitle: Text('Currently'.i18n + ': ${settings.downloadFilename}'),
             leading: const Icon(Icons.text_format),
             onTap: () {
@@ -947,22 +1069,69 @@ class _DownloadsSettingsState extends State<DownloadsSettings> {
             },
           ),
           ListTile(
-            title: Text('Singleton naming'.i18n),
-            subtitle:
-                Text('Currently'.i18n + ': ${settings.singletonFilename}'),
-            leading: const Icon(Icons.text_format),
-            onTap: () {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return FilenameTemplateDialog(settings.singletonFilename,
-                        (f) async {
-                      setState(() => settings.singletonFilename = f);
-                      await settings.save();
-                    });
-                  });
-            },
+            title: Text('Create folders for artist'.i18n),
+            trailing: Switch(
+              value: settings.artistFolder,
+              onChanged: (v) {
+                setState(() => settings.artistFolder = v);
+                settings.save();
+              },
+            ),
+            leading: const Icon(Icons.folder),
           ),
+          ListTile(
+              title: Text('Create folders for albums'.i18n),
+              trailing: Switch(
+                value: settings.albumFolder,
+                onChanged: (v) {
+                  setState(() => settings.albumFolder = v);
+                  settings.save();
+                },
+              ),
+              leading: const Icon(Icons.folder)),
+          ListTile(
+            title: Text('Artist separator'.i18n),
+            leading: const Icon(WebSymbols.tag),
+            trailing: SizedBox(
+              width: 75.0,
+              child: TextField(
+                controller: _artistSeparatorController,
+                onChanged: (s) async {
+                  settings.artistSeparator = s;
+                  await settings.save();
+                },
+              ),
+            ),
+          ),
+          ListenableBuilder(
+              listenable: playerBarState,
+              builder: (BuildContext context, Widget? child) {
+                return AnimatedPadding(
+                  duration: Duration(milliseconds: 200),
+                  padding:
+                      EdgeInsets.only(bottom: playerBarState.state ? 80 : 0),
+                );
+              }),
+        ]));
+  }
+}
+
+class DownloadsSettings extends StatefulWidget {
+  const DownloadsSettings({super.key});
+
+  @override
+  _DownloadsSettingsState createState() => _DownloadsSettingsState();
+}
+
+class _DownloadsSettingsState extends State<DownloadsSettings> {
+  double _downloadThreads = settings.downloadThreads.toDouble();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: FreezerAppBar('Download Settings'.i18n),
+      body: ListView(
+        children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
@@ -1022,48 +1191,7 @@ class _DownloadsSettingsState extends State<DownloadsSettings> {
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => const TagSelectionScreen())),
           ),
-          ListTile(
-            title: Text('Create folders for artist'.i18n),
-            trailing: Switch(
-              value: settings.artistFolder,
-              onChanged: (v) {
-                setState(() => settings.artistFolder = v);
-                settings.save();
-              },
-            ),
-            leading: const Icon(Icons.folder),
-          ),
-          ListTile(
-              title: Text('Create folders for albums'.i18n),
-              trailing: Switch(
-                value: settings.albumFolder,
-                onChanged: (v) {
-                  setState(() => settings.albumFolder = v);
-                  settings.save();
-                },
-              ),
-              leading: const Icon(Icons.folder)),
-          ListTile(
-              title: Text('Create folder for playlist'.i18n),
-              trailing: Switch(
-                value: settings.playlistFolder,
-                onChanged: (v) {
-                  setState(() => settings.playlistFolder = v);
-                  settings.save();
-                },
-              ),
-              leading: const Icon(Icons.folder)),
           const FreezerDivider(),
-          ListTile(
-              title: Text('Separate albums by discs'.i18n),
-              trailing: Switch(
-                value: settings.albumDiscFolder,
-                onChanged: (v) {
-                  setState(() => settings.albumDiscFolder = v);
-                  settings.save();
-                },
-              ),
-              leading: const Icon(Icons.album)),
           ListTile(
               title: Text('Overwrite already downloaded files'.i18n),
               trailing: Switch(
@@ -1096,17 +1224,7 @@ class _DownloadsSettingsState extends State<DownloadsSettings> {
               ),
               leading: const Icon(Icons.image)),
           ListTile(
-              title: Text('Save album cover'.i18n),
-              trailing: Switch(
-                value: settings.albumCover,
-                onChanged: (v) {
-                  setState(() => settings.albumCover = v);
-                  settings.save();
-                },
-              ),
-              leading: const Icon(Icons.image)),
-          ListTile(
-              title: Text('Album cover resolution'.i18n),
+              title: Text('Track cover resolution'.i18n),
               subtitle: Text(
                   "WARNING: Resolutions above 1200 aren't officially supported"
                       .i18n),
@@ -1129,32 +1247,6 @@ class _DownloadsSettingsState extends State<DownloadsSettings> {
                       await settings.save();
                     },
                   ))),
-          ListTile(
-              title: Text('Create .nomedia files'.i18n),
-              subtitle:
-                  Text('To prevent gallery being filled with album art'.i18n),
-              trailing: Switch(
-                value: settings.nomediaFiles,
-                onChanged: (v) {
-                  setState(() => settings.nomediaFiles = v);
-                  settings.save();
-                },
-              ),
-              leading: const Icon(Icons.insert_drive_file)),
-          ListTile(
-            title: Text('Artist separator'.i18n),
-            leading: const Icon(WebSymbols.tag),
-            trailing: SizedBox(
-              width: 75.0,
-              child: TextField(
-                controller: _artistSeparatorController,
-                onChanged: (s) async {
-                  settings.artistSeparator = s;
-                  await settings.save();
-                },
-              ),
-            ),
-          ),
           const FreezerDivider(),
           ListTile(
             title: Text('Download Log'.i18n),
@@ -1820,7 +1912,7 @@ class _CreditsScreenState extends State<CreditsScreen> {
             subtitle: Text('Source code, report issues there.'.i18n),
             leading: const Icon(Icons.code, color: Colors.green, size: 36.0),
             onTap: () {
-              launchUrlString('https://github.com/DJDoubleD/ReFreezer');
+              launchUrlString('https://github.com/PetitPrinc3/Deezer');
             },
           ),
           ListTile(

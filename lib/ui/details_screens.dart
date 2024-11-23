@@ -2808,57 +2808,60 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
-                                          Padding(
-                                            padding:
-                                                EdgeInsets.only(right: 8.0),
-                                            child: IconButton(
-                                              icon: isLibrary
-                                                  ? Icon(
-                                                      DeezerIcons.heart_fill,
-                                                      size: 25,
-                                                      color: Theme.of(context)
-                                                          .primaryColor,
-                                                      semanticLabel:
-                                                          'Unlove'.i18n,
-                                                    )
-                                                  : Icon(
-                                                      DeezerIcons.heart,
-                                                      size: 25,
-                                                      semanticLabel:
-                                                          'Love'.i18n,
-                                                    ),
-                                              onPressed: () async {
-                                                //Add to library
-                                                if (!isLibrary) {
-                                                  await deezerAPI.addPlaylist(
-                                                      playlist.id ?? '');
+                                          if (playlist.user?.name !=
+                                              deezerAPI.userName)
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 8.0),
+                                              child: IconButton(
+                                                icon: isLibrary
+                                                    ? Icon(
+                                                        DeezerIcons.heart_fill,
+                                                        size: 25,
+                                                        color: Theme.of(context)
+                                                            .primaryColor,
+                                                        semanticLabel:
+                                                            'Unlove'.i18n,
+                                                      )
+                                                    : Icon(
+                                                        DeezerIcons.heart,
+                                                        size: 25,
+                                                        semanticLabel:
+                                                            'Love'.i18n,
+                                                      ),
+                                                onPressed: () async {
+                                                  //Add to library
+                                                  if (!isLibrary) {
+                                                    await deezerAPI.addPlaylist(
+                                                        playlist.id ?? '');
+                                                    Fluttertoast.showToast(
+                                                        msg: 'Added to library'
+                                                            .i18n,
+                                                        toastLength:
+                                                            Toast.LENGTH_SHORT,
+                                                        gravity: ToastGravity
+                                                            .BOTTOM);
+                                                    setState(() => playlist
+                                                        .library = true);
+                                                    return;
+                                                  }
+                                                  //Remove
+                                                  await deezerAPI
+                                                      .removePlaylist(
+                                                          playlist.id ?? '');
                                                   Fluttertoast.showToast(
-                                                      msg: 'Added to library'
-                                                          .i18n,
+                                                      msg:
+                                                          'Playlist removed from library!'
+                                                              .i18n,
                                                       toastLength:
                                                           Toast.LENGTH_SHORT,
                                                       gravity:
                                                           ToastGravity.BOTTOM);
                                                   setState(() =>
-                                                      playlist.library = true);
-                                                  return;
-                                                }
-                                                //Remove
-                                                await deezerAPI.removePlaylist(
-                                                    playlist.id ?? '');
-                                                Fluttertoast.showToast(
-                                                    msg:
-                                                        'Playlist removed from library!'
-                                                            .i18n,
-                                                    toastLength:
-                                                        Toast.LENGTH_SHORT,
-                                                    gravity:
-                                                        ToastGravity.BOTTOM);
-                                                setState(() =>
-                                                    playlist.library = false);
-                                              },
+                                                      playlist.library = false);
+                                                },
+                                              ),
                                             ),
-                                          ),
                                           IconButton(
                                               onPressed: () => {
                                                     Share.share(
@@ -3270,7 +3273,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                     Padding(
                                       padding: EdgeInsets.only(right: 8.0),
                                       child: IconButton(
-                                        icon: (isLibrary == true)
+                                        icon: isLibrary
                                             ? Icon(
                                                 DeezerIcons.heart_fill,
                                                 size: 25,

@@ -285,7 +285,7 @@ class MenuSheet {
         bool isDownloaded = await downloadManager.checkOffline(track: t);
         if (isDownloaded) {}
         if (await downloadManager.addOfflineTrack(t,
-                private: false, isSingleton: true) !=
+                private: true, isSingleton: true) !=
             false) {
           showDownloadStartedToast();
         }
@@ -419,6 +419,9 @@ class MenuSheet {
       downloadAlbum(album, context),
       offlineAlbum(album, context),
       shareTile('album', album.id!),
+      ...List.generate(album.artists?.length ?? 0, (int index) {
+        return showArtist(album.artists![index], context);
+      }),
       ...options
     ]);
   }

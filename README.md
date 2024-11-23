@@ -75,13 +75,6 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
 - Merge offline tracks and online tracks under tracks (same for playlists, albums, etc.)
 - Caching information to avoid reloading every time (eg. favorites screen)
 - Implement UpdateOfflinePlaylist() in downloadManager
-- Re-think the offline/download scheme. 
-  - Currently (ReFreezer) :
-    - Offline = downloaded "within" the app and accessible ofline through the app only
-    - Download = downloaded to local storage with art and lyrics and accessible as such, but not accessible through the app in offline mode
-  - Next :
-    - Downloaded within the app with art and lyrics
-    - Export button under settings to export tracks to local storage (file copy instead of second download)
 - Turn the mod into a skin for the official refreezer app
 - NavigationRail for landscape mode on left side of screen
 
@@ -95,6 +88,7 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
 - Deezer like info menu
 - Deezer like favorite screen (Offline : offline playlists and random offline tracks)
 - Most deezer pages (artists, playlists, albums)
+- Downloads are stored within the app storage (Android/data/package) and can be exported to local storage under settings with full tags
 
 ### :rocket: ReFreezer Features :
 - Restored all features of the old Freezer app, most notably:

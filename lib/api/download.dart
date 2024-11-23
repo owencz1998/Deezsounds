@@ -94,6 +94,20 @@ class DownloadManager {
     await platform.invokeMethod('loadDownloads');
   }
 
+  void exportTracks() async {
+    List<Track> allTracks = await allOfflineTracks();
+    for (Track track in allTracks) {
+      String path = p.join(offlinePath!, track.id);
+      File trackFile = File(path);
+      if (await trackFile.exists()) {
+        String newPath = _generatePath(track, false);
+        await trackFile.copy(newPath);
+      }
+      Fluttertoast.showToast(
+          msg: 'Eported ' + allTracks.length.toString() + ' tracks.');
+    }
+  }
+
   //Get all downloads from db
   Future<List<Download>> getDownloads() async {
     List raw = await platform.invokeMethod('getDownloads');
