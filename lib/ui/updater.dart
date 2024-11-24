@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:refreezer/fonts/deezer_icons.dart';
+import 'package:refreezer/main.dart';
+import 'package:refreezer/settings.dart';
 
 import '../api/cache.dart';
 import '../api/download.dart';
@@ -148,109 +152,138 @@ class _UpdaterScreenState extends State<UpdaterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ScrollController scrollController = ScrollController();
     return Scaffold(
-        appBar: FreezerAppBar('Updates'.i18n),
-        body: ListView(
-          children: [
-            if (_error) const ErrorScreen(),
-            if (_loading)
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [CircularProgressIndicator()],
-                ),
+      appBar: FreezerAppBar('Updates'.i18n),
+      body: ListView(
+        controller: scrollController,
+        children: [
+          if (_error) const ErrorScreen(),
+          if (_loading)
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [CircularProgressIndicator()],
               ),
-            if (!_error &&
-                !_loading &&
-                (_latestRelease?.version ?? Version(0, 0, 0)) <=
-                    _currentVersion)
-              Center(
-                  child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text('You are running latest version!'.i18n,
+            ),
+          if (!_error &&
+              !_loading &&
+              (_latestRelease?.version ?? Version(0, 0, 0)) <= _currentVersion)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('You are running the latest version!'.i18n,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      fontSize: 26.0, fontWeight: FontWeight.bold)),
+            ),
+          if (!_error &&
+              !_loading &&
+              (_latestRelease?.version ?? Version(0, 0, 0)) <= _currentVersion)
+            ExpansionTile(
+              textColor: Theme.of(context).textTheme.bodyMedium?.color,
+              iconColor: Theme.of(context).textTheme.bodyMedium?.color,
+              collapsedTextColor: Settings.secondaryText,
+              collapsedIconColor: Settings.secondaryText,
+              leading: Icon(DeezerIcons.release_notes),
+              title: Text('See changelog'),
+              children: [
+                Markdown(
+                  controller: scrollController,
+                  data: _latestRelease?.changelog ?? '',
+                  shrinkWrap: true,
+                ),
+              ],
+            ),
+          if (!_error &&
+              !_loading &&
+              (_latestRelease?.version ?? Version(0, 0, 0)) > _currentVersion)
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'New update available!'.i18n +
+                        ' ' +
+                        _latestRelease!.version.toString(),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 26.0)),
-              )),
-            if (!_error &&
-                !_loading &&
-                (_latestRelease?.version ?? Version(0, 0, 0)) > _currentVersion)
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'New update available!'.i18n +
-                          ' ' +
-                          _latestRelease!.version.toString(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          fontSize: 20.0, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Text(
-                    'Current version: ' + _currentVersion.toString(),
                     style: const TextStyle(
-                        fontSize: 14.0, fontStyle: FontStyle.italic),
+                        fontSize: 20.0, fontWeight: FontWeight.bold),
                   ),
-                  Container(height: 8.0),
-                  const FreezerDivider(),
-                  Container(height: 8.0),
-                  const Text(
-                    'Changelog',
-                    style:
-                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                  ),
-                  Container(height: 8.0),
-                  const FreezerDivider(),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                    child: Container(
-                      constraints: const BoxConstraints(
-                          maxHeight: 350 // Screen Title height, ...
-                          ),
-                      child: Markdown(
-                        data: _latestRelease?.changelog ?? '',
-                        shrinkWrap: true,
-                      ),
+                ),
+                Text(
+                  'Current version: ' + _currentVersion.toString(),
+                  style: const TextStyle(
+                      fontSize: 14.0, fontStyle: FontStyle.italic),
+                ),
+                Container(height: 8.0),
+                const FreezerDivider(),
+                Container(height: 8.0),
+                const Text(
+                  'Changelog',
+                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                ),
+                Container(height: 8.0),
+                const FreezerDivider(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                  child: Container(
+                    constraints: const BoxConstraints(
+                        maxHeight: 350 // Screen Title height, ...
+                        ),
+                    child: Markdown(
+                      controller: scrollController,
+                      data: _latestRelease?.changelog ?? '',
+                      shrinkWrap: true,
                     ),
                   ),
-                  const FreezerDivider(),
-                  Container(height: 8.0),
-                  //Available download
-                  if (_versionDownload != null)
-                    Column(children: [
-                      ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
-                          ),
-                          onPressed: _buttonEnabled
-                              ? () {
-                                  setState(() => _buttonEnabled = false);
-                                  _download();
-                                }
-                              : null,
-                          child: Text(
-                              'Download'.i18n + ' (${_versionDownload?.abi})')),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: LinearProgressIndicator(
-                          value: _progress,
-                          color: Theme.of(context).primaryColor,
+                ),
+                const FreezerDivider(),
+                Container(height: 8.0),
+                //Available download
+                if (_versionDownload != null)
+                  Column(children: [
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).primaryColor,
                         ),
-                      )
-                    ]),
-                  //Unsupported arch
-                  if (_versionDownload == null)
-                    Text(
-                      'Unsupported platform!'.i18n + ' $_arch',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 16.0),
+                        onPressed: _buttonEnabled
+                            ? () {
+                                setState(() => _buttonEnabled = false);
+                                _download();
+                              }
+                            : null,
+                        child: Text(
+                            'Download'.i18n + ' (${_versionDownload?.abi})')),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: LinearProgressIndicator(
+                        value: _progress,
+                        color: Theme.of(context).primaryColor,
+                      ),
                     )
-                ],
-              )
-          ],
-        ));
+                  ]),
+                //Unsupported arch
+                if (_versionDownload == null)
+                  Text(
+                    'Unsupported platform!'.i18n + ' $_arch',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 16.0),
+                  )
+              ],
+            ),
+          ListenableBuilder(
+              listenable: playerBarState,
+              builder: (BuildContext context, Widget? child) {
+                return AnimatedPadding(
+                  duration: Duration(milliseconds: 200),
+                  padding:
+                      EdgeInsets.only(bottom: playerBarState.state ? 80 : 0),
+                );
+              })
+        ],
+      ),
+    );
   }
 }
 

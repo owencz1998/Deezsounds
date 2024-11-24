@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logging/logging.dart';
+import 'package:lottie/lottie.dart';
+import 'package:refreezer/main.dart';
 
 import '../api/deezer.dart';
 import '../api/deezer_login.dart';
@@ -11,7 +13,6 @@ import '../api/definitions.dart';
 import '../utils/navigator_keys.dart';
 import '../settings.dart';
 import '../translations.i18n.dart';
-import 'home_screen.dart';
 
 class LoginWidget extends StatefulWidget {
   final Function? callback;
@@ -57,7 +58,8 @@ class _LoginWidgetState extends State<LoginWidget> {
           builder: (context) => AlertDialog(
                 title: Text('Deezer is unavailable'.i18n),
                 content: Text(
-                    'Deezer is unavailable in your country, ReFreezer might not work properly. Please use a VPN'.i18n),
+                    'Deezer is unavailable in your country, ReFreezer might not work properly. Please use a VPN'
+                        .i18n),
                 actions: [
                   TextButton(
                     child: Text('Continue'.i18n),
@@ -93,7 +95,9 @@ class _LoginWidgetState extends State<LoginWidget> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Error logging in! Please check your token and internet connection and try again.'.i18n),
+                Text(
+                    'Error logging in! Please check your token and internet connection and try again.'
+                        .i18n),
                 if (_error != null) Text('\n\n$_error')
               ],
             ),
@@ -116,7 +120,8 @@ class _LoginWidgetState extends State<LoginWidget> {
     //Try logging in
     try {
       deezerAPI.arl = settings.arl;
-      bool resp = await deezerAPI.rawAuthorize(onError: (e) => setState(() => _error = e.toString()));
+      bool resp = await deezerAPI.rawAuthorize(
+          onError: (e) => setState(() => _error = e.toString()));
       if (resp == false) {
         //false, not null
         int arlLength = (settings.arl ?? '').length;
@@ -172,103 +177,156 @@ class _LoginWidgetState extends State<LoginWidget> {
         });
     if (settings.arl == null) {
       return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: ListView(
             children: <Widget>[
-              const FreezerTitle(),
-              Container(
-                height: 8.0,
+              Stack(alignment: Alignment.bottomLeft, children: [
+                Container(
+                  margin: EdgeInsets.only(bottom: 4.0),
+                  decoration: BoxDecoration(color: settings.primaryColor),
+                  height: MediaQuery.of(context).size.height / 3,
+                  width: MediaQuery.of(context).size.width,
+                  alignment: Alignment.bottomCenter,
+                ),
+                Lottie.asset('assets/animations/welcome_waves.json',
+                    repeat: true,
+                    frameRate: FrameRate(25),
+                    fit: BoxFit.fitWidth,
+                    width: MediaQuery.of(context).size.width,
+                    delegates: LottieDelegates(values: [
+                      ValueDelegate.color(const ['**'],
+                          value: Theme.of(context).scaffoldBackgroundColor)
+                    ])),
+              ]),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
+                child: Text(
+                  'WELCOME TO DEEZER'.i18n,
+                  style: TextStyle(
+                      fontFamily: 'Deezer',
+                      fontWeight: FontWeight.w900,
+                      fontSize: 64),
+                  textAlign: TextAlign.start,
+                ),
               ),
-              Text(
-                'Please login using your Deezer account.'.i18n,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16.0),
-              ),
-              Container(
-                height: 16.0,
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                child: Text(
+                  'Sign up for free or log in'.i18n,
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                      fontSize: 16.0, color: Settings.secondaryText),
+                ),
               ),
               //Email login dialog
               Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: OutlinedButton(
-                    child: Text(
-                      'Login using email'.i18n,
-                    ),
-                    onPressed: () {
-                      showDialog(context: context, builder: (context) => EmailLogin(_update));
-                    },
-                  )),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: settings.primaryColor,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10))),
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) => EmailLogin(_update));
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12.0),
+                        child: Text(
+                          'Continue with email'.i18n,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 18.0),
+                        ),
+                      ))),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: OutlinedButton(
-                  child: Text('Login using browser'.i18n),
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginBrowser(_update)));
-                  },
+                padding: EdgeInsets.symmetric(vertical: 4.0),
+                child: Text(
+                  'Or'.i18n,
+                  style: TextStyle(color: Settings.secondaryText),
+                  textAlign: TextAlign.center,
                 ),
               ),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                      padding: EdgeInsets.all(2),
+                      margin:
+                          EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                            color: Settings.secondaryText.withOpacity(0.9),
+                            width: 0.5),
+                      ),
+                      alignment: Alignment.center,
+                      child: IconButton(
+                        icon: Image.asset('assets/chrome.png'),
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => LoginBrowser(_update)));
+                        },
+                      )),
+                  Container(
+                      padding: EdgeInsets.all(2),
+                      margin:
+                          EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                            color: Settings.secondaryText.withOpacity(0.9),
+                            width: 0.5),
+                      ),
+                      alignment: Alignment.center,
+                      child: IconButton(
+                          icon: Image.asset('assets/token.png'),
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  Future.delayed(
+                                      const Duration(seconds: 1),
+                                      () => {
+                                            focusNode.requestFocus()
+                                          }); // autofocus doesn't work - it's replacement
+                                  return AlertDialog(
+                                    title: Text('Enter ARL'.i18n),
+                                    content: TextField(
+                                      onChanged: (String s) => _arl = s,
+                                      decoration: InputDecoration(
+                                          labelText: 'Token (ARL)'.i18n),
+                                      focusNode: focusNode,
+                                      controller: controller,
+                                      onSubmitted: (String s) {
+                                        goARL(focusNode, controller);
+                                      },
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: Text('Save'.i18n),
+                                        onPressed: () =>
+                                            goARL(null, controller),
+                                      )
+                                    ],
+                                  );
+                                });
+                          }))
+                ],
+              ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: OutlinedButton(
-                  child: Text('Login using token'.i18n),
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          Future.delayed(const Duration(seconds: 1),
-                              () => {focusNode.requestFocus()}); // autofocus doesn't work - it's replacement
-                          return AlertDialog(
-                            title: Text('Enter ARL'.i18n),
-                            content: TextField(
-                              onChanged: (String s) => _arl = s,
-                              decoration: InputDecoration(labelText: 'Token (ARL)'.i18n),
-                              focusNode: focusNode,
-                              controller: controller,
-                              onSubmitted: (String s) {
-                                goARL(focusNode, controller);
-                              },
-                            ),
-                            actions: <Widget>[
-                              TextButton(
-                                child: Text('Save'.i18n),
-                                onPressed: () => goARL(null, controller),
-                              )
-                            ],
-                          );
-                        });
-                  },
-                ),
-              ),
-              Container(
-                height: 16.0,
-              ),
-              Text(
-                "If you don't have account, you can register on deezer.com for free.".i18n,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16.0),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: OutlinedButton(
-                  child: Text('Open in browser'.i18n),
-                  onPressed: () {
-                    InAppBrowser.openWithSystemBrowser(url: WebUri('https://deezer.com/register'));
-                  },
-                ),
-              ),
-              Container(
-                height: 8.0,
-              ),
-              const Divider(),
-              Container(
-                height: 8.0,
-              ),
-              Text(
-                "By using this app, you don't agree with the Deezer ToS".i18n,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16.0),
-              )
+                  padding: EdgeInsets.symmetric(vertical: 32.0),
+                  child: Text(
+                    "By using this app, you don't agree with the Deezer ToS."
+                        .i18n,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 16.0),
+                  ))
             ],
           ),
         ),
@@ -288,15 +346,21 @@ class LoginBrowser extends StatelessWidget {
       children: <Widget>[
         Expanded(
           child: InAppWebView(
-            initialUrlRequest: URLRequest(url: WebUri('https://deezer.com/login')),
-            onLoadStart: (InAppWebViewController controller, WebUri? loadedUri) async {
+            initialUrlRequest:
+                URLRequest(url: WebUri('https://deezer.com/login')),
+            onLoadStart:
+                (InAppWebViewController controller, WebUri? loadedUri) async {
               //Offers URL
-              if (!loadedUri!.path.contains('/login') && !loadedUri.path.contains('/register')) {
-                controller.evaluateJavascript(source: 'window.location.href = "/open_app"');
+              if (!loadedUri!.path.contains('/login') &&
+                  !loadedUri.path.contains('/register')) {
+                controller.evaluateJavascript(
+                    source: 'window.location.href = "/open_app"');
               }
 
               //Parse arl from url
-              if (loadedUri.toString().startsWith('intent://deezer.page.link')) {
+              if (loadedUri
+                  .toString()
+                  .startsWith('intent://deezer.page.link')) {
                 try {
                   //Actual url is in `link` query parameter
                   Uri linkUri = Uri.parse(loadedUri.queryParameters['link']!);
@@ -307,7 +371,8 @@ class LoginBrowser extends StatelessWidget {
                   Navigator.of(context).pop();
                   updateParent();
                 } catch (e) {
-                  Logger.root.severe('Error loading ARL from browser login: $e');
+                  Logger.root
+                      .severe('Error loading ARL from browser login: $e');
                 }
               }
             },
@@ -361,7 +426,8 @@ class _EmailLoginState extends State<EmailLogin> {
           context: context,
           builder: (context) => AlertDialog(
                 title: Text('Error logging in!'.i18n),
-                content: Text('Error logging in using email, please check your credentials.\n\nError: ${exception!}'),
+                content: Text(
+                    'Error logging in using email, please check your credentials.\n\nError: ${exception!}'),
                 actions: [
                   TextButton(
                     child: Text('Dismiss'.i18n),
@@ -376,43 +442,112 @@ class _EmailLoginState extends State<EmailLogin> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Email Login'.i18n),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: _loading
-            ? [const CircularProgressIndicator()]
-            : [
-                TextField(
-                  decoration: InputDecoration(labelText: 'Email'.i18n),
-                  onChanged: (s) => _email = s,
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: ListView(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 52.0, bottom: 24.0),
+            child: Text(
+              'Email',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontFamily: 'Deezer',
+                  fontSize: 56.0,
+                  fontWeight: FontWeight.w700),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+            child: TextField(
+              cursorColor: Theme.of(context).primaryColor,
+              decoration: InputDecoration(
+                labelText: 'Email'.i18n,
+                floatingLabelStyle:
+                    TextStyle(color: Theme.of(context).primaryColor),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: Theme.of(context).primaryColor, width: 2.0),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
-                Container(
-                  height: 8.0,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: _email == null
+                          ? Settings.secondaryText
+                          : Theme.of(context).primaryColor,
+                      width: 2.0),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
-                TextField(
-                  obscureText: true,
-                  decoration: InputDecoration(labelText: 'Password'.i18n),
-                  onChanged: (s) => _password = s,
-                )
-              ],
+              ),
+              onChanged: (s) => _email = s,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+            child: TextField(
+              obscureText: true,
+              cursorColor: Theme.of(context).primaryColor,
+              decoration: InputDecoration(
+                labelText: 'Password'.i18n,
+                floatingLabelStyle:
+                    TextStyle(color: Theme.of(context).primaryColor),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: Theme.of(context).primaryColor, width: 2.0),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: _password == null
+                          ? Settings.secondaryText
+                          : Theme.of(context).primaryColor,
+                      width: 2.0),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+              onChanged: (s) => _password = s,
+            ),
+          ),
+          Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: settings.primaryColor,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10))),
+                  onPressed: () async {
+                    if (_email != null && _password != null) {
+                      await _login();
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: 'Missing email or password!'.i18n,
+                          gravity: ToastGravity.BOTTOM,
+                          toastLength: Toast.LENGTH_SHORT);
+                    }
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12.0),
+                    child: _loading
+                        ? Align(
+                            alignment: Alignment.center,
+                            child: SizedBox(
+                              height: 12.0,
+                              width: 12.0,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          )
+                        : Text(
+                            'Continue'.i18n,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 18.0),
+                          ),
+                  ))),
+        ],
       ),
-      actions: [
-        if (!_loading)
-          TextButton(
-            child: const Text('Login'),
-            onPressed: () async {
-              if (_email != null && _password != null) {
-                await _login();
-              } else {
-                Fluttertoast.showToast(
-                    msg: 'Missing email or password!'.i18n,
-                    gravity: ToastGravity.BOTTOM,
-                    toastLength: Toast.LENGTH_SHORT);
-              }
-            },
-          )
-      ],
     );
   }
 }

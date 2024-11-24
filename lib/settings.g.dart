@@ -63,7 +63,7 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
                 'art'
               ]
       ..theme =
-          $enumDecodeNullable(_$ThemesEnumMap, json['theme']) ?? Themes.Dark
+          $enumDecodeNullable(_$ThemesEnumMap, json['theme']) ?? Themes.Deezer
       ..useSystemTheme = json['useSystemTheme'] as bool? ?? false
       ..colorGradientBackground =
           json['colorGradientBackground'] as bool? ?? true

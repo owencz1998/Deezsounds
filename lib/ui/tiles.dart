@@ -139,8 +139,7 @@ class SimpleTrackTile extends StatelessWidget {
       title: Text(track.title ?? '',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-              color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
       subtitle: Text(track.artistString ?? '',
           style: TextStyle(color: Settings.secondaryText, fontSize: 12)),
       trailing: PlayerMenuButton(track),
@@ -383,14 +382,14 @@ class SmartTrackListTile extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                              fontSize: 18.0,
-                              shadows: [
-                                Shadow(
-                                    offset: Offset(1, 1),
-                                    blurRadius: 2,
-                                    color: Colors.black)
-                              ],
-                              color: Colors.white),
+                            fontSize: 18.0,
+                            shadows: [
+                              Shadow(
+                                  offset: Offset(1, 1),
+                                  blurRadius: 2,
+                                  color: Colors.black)
+                            ],
+                          ),
                         ),
                       ),
                     )
@@ -752,10 +751,8 @@ class LargePlaylistTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     textAlign: TextAlign.start,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12)),
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
               ),
             ),
             if (playlist.user?.name != null && playlist.user?.name != '')
@@ -825,10 +822,8 @@ class LargeAlbumTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       textAlign: TextAlign.start,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12)),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 )),
             SizedBox(
                 width: 180,

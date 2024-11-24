@@ -98,7 +98,6 @@ class FavoriteScreen extends StatelessWidget {
             },
             trailing: Icon(
               Icons.chevron_right,
-              color: Colors.white,
             )),
         FreezerDivider(),
         ListTile(
@@ -111,7 +110,6 @@ class FavoriteScreen extends StatelessWidget {
             },
             trailing: Icon(
               Icons.chevron_right,
-              color: Colors.white,
             )),
         FreezerDivider(),
         FutureBuilder(
@@ -145,7 +143,6 @@ class FavoriteScreen extends StatelessWidget {
                         style: TextStyle(color: Settings.secondaryText)),
                     Icon(
                       Icons.chevron_right,
-                      color: Colors.white,
                     )
                   ],
                 ),
@@ -296,10 +293,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
             ),
             title: Text(
               'Favorite tracks'.i18n,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             trailing: Transform.scale(
                 scale: 0.5, // Adjust the scale to 75% of the original size
@@ -324,10 +318,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
             ),
             title: Text(
               'Favorite tracks'.i18n,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -338,7 +329,6 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
                     style: TextStyle(color: Settings.secondaryText)),
                 Icon(
                   Icons.chevron_right,
-                  color: Colors.white,
                 )
               ],
             ),
@@ -434,8 +424,7 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
           ),
           title: Text(
             'Playlists'.i18n,
-            style: TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           trailing: Transform.scale(
               scale: 0.5, // Adjust the scale to 75% of the original size
@@ -460,10 +449,7 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
                 ),
                 title: Text(
                   'Playlists'.i18n,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -474,7 +460,6 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
                         style: TextStyle(color: Settings.secondaryText)),
                     Icon(
                       Icons.chevron_right,
-                      color: Colors.white,
                     )
                   ],
                 ),
@@ -528,7 +513,6 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
                                 child: Text('Favorite tracks'.i18n,
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
-                                        color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12)),
                               ),
@@ -562,7 +546,6 @@ class PlayerMenuButton extends StatelessWidget {
     return IconButton(
       icon: Icon(
         DeezerIcons.more_vert,
-        color: Colors.white,
         semanticLabel: 'Options'.i18n,
       ),
       onPressed: () {

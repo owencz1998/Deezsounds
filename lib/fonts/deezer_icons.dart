@@ -181,4 +181,6 @@ class DeezerIcons {
       IconData(0xe914, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData import_small =
       IconData(0xe915, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData release_notes =
+      IconData(0xe916, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

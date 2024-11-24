@@ -149,9 +149,9 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                           title: Text(
                                             album.title ?? '',
                                             style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 18.0,
-                                                color: Colors.white),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18.0,
+                                            ),
                                           ),
                                           subtitle: Text(
                                             album.artistString ?? '',
@@ -273,8 +273,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              color:
-                                                                  Colors.white,
                                                               fontSize: 16),
                                                         ),
                                                         subtitle: Text(
@@ -299,8 +297,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              color:
-                                                                  Colors.white,
                                                               fontSize: 16),
                                                         ),
                                                         subtitle: Text(
@@ -324,8 +320,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              color:
-                                                                  Colors.white,
                                                               fontSize: 16),
                                                         ),
                                                         subtitle: Text(
@@ -349,8 +343,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              color:
-                                                                  Colors.white,
                                                               fontSize: 16),
                                                         ),
                                                         subtitle: Text(
@@ -723,7 +715,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      color: Colors.white,
                                                       fontSize: 16),
                                                 ),
                                                 subtitle: Text(
@@ -745,7 +736,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      color: Colors.white,
                                                       fontSize: 16),
                                                 ),
                                                 subtitle: Text(
@@ -766,7 +756,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      color: Colors.white,
                                                       fontSize: 16),
                                                 ),
                                                 subtitle: Text(
@@ -788,7 +777,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      color: Colors.white,
                                                       fontSize: 16),
                                                 ),
                                                 subtitle: Text(
@@ -1214,8 +1202,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                             artist.name ?? '',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 18.0,
-                                                color: Colors.white),
+                                                fontSize: 18.0),
                                           ),
                                           trailing: IconButton(
                                             icon: Icon(DeezerIcons.more_vert),
@@ -1615,7 +1602,6 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                                 .secondaryText)),
                                                     Icon(
                                                       Icons.chevron_right,
-                                                      color: Colors.white,
                                                     )
                                                   ],
                                                 ),
@@ -2076,7 +2062,6 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                       Settings.secondaryText)),
                                           Icon(
                                             Icons.chevron_right,
-                                            color: Colors.white,
                                           )
                                         ],
                                       ),
@@ -2562,8 +2547,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                           playlist.title ?? '',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
-                                              fontSize: 18.0,
-                                              color: Colors.white),
+                                              fontSize: 18.0),
                                         ),
                                         subtitle: Text(
                                           playlist.user?.name ?? '',
@@ -2683,7 +2667,6 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                         style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            color: Colors.white,
                                                             fontSize: 16),
                                                       ),
                                                       subtitle: Text(
@@ -2707,7 +2690,6 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                         style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            color: Colors.white,
                                                             fontSize: 16),
                                                       ),
                                                       subtitle: Text(
@@ -2730,7 +2712,6 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                         style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            color: Colors.white,
                                                             fontSize: 16),
                                                       ),
                                                       subtitle: Text(
@@ -3098,7 +3079,6 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                 'Tracks'.i18n,
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
                                                     fontSize: 16),
                                               ),
                                               subtitle: Text(
@@ -3122,7 +3102,6 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                 'Duration'.i18n,
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
                                                     fontSize: 16),
                                               ),
                                               subtitle: Text(
@@ -3142,7 +3121,6 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                 'Fans'.i18n,
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
                                                     fontSize: 16),
                                               ),
                                               subtitle: Text(
