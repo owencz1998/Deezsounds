@@ -847,8 +847,8 @@ class _PlaybackControlsState extends State<PlaybackControls> {
                 icon: Icon(
                   //cons.shuffle,
                   shuffleModeEnabled
-                      ? DeezerIcons.shuffle
-                      : DeezerIcons.shuffle_active,
+                      ? DeezerIcons.shuffle_active
+                      : DeezerIcons.shuffle,
                   semanticLabel: 'Shuffle'.i18n,
                   color: Colors.white,
                   size: widget.iconSize * 0.6,
@@ -1216,8 +1216,8 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
               icon: Icon(
                 //cons.shuffle,
                 shuffleModeEnabled
-                    ? DeezerIcons.shuffle
-                    : DeezerIcons.shuffle_active,
+                    ? DeezerIcons.shuffle_active
+                    : DeezerIcons.shuffle,
                 semanticLabel: 'Shuffle'.i18n,
               ),
               onPressed: () async {

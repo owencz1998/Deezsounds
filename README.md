@@ -28,6 +28,7 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
 ## :camera_flash: Screenshots
 
 <p align="center">
+    <img src="./assets/screenshots/Mod_login.png" width=100>
     <img src="./assets/screenshots/Mod_home.png" width=100>
     <img src="./assets/screenshots/Mod_player.png" width=100>
     <img src="./assets/screenshots/Mod_search.png" width=100>
