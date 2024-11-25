@@ -94,7 +94,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
               end: Alignment.bottomCenter,
               colors: [
                 palette.dominantColor!.color.withOpacity(0.7),
-                Settings.deezerBg
+                Theme.of(context).scaffoldBackgroundColor
               ],
               stops: const [
                 0.0,
@@ -544,7 +544,7 @@ class _QualityInfoWidgetState extends State<QualityInfoWidget> {
   }
 }
 
-class LyricsIconButton extends StatelessWidget {
+class LyricsIconButton extends StatefulWidget {
   final double width;
   final Function? afterOnPressed;
 
@@ -555,12 +555,40 @@ class LyricsIconButton extends StatelessWidget {
   });
 
   @override
+  _LyricsIconButtonState createState() => _LyricsIconButtonState();
+}
+
+class _LyricsIconButtonState extends State<LyricsIconButton> {
+  Track track =
+      Track.fromMediaItem(GetIt.I<AudioPlayerHandler>().mediaItem.value!);
+  bool isEnabled = false;
+  Lyrics? trackLyrics;
+
+  void _loadLyrics() async {
+    if (!isEnabled) {
+      Lyrics newLyrics = await deezerAPI.lyrics(track.id!);
+      if (newLyrics.id != null) {
+        setState(() {
+          isEnabled = true;
+          trackLyrics = newLyrics;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      isEnabled = (track.lyrics?.id ?? '0') != '0';
+    });
+
+    _loadLyrics();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Track track =
-        Track.fromMediaItem(GetIt.I<AudioPlayerHandler>().mediaItem.value!);
-
-    bool isEnabled = (track.lyrics?.id ?? '0') != '0';
-
     return Opacity(
       opacity: isEnabled
           ? 1.0
@@ -569,7 +597,7 @@ class LyricsIconButton extends StatelessWidget {
         icon: Icon(
           //Icons.lyrics,
           DeezerIcons.microphone,
-          size: ScreenUtil().setWidth(width),
+          size: ScreenUtil().setWidth(widget.width),
           semanticLabel: 'Lyrics'.i18n,
         ),
         onPressed: isEnabled
@@ -579,10 +607,13 @@ class LyricsIconButton extends StatelessWidget {
                     statusBarColor: Colors.transparent));
 
                 await Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => LyricsScreen(trackId: track.id!)));
+                    builder: (context) => LyricsScreen(
+                          trackId: track.id!,
+                          lyrics: trackLyrics,
+                        )));
 
-                if (afterOnPressed != null) {
-                  afterOnPressed!();
+                if (widget.afterOnPressed != null) {
+                  widget.afterOnPressed!();
                 }
               }
             : null, // No action when disabled

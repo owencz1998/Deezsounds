@@ -503,7 +503,9 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                 color: Theme.of(context)
                                                     .primaryColor,
                                                 border: Border.all(
-                                                    color: Colors.transparent),
+                                                    color:
+                                                        scaffoldBackgroundColor
+                                                            .withOpacity(0)),
                                                 borderRadius:
                                                     BorderRadius.circular(100),
                                               ),
@@ -640,7 +642,9 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                               scaffoldBackgroundColor
                                                                   .withOpacity(
                                                                       .6),
-                                                              Colors.transparent
+                                                              scaffoldBackgroundColor
+                                                                  .withOpacity(
+                                                                      0)
                                                             ],
                                                             begin: Alignment
                                                                 .topCenter,
@@ -968,7 +972,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                       decoration: BoxDecoration(
                                         color: Theme.of(context).primaryColor,
                                         border: Border.all(
-                                            color: Colors.transparent),
+                                            color: scaffoldBackgroundColor
+                                                .withOpacity(0)),
                                         borderRadius:
                                             BorderRadius.circular(100),
                                       ),
@@ -1315,7 +1320,8 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                       .primaryColor,
                                                   border: Border.all(
                                                       color:
-                                                          Colors.transparent),
+                                                          scaffoldBackgroundColor
+                                                              .withOpacity(0)),
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           100),
@@ -1452,7 +1458,8 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                               decoration: BoxDecoration(
                                                   border: Border.all(
                                                       color:
-                                                          Colors.transparent),
+                                                          scaffoldBackgroundColor
+                                                              .withOpacity(0)),
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                   color: Theme.of(context)
@@ -1676,7 +1683,8 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                             colors: [
                                               scaffoldBackgroundColor
                                                   .withOpacity(.6),
-                                              Colors.transparent
+                                              scaffoldBackgroundColor
+                                                  .withOpacity(0)
                                             ],
                                             begin: Alignment.topCenter,
                                             end: Alignment.bottomCenter,
@@ -1693,7 +1701,8 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                               colors: [
                                                 scaffoldBackgroundColor
                                                     .withOpacity(.6),
-                                                Colors.transparent
+                                                scaffoldBackgroundColor
+                                                    .withOpacity(0)
                                               ],
                                               begin: Alignment.bottomCenter,
                                               end: Alignment.topCenter,
@@ -1825,7 +1834,8 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                             color:
                                                 Theme.of(context).primaryColor,
                                             border: Border.all(
-                                                color: Colors.transparent),
+                                                color: scaffoldBackgroundColor
+                                                    .withOpacity(0)),
                                             borderRadius:
                                                 BorderRadius.circular(100),
                                           ),
@@ -1939,7 +1949,8 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                     clipBehavior: Clip.hardEdge,
                                     decoration: BoxDecoration(
                                         border: Border.all(
-                                            color: Colors.transparent),
+                                            color: scaffoldBackgroundColor
+                                                .withOpacity(0)),
                                         borderRadius: BorderRadius.circular(10),
                                         color: Theme.of(context).hintColor),
                                     child: InkWell(
@@ -2649,7 +2660,9 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                         scaffoldBackgroundColor,
                                                     border: Border.all(
                                                         color:
-                                                            Colors.transparent),
+                                                            scaffoldBackgroundColor
+                                                                .withOpacity(
+                                                                    0)),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             5)),
@@ -2870,7 +2883,8 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                               color: Theme.of(context)
                                                   .primaryColor,
                                               border: Border.all(
-                                                  color: Colors.transparent),
+                                                  color: scaffoldBackgroundColor
+                                                      .withOpacity(0)),
                                               borderRadius:
                                                   BorderRadius.circular(100),
                                             ),
@@ -3009,7 +3023,8 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                             scaffoldBackgroundColor
                                                                 .withOpacity(
                                                                     .6),
-                                                            Colors.transparent
+                                                            scaffoldBackgroundColor
+                                                                .withOpacity(0)
                                                           ],
                                                           begin: Alignment
                                                               .topCenter,
@@ -3035,7 +3050,9 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                               scaffoldBackgroundColor
                                                                   .withOpacity(
                                                                       .6),
-                                                              Colors.transparent
+                                                              scaffoldBackgroundColor
+                                                                  .withOpacity(
+                                                                      0)
                                                             ],
                                                             begin: Alignment
                                                                 .bottomCenter,
@@ -3314,8 +3331,9 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                     margin: EdgeInsets.only(right: 6.0),
                                     decoration: BoxDecoration(
                                       color: Theme.of(context).primaryColor,
-                                      border:
-                                          Border.all(color: Colors.transparent),
+                                      border: Border.all(
+                                          color: scaffoldBackgroundColor
+                                              .withOpacity(0)),
                                       borderRadius: BorderRadius.circular(100),
                                     ),
                                     child: IconButton(

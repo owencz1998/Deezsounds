@@ -71,7 +71,6 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
 - When the same track is added multiple times to queue, it does not display properly
 - If queue is cleared and player bar is dismissed, it will not be brought back up if the user clicks back on the formerly playing track.
 - Player bar does not always update its color on track tile tap or various other scenarios.
-- Lyrics are not properly supported for free accounts.
 
 ### :building_construction: Upcoming features
 - Menu add inkwell tiles ontap visual effect
@@ -91,6 +90,7 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
 - Deezer like favorite screen (Offline : offline playlists and random offline tracks)
 - Most deezer pages (artists, playlists, albums)
 - Downloads are stored within the app storage (Android/data/package) and can be exported to local storage under settings with full tags
+- Fixed lyrics support
 
 ### :rocket: ReFreezer Features :
 - Restored all features of the old Freezer app, most notably:

@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
+import 'package:refreezer/fonts/deezer_icons.dart';
 
 import '../api/deezer.dart';
 import '../api/definitions.dart';
@@ -34,6 +36,7 @@ class _LyricsScreenState extends State<LyricsScreen> {
   final ScrollController _controller = ScrollController();
   StreamSubscription? _mediaItemSub;
   final double height = 90;
+  double progress = 0;
 
   @override
   void initState() {
@@ -80,7 +83,8 @@ class _LyricsScreenState extends State<LyricsScreen> {
     }
 
     if (lyrics.errorMessage != null) {
-      Logger.root.warning('Error loading lyrics for track id ${widget.trackId}: ${lyrics.errorMessage}');
+      Logger.root.warning(
+          'Error loading lyrics for track id ${widget.trackId}: ${lyrics.errorMessage}');
     }
 
     setState(() {
@@ -96,9 +100,22 @@ class _LyricsScreenState extends State<LyricsScreen> {
       _timer = timer;
       if (_loading) return;
 
+      setState(() {
+        progress = min(
+            GetIt.I<AudioPlayerHandler>()
+                    .playbackState
+                    .value
+                    .position
+                    .inSeconds /
+                (lyrics?.syncedLyrics?.first.offset?.inSeconds ?? 1),
+            1);
+      });
+
       //Update current lyric index
-      setState(() => _currentIndex = lyrics!.syncedLyrics!.lastIndexWhere((lyric) =>
-          (lyric.offset ?? const Duration(seconds: 0)) <= GetIt.I<AudioPlayerHandler>().playbackState.value.position));
+      setState(() => _currentIndex = lyrics!.syncedLyrics!.lastIndexWhere(
+          (lyric) =>
+              (lyric.offset ?? const Duration(seconds: 0)) <=
+              GetIt.I<AudioPlayerHandler>().playbackState.value.position));
 
       //Scroll to current lyric
       if (_currentIndex <= 0) return;
@@ -106,7 +123,7 @@ class _LyricsScreenState extends State<LyricsScreen> {
       _prevIndex = _currentIndex;
       _controller.animateTo(
           //Lyric height, screen height, appbar height
-          (height * _currentIndex) - (MediaQuery.of(context).size.height / 2) + (height / 2) + 56,
+          max((height * (_currentIndex)) + 56, 0),
           duration: const Duration(milliseconds: 250),
           curve: Curves.ease);
     });
@@ -131,106 +148,215 @@ class _LyricsScreenState extends State<LyricsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: FreezerAppBar(appBarTitle),
-        body: Stack(
-          children: [
-            //Visualizer
-            if (settings.lyricsVisualizer)
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: StreamBuilder(
-                    stream: GetIt.I<AudioPlayerHandler>().visualizerStream,
-                    builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      List<double> data = snapshot.data ?? [];
-                      double width = MediaQuery.of(context).size.width / data.length - 0.25;
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: List.generate(
-                            data.length,
-                            (i) => AnimatedContainer(
-                                  duration: const Duration(milliseconds: 130),
-                                  color: Theme.of(context).primaryColor,
-                                  height: data[i] * 100,
-                                  width: width,
-                                )),
-                      );
-                    }),
-              ),
+        body: SafeArea(
+            child: Stack(
+      children: [
+        //Visualizer
+        if (settings.lyricsVisualizer)
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: StreamBuilder(
+                stream: GetIt.I<AudioPlayerHandler>().visualizerStream,
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  List<double> data = snapshot.data ?? [];
+                  double width =
+                      MediaQuery.of(context).size.width / data.length - 0.25;
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(
+                        data.length,
+                        (i) => AnimatedContainer(
+                              duration: const Duration(milliseconds: 130),
+                              color: Theme.of(context).primaryColor,
+                              height: data[i] * 100,
+                              width: width,
+                            )),
+                  );
+                }),
+          ),
 
-            //Lyrics
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 0, settings.lyricsVisualizer ? 100 : 0),
-              child: ListView(
-                controller: _controller,
-                children: [
-                  //Shouldn't really happen, empty lyrics have own text
-                  if (_error) const ErrorScreen(),
+        //Lyrics
 
-                  //Loading
-                  if (_loading)
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [CircularProgressIndicator()],
+        Padding(
+          padding:
+              EdgeInsets.fromLTRB(0, 0, 0, settings.lyricsVisualizer ? 100 : 0),
+          child: ListView(
+            controller: _controller,
+            children: [
+              //Shouldn't really happen, empty lyrics have own text
+              if (_error) const ErrorScreen(),
+
+              //Loading
+              if (_loading)
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [CircularProgressIndicator()],
+                  ),
+                ),
+
+              SizedBox(
+                height: MediaQuery.of(context).size.height / 2 - height / 2,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Stack(
+                    children: [
+                      SizedBox(
+                        width: 84,
+                        height: 84,
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Icon(DeezerIcons.microphone),
+                        ),
                       ),
-                    ),
-
-                  // Synced Lyrics
-                  if (lyrics != null && lyrics!.syncedLyrics?.isNotEmpty == true)
-                    ...List.generate(lyrics!.syncedLyrics!.length, (i) {
-                      return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8.0),
-                                color: (_currentIndex == i) ? Colors.grey.withOpacity(0.25) : Colors.transparent,
-                              ),
-                              height: height,
-                              child: Center(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    final offset = lyrics!.syncedLyrics![i].offset;
-                                    if (offset != null) {
-                                      GetIt.I<AudioPlayerHandler>().seek(offset);
-                                    }
-                                  },
-                                  child: Text(
-                                    lyrics!.syncedLyrics![i].text ?? '',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 26.0,
-                                      fontWeight: (_currentIndex == i) ? FontWeight.bold : FontWeight.normal,
-                                    ),
-                                  ),
-                                ),
-                              )));
-                    }),
-
-                  // Unsynced Lyrics
-                  if (lyrics != null && (lyrics!.syncedLyrics?.isEmpty ?? true) && lyrics!.unsyncedLyrics != null)
-                    Padding(
+                      SizedBox(
+                        width: 84,
+                        height: 84,
+                        child: CircularProgressIndicator(
+                          value: progress,
+                          strokeWidth: 1,
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Synced Lyrics
+              if (lyrics != null && lyrics!.syncedLyrics?.isNotEmpty == true)
+                ...List.generate(lyrics!.syncedLyrics!.length, (i) {
+                  return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Center(
-                          child: Text(
-                            lyrics!.unsyncedLyrics!,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 26.0,
-                            ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            color: (_currentIndex == i)
+                                ? Colors.grey.withOpacity(0.25)
+                                : Colors.transparent,
                           ),
+                          height: height,
+                          child: Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                final offset = lyrics!.syncedLyrics![i].offset;
+                                if (offset != null) {
+                                  GetIt.I<AudioPlayerHandler>().seek(offset);
+                                }
+                              },
+                              child: Text(
+                                lyrics!.syncedLyrics![i].text ?? '',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 26.0,
+                                  fontWeight: (_currentIndex == i)
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          )));
+                }),
+
+              // Unsynced Lyrics
+              if (lyrics != null &&
+                  (lyrics!.syncedLyrics?.isEmpty ?? true) &&
+                  lyrics!.unsyncedLyrics != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Center(
+                      child: Text(
+                        lyrics!.unsyncedLyrics!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 26.0,
                         ),
                       ),
                     ),
-                ],
+                  ),
+                ),
+              Container(
+                height: MediaQuery.of(context).size.height / 2 - height / 2,
+              ),
+            ],
+          ),
+        ),
+
+        Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 6.0),
+                child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 6.0),
+                        child: IconButton(
+                            onPressed: () {
+                              Navigator.of(context).canPop()
+                                  ? Navigator.of(context).pop()
+                                  : null;
+                            },
+                            icon: Icon(DeezerIcons.cross)),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              GetIt.I<AudioPlayerHandler>()
+                                      .mediaItem
+                                      .value
+                                      ?.title ??
+                                  '',
+                              style: TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.w500),
+                            ),
+                            Text(
+                              GetIt.I<AudioPlayerHandler>()
+                                      .mediaItem
+                                      .value
+                                      ?.artist ??
+                                  '',
+                              style: TextStyle(
+                                  fontSize: 12.0,
+                                  color: Settings.secondaryText),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 6.0),
+                        child: IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              DeezerIcons.heart,
+                              color: Colors.white.withOpacity(0),
+                            )),
+                      ),
+                    ]),
               ),
             )
           ],
-        ));
+        )
+      ],
+    )));
   }
 }

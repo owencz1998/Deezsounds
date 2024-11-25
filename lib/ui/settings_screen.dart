@@ -974,34 +974,6 @@ class _ExportsSettingsState extends State<ExportsSettings> {
         appBar: FreezerAppBar('Export Settings'.i18n),
         body: ListView(children: [
           ListTile(
-            title: Text('Download path'.i18n),
-            leading: const Icon(Icons.folder),
-            subtitle: Text(settings.downloadPath ?? 'Not set'.i18n),
-            onTap: () async {
-              //Check permissions
-              //if (!(await Permission.storage.request().isGranted)) return;
-              if (await FileUtils.checkStoragePermission()) {
-                //Navigate
-                if (context.mounted) {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => DirectoryPicker(
-                            settings.downloadPath ?? '',
-                            onSelect: (String p) async {
-                              setState(() => settings.downloadPath = p);
-                              await settings.save();
-                            },
-                          )));
-                }
-              } else {
-                Fluttertoast.showToast(
-                    msg: 'Storage permission denied!'.i18n,
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM);
-                return;
-              }
-            },
-          ),
-          ListTile(
               title: Text('Exports tracks'.i18n),
               subtitle: Text('Export all tracks to internal storage.'.i18n),
               leading: Transform.rotate(
@@ -1052,6 +1024,34 @@ class _ExportsSettingsState extends State<ExportsSettings> {
                   value: _progress,
                 )),
           const FreezerDivider(),
+          ListTile(
+            title: Text('Download path'.i18n),
+            leading: const Icon(Icons.folder),
+            subtitle: Text(settings.downloadPath ?? 'Not set'.i18n),
+            onTap: () async {
+              //Check permissions
+              //if (!(await Permission.storage.request().isGranted)) return;
+              if (await FileUtils.checkStoragePermission()) {
+                //Navigate
+                if (context.mounted) {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => DirectoryPicker(
+                            settings.downloadPath ?? '',
+                            onSelect: (String p) async {
+                              setState(() => settings.downloadPath = p);
+                              await settings.save();
+                            },
+                          )));
+                }
+              } else {
+                Fluttertoast.showToast(
+                    msg: 'Storage permission denied!'.i18n,
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM);
+                return;
+              }
+            },
+          ),
           ListTile(
             title: Text('Exports naming'.i18n),
             subtitle: Text('Currently'.i18n + ': ${settings.downloadFilename}'),
@@ -1864,7 +1864,7 @@ class _CreditsScreenState extends State<CreditsScreen> {
           ListTile(
             title: Text('DJDoubleD'.i18n),
             subtitle: Text(
-                'Developer, tester, new icon & logo, some translations, ...'
+                'Original ReFreezer developer, tester and maintainer, ...'
                     .i18n),
             leading: Image.asset('assets/DJDoubleD.jpg', width: 36, height: 36),
             onTap: () {
@@ -1875,7 +1875,7 @@ class _CreditsScreenState extends State<CreditsScreen> {
           ListTile(
             title: Text('PetitPrince'.i18n),
             subtitle: Text(
-                'Developer, maintainer, tester, Deezer® branding, ...'.i18n),
+                'Developer, Deezer® UIX MOD, tester, maintainer, ...'.i18n),
             leading:
                 Image.asset('assets/PetitPrince.png', width: 36, height: 36),
             onTap: () {
