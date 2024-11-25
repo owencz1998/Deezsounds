@@ -71,6 +71,7 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
 - When the same track is added multiple times to queue, it does not display properly
 - If queue is cleared and player bar is dismissed, it will not be brought back up if the user clicks back on the formerly playing track.
 - Player bar does not always update its color on track tile tap or various other scenarios.
+- Lyrics are not reloaded on track change in certain scenario. Lyrics are re-loaded every time the player screen is up or down.
 
 ### :building_construction: Upcoming features
 - Menu add inkwell tiles ontap visual effect
