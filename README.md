@@ -68,15 +68,14 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
 ## :star2: Features & changes
 
 ### :lady_beetle: Bugs
-- When the same track is added multiple times to queue, it does not display properly
 - If queue is cleared and player bar is dismissed, it will not be brought back up if the user clicks back on the formerly playing track.
+- Lyrics are re-fetched from api each time the player is broght back. This is because the API does not include informations regarding the lyrics in the track model.
+- No remove from playlist option in track menu.
 - Player bar does not always update its color on track tile tap or various other scenarios.
 
 ### :building_construction: Upcoming features
-- Menu add inkwell tiles ontap visual effect
 - Merge offline tracks and online tracks under tracks (same for playlists, albums, etc.)
 - Caching information to avoid reloading every time (eg. favorites screen)
-- Implement UpdateOfflinePlaylist() in downloadManager
 - Turn the mod into a skin for the official refreezer app
 - NavigationRail for landscape mode on left side of screen
 

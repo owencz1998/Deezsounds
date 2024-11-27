@@ -2363,23 +2363,6 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
     setState(() => _sort = cache.sorts[index]);
   }
 
-  Future _reverse() async {
-    setState(() => _sort.reverse = !_sort.reverse);
-    //Save sorting in cache
-    int? index = Sorting.index(SortSourceTypes.TRACKS);
-    if (index != null) {
-      cache.sorts[index] = _sort;
-    } else {
-      cache.sorts.add(_sort);
-    }
-    await cache.save();
-
-    //Preload for sorting
-    if (playlist.tracks!.length < (playlist.trackCount ?? 0)) {
-      playlist = await deezerAPI.fullPlaylist(playlist.id!);
-    }
-  }
-
   Future _isLibrary() async {
     if (playlist.isIn(await downloadManager.getOfflinePlaylists())) {
       setState(() {

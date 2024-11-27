@@ -376,7 +376,53 @@ class DownloadManager {
     await start();
   }
 
-  Future updateOfflinePlaylist(Playlist playlist) async {}
+  Future updateOfflinePlaylist(Playlist playlist) async {
+    if (playlist.isIn(await getOfflinePlaylists())) {
+      Playlist? fullPlaylist = await deezerAPI.fullPlaylist(playlist.id ?? '');
+
+      //If playlist didn't change
+      if (fullPlaylist == (await getOfflinePlaylist(playlist.id ?? ''))) return;
+
+      if (!(await checkPermission())) return;
+
+      List<Track> toDowload = [];
+
+      //Add to DB
+      Batch b = db!.batch();
+      b.update('Playlists', fullPlaylist.toSQL(),
+          where: 'id == ?',
+          whereArgs: [fullPlaylist.id],
+          conflictAlgorithm: ConflictAlgorithm.replace);
+      for (Track t in (fullPlaylist.tracks ?? [])) {
+        if ((await getOfflineTrack(t.id!)) == null) {
+          toDowload.add(t);
+        }
+        b = await _addTrackToDB(b, t, false);
+        //Cache art
+        DefaultCacheManager().getSingleFile(t.albumArt?.thumb ?? '');
+        DefaultCacheManager().getSingleFile(t.albumArt?.full ?? '');
+      }
+      await b.commit();
+
+      //Generate downloads
+      List<Map> out = [];
+      for (int i = 0; i < toDowload.length; i++) {
+        Track t = toDowload[i];
+        out.add(await Download.jsonFromTrack(
+          t,
+          _generatePath(
+            t,
+            true,
+            playlistName: playlist.title,
+            playlistTrackNumber: i,
+          ),
+          private: true,
+        ));
+      }
+      await platform.invokeMethod('addDownloads', out);
+      await start();
+    }
+  }
 
   //Get track and meta from offline DB
   Future<Track?> getOfflineTrack(String id,

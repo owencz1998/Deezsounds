@@ -12,7 +12,6 @@ import '../api/definitions.dart';
 import '../service/audio_service.dart';
 import '../settings.dart';
 import '../translations.i18n.dart';
-import '../ui/elements.dart';
 import '../ui/error.dart';
 
 class LyricsScreen extends StatefulWidget {
@@ -36,7 +35,7 @@ class _LyricsScreenState extends State<LyricsScreen> {
   final ScrollController _controller = ScrollController();
   StreamSubscription? _mediaItemSub;
   final double height = 90;
-  double progress = 0;
+  List<double> progress = [0, 0];
 
   @override
   void initState() {
@@ -101,14 +100,18 @@ class _LyricsScreenState extends State<LyricsScreen> {
       if (_loading) return;
 
       setState(() {
-        progress = min(
-            GetIt.I<AudioPlayerHandler>()
-                    .playbackState
-                    .value
-                    .position
-                    .inSeconds /
-                (lyrics?.syncedLyrics?.first.offset?.inSeconds ?? 1),
-            1);
+        progress = [
+          progress[1],
+          min(
+              GetIt.I<AudioPlayerHandler>()
+                      .playbackState
+                      .value
+                      .position
+                      .inSeconds /
+                  (lyrics?.syncedLyrics?.first.offset?.inSeconds ?? 1),
+              1)
+        ];
+        if (progress == [1, 1]) timer.cancel();
       });
 
       //Update current lyric index
@@ -214,10 +217,16 @@ class _LyricsScreenState extends State<LyricsScreen> {
                       SizedBox(
                         width: 84,
                         height: 84,
-                        child: CircularProgressIndicator(
-                          value: progress,
-                          strokeWidth: 1,
-                          color: Theme.of(context).textTheme.bodyMedium?.color,
+                        child: TweenAnimationBuilder<double>(
+                          tween: Tween(begin: progress[0], end: progress[1]),
+                          duration: Duration(milliseconds: 350),
+                          builder: (context, value, _) =>
+                              CircularProgressIndicator(
+                            value: value,
+                            strokeWidth: 1,
+                            color:
+                                Theme.of(context).textTheme.bodyMedium?.color,
+                          ),
                         ),
                       ),
                     ],

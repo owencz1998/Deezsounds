@@ -94,7 +94,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
               end: Alignment.bottomCenter,
               colors: [
                 palette.dominantColor!.color.withOpacity(0.7),
-                Theme.of(context).scaffoldBackgroundColor
+                Settings.deezerBg
               ],
               stops: const [
                 0.0,
@@ -563,6 +563,7 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
       Track.fromMediaItem(GetIt.I<AudioPlayerHandler>().mediaItem.value!);
   bool isEnabled = false;
   Lyrics? trackLyrics;
+  AudioPlayerHandler audioHandler = GetIt.I<AudioPlayerHandler>();
 
   void _loadLyrics() async {
     if (!isEnabled) {
@@ -585,6 +586,15 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
     });
 
     _loadLyrics();
+
+    audioHandler.mediaItem.listen((event) {
+      setState(() {
+        isEnabled = false;
+        track =
+            Track.fromMediaItem(GetIt.I<AudioPlayerHandler>().mediaItem.value!);
+      });
+      _loadLyrics();
+    });
   }
 
   @override
@@ -1285,7 +1295,7 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
                     await audioHandler.skipToQueueItem(index);
                     if (context.mounted) Navigator.of(context).pop();
                   },
-                  key: Key(mediaItem.id),
+                  key: Key(mediaItem.id + index.toString()),
                   trailing: IconButton(
                     icon: Icon(
                       Icons.close,
@@ -1316,7 +1326,7 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
                     await audioHandler.skipToQueueItem(index);
                     if (context.mounted) Navigator.of(context).pop();
                   },
-                  key: Key(mediaItem.id),
+                  key: Key(mediaItem.id + index.toString()),
                   trailing: IconButton(
                     icon: Icon(
                       Icons.close,

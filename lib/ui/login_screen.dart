@@ -5,7 +5,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logging/logging.dart';
 import 'package:lottie/lottie.dart';
-import 'package:refreezer/main.dart';
 
 import '../api/deezer.dart';
 import '../api/deezer_login.dart';

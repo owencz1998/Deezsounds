@@ -58,7 +58,10 @@ class MenuSheet {
                       topLeft: Radius.circular(18),
                       topRight: Radius.circular(18))),
               child: SingleChildScrollView(
-                child: Column(children: options),
+                child: Material(
+                  color: Colors.transparent,
+                  child: Column(children: options),
+                ),
               ),
             ),
           );
@@ -178,7 +181,9 @@ class MenuSheet {
                           : 350,
                     ),
                     child: SingleChildScrollView(
-                      child: Column(children: options),
+                      child: Material(
+                          color: Colors.transparent,
+                          child: Column(children: options)),
                     ),
                   )
                 ],
