@@ -72,6 +72,7 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
 - Lyrics are re-fetched from api each time the player is broght back. This is because the API does not include informations regarding the lyrics in the track model.
 - No remove from playlist option in track menu.
 - Player bar does not always update its color on track tile tap or various other scenarios.
+- Lyrics are not reloaded on track change in certain scenario. Lyrics are re-loaded every time the player screen is up or down.
 
 ### :building_construction: Upcoming features
 - Merge offline tracks and online tracks under tracks (same for playlists, albums, etc.)
