@@ -717,7 +717,9 @@ class AudioPlayerHandler extends BaseAudioHandler
     File f = File(await _getQueueFilePath());
     if (await f.exists()) {
       Logger.root.info('saved queue file found, loading...');
-      Map<String, dynamic> json = jsonDecode(await f.readAsString());
+      String queueString = await f.readAsString();
+      if (queueString == '') return;
+      Map<String, dynamic> json = jsonDecode(queueString);
       List<MediaItem> savedQueue = (json['queue'] ?? [])
           .map<MediaItem>((mi) => (MediaItemConverter.mediaItemFromMap(mi)))
           .toList();

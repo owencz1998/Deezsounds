@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
 
@@ -40,7 +41,11 @@ class _PlayerBarState extends State<PlayerBar> {
             audioHandler.mediaItem.value?.extras?['thumb'] ??
                 audioHandler.mediaItem.value?.artUri));
 
-    setState(() => _bgColor = palette.dominantColor?.color.withOpacity(1));
+    if (mounted) {
+      setState(() {
+        _bgColor = palette.dominantColor?.color.withOpacity(1);
+      });
+    }
   }
 
   @override
@@ -56,7 +61,6 @@ class _PlayerBarState extends State<PlayerBar> {
 
   @override
   void dispose() async {
-    await audioHandler.clearQueue();
     await _mediaItemSub?.cancel();
     super.dispose();
   }
@@ -80,7 +84,6 @@ class _PlayerBarState extends State<PlayerBar> {
 
   @override
   Widget build(BuildContext context) {
-    scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
     var focusNode = FocusNode();
     return GestureDetector(
       key: UniqueKey(),
@@ -102,7 +105,7 @@ class _PlayerBarState extends State<PlayerBar> {
               .push(SlideBottomRoute(widget: const PlayerScreen()));
         } else if ((details.primaryVelocity ?? 0) > 100) {
           // Swiped down => close
-          dispose();
+          await audioHandler.clearQueue();
         }
         updateColor();
       },
@@ -118,7 +121,7 @@ class _PlayerBarState extends State<PlayerBar> {
             return Container(
               clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
-                  color: scaffoldBackgroundColor,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   border: Border.all(
                       color: _bgColor?.withOpacity(0.7) ??
                           Theme.of(context).scaffoldBackgroundColor),
@@ -142,7 +145,8 @@ class _PlayerBarState extends State<PlayerBar> {
                                 SlideBottomRoute(widget: const PlayerScreen()));
                             SystemChrome.setSystemUIOverlayStyle(
                                 SystemUiOverlayStyle(
-                              systemNavigationBarColor: scaffoldBackgroundColor,
+                              systemNavigationBarColor:
+                                  Theme.of(context).scaffoldBackgroundColor,
                             ));
                           },
                           leading: CachedImage(
@@ -290,14 +294,11 @@ class PlayPauseButton extends StatefulWidget {
 class _PlayPauseButtonState extends State<PlayPauseButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _animation;
 
   @override
   void initState() {
     _controller = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200));
-    _animation = Tween<double>(begin: 0, end: 1)
-        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     super.initState();
   }
 

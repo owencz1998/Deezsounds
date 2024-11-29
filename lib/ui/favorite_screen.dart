@@ -381,9 +381,11 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
         Logger.root.severe('Error loading playlists: $e');
       }
     }
-    setState(() {
-      _loading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   Future _loadFavorite() async {
@@ -399,9 +401,11 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
         await deezerAPI.fullPlaylist(deezerAPI.favoritesPlaylistId ?? '');
 
     if (favPlaylist.tracks?.isNotEmpty ?? false) {
-      setState(() {
-        favoritesPlaylist = favPlaylist;
-      });
+      if (mounted) {
+        setState(() {
+          favoritesPlaylist = favPlaylist;
+        });
+      }
     }
   }
 

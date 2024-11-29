@@ -61,8 +61,12 @@ class DeezerAPI {
       if (gatewayInput != null) 'gateway_input': gatewayInput
     });
     //Post
-    http.Response res =
-        await http.post(uri, headers: headers, body: jsonEncode(params));
+    http.Response res = await http
+        .post(uri, headers: headers, body: jsonEncode(params))
+        .catchError((e) {
+      return http.Response("'error': '" + e.toString() + "'", 200);
+    });
+    if (res.body == '') res;
     dynamic body = jsonDecode(res.body);
     //Grab SID
     if (method == 'deezer.getUserData' && res.headers['set-cookie'] != null) {
@@ -228,6 +232,7 @@ class DeezerAPI {
       'header': true,
       'lang': settings.deezerLanguage
     });
+    if (data['results']['DATA'] == null) return Album();
     return Album.fromPrivateJson(data['results']['DATA'],
         songsJson: data['results']['SONGS']);
   }

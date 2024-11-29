@@ -5,6 +5,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:refreezer/api/deezer.dart';
@@ -86,8 +87,12 @@ class Track {
     Album album = Album(title: mi.album);
     List<Artist> artists = [Artist(name: mi.displaySubtitle ?? mi.artist)];
     album.id = mi.extras?['albumId'];
-    if (album.id != null) {
-      deezerAPI.album(album.id!).then((Album a) => album = a);
+    if (album.id != '') {
+      try {
+        deezerAPI.album(album.id!).then((Album a) => album = a);
+      } catch (e) {
+        Logger.root.severe(e);
+      }
     }
     if (mi.extras?['artists'] != null) {
       artists = jsonDecode(mi.extras?['artists'])

@@ -218,14 +218,14 @@ class MenuSheet {
       (cache.checkTrackFavorite(track))
           ? removeFavoriteTrack(track, context, onUpdate: onRemove)
           : addTrackFavorite(track, context),
-      addToPlaylist(track, context),
+      ...options,
       downloadTrack(track, context),
-      shareTile('track', track.id ?? ''),
-      playMix(track, context),
+      addToPlaylist(track, context),
       showAlbum(elevatedAlbum, context),
       ...List.generate(track.artists?.length ?? 0,
           (i) => showArtist(track.artists?[i] ?? Artist(), context)),
-      ...options
+      shareTile('track', track.id ?? ''),
+      playMix(track, context),
     ]);
   }
 

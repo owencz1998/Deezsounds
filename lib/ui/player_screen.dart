@@ -347,7 +347,8 @@ class _PlayerScreenVerticalState extends State<PlayerScreenVertical> {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
           child: SizedBox(
-            height: ScreenUtil().setHeight(360),
+            height: ScreenUtil()
+                .setHeight(MediaQuery.of(context).size.height * 0.35),
             child: const Stack(
               children: <Widget>[
                 BigAlbumArt(),
@@ -426,7 +427,7 @@ class _PlayerScreenVerticalState extends State<PlayerScreenVertical> {
         ),
         PlaybackControls(ScreenUtil().setSp(25)),
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -568,7 +569,7 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
   void _loadLyrics() async {
     if (!isEnabled) {
       Lyrics newLyrics = await deezerAPI.lyrics(track.id!);
-      if (newLyrics.id != null) {
+      if (mounted && newLyrics.id != null) {
         setState(() {
           isEnabled = true;
           trackLyrics = newLyrics;
@@ -588,11 +589,13 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
     _loadLyrics();
 
     audioHandler.mediaItem.listen((event) {
-      setState(() {
-        isEnabled = false;
-        track =
-            Track.fromMediaItem(GetIt.I<AudioPlayerHandler>().mediaItem.value!);
-      });
+      if (mounted) {
+        setState(() {
+          isEnabled = false;
+          track = Track.fromMediaItem(
+              GetIt.I<AudioPlayerHandler>().mediaItem.value!);
+        });
+      }
       _loadLyrics();
     });
   }

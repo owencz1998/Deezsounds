@@ -198,6 +198,8 @@ class _UpdaterScreenState extends State<UpdaterScreen> {
               !_loading &&
               (_latestRelease?.version ?? Version(0, 0, 0)) > _currentVersion)
             Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -226,15 +228,15 @@ class _UpdaterScreenState extends State<UpdaterScreen> {
                 const FreezerDivider(),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                  child: Container(
-                    constraints: const BoxConstraints(
-                        maxHeight: 350 // Screen Title height, ...
-                        ),
-                    child: Markdown(
-                      controller: scrollController,
-                      data: _latestRelease?.changelog ?? '',
-                      shrinkWrap: true,
-                    ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Markdown(
+                        controller: scrollController,
+                        data: _latestRelease?.changelog ?? '',
+                        shrinkWrap: true,
+                      )
+                    ],
                   ),
                 ),
                 const FreezerDivider(),

@@ -2873,13 +2873,37 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                             ),
                                             child: IconButton(
                                                 onPressed: () async {
-                                                  playlist.tracks?.shuffle();
+                                                  List<Track> tracklist =
+                                                      List.from(
+                                                          playlist.tracks ??
+                                                              []);
+                                                  if (playlist.trackCount !=
+                                                      tracklist.length) {
+                                                    playlist = await deezerAPI
+                                                        .fullPlaylist(
+                                                            playlist.id ?? '');
+                                                    tracklist = List.from(
+                                                        playlist.tracks ?? []);
+                                                  }
+                                                  tracklist.shuffle();
                                                   GetIt.I<AudioPlayerHandler>()
                                                       .playFromTrackList(
-                                                          playlist.tracks ?? [],
-                                                          playlist.tracks?[0]
-                                                                  .id ??
-                                                              '',
+                                                          tracklist,
+                                                          tracklist[0].id ?? '',
+                                                          QueueSource(
+                                                              id: playlist.id,
+                                                              source: playlist
+                                                                  .title,
+                                                              text: playlist
+                                                                      .title ??
+                                                                  'Playlist' +
+                                                                      ' shuffle'
+                                                                          .i18n));
+                                                  tracklist.shuffle();
+                                                  GetIt.I<AudioPlayerHandler>()
+                                                      .playFromTrackList(
+                                                          tracklist,
+                                                          tracklist[0].id ?? '',
                                                           QueueSource(
                                                               id: playlist.id,
                                                               source: playlist
@@ -2913,15 +2937,40 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                     (i) {
                                   Track t = (playlist.tracks ?? [])[i];
                                   return TrackTile(t, onTap: () {
-                                    Playlist p = Playlist(
-                                        title: playlist.title,
-                                        id: playlist.id,
-                                        tracks: playlist.tracks);
-                                    GetIt.I<AudioPlayerHandler>()
-                                        .playFromPlaylist(p, t.id ?? '');
+                                    playlist.trackCount ==
+                                            playlist.tracks?.length
+                                        ? GetIt.I<AudioPlayerHandler>()
+                                            .playFromPlaylist(
+                                                Playlist(
+                                                    title: playlist.title,
+                                                    id: playlist.id,
+                                                    tracks: playlist.tracks),
+                                                t.id ?? '')
+                                        : deezerAPI
+                                            .fullPlaylist(playlist.id ?? '')
+                                            .then((Playlist p) => {
+                                                  GetIt.I<AudioPlayerHandler>()
+                                                      .playFromPlaylist(
+                                                          Playlist(
+                                                              title: p.title,
+                                                              id: p.id,
+                                                              tracks: p.tracks),
+                                                          t.id ?? '')
+                                                });
                                   }, onHold: () {
                                     MenuSheet m = MenuSheet();
-                                    m.defaultTrackMenu(t, context: context);
+                                    m.defaultTrackMenu(t,
+                                        context: context,
+                                        options: [
+                                          (playlist.user?.id ==
+                                                  deezerAPI.userId)
+                                              ? m.removeFromPlaylist(
+                                                  t, playlist, context)
+                                              : const SizedBox(
+                                                  width: 0,
+                                                  height: 0,
+                                                )
+                                        ]);
                                   });
                                 }),
                                 if (_isLoadingTracks)
@@ -3323,6 +3372,25 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                         onPressed: () async {
                                           List<Track> tracklist =
                                               List.from(playlist.tracks ?? []);
+                                          if (playlist.trackCount !=
+                                              tracklist.length) {
+                                            playlist =
+                                                await deezerAPI.fullPlaylist(
+                                                    playlist.id ?? '');
+                                            tracklist = List.from(
+                                                playlist.tracks ?? []);
+                                          }
+                                          tracklist.shuffle();
+                                          GetIt.I<AudioPlayerHandler>()
+                                              .playFromTrackList(
+                                                  tracklist,
+                                                  tracklist[0].id ?? '',
+                                                  QueueSource(
+                                                      id: playlist.id,
+                                                      source: playlist.title,
+                                                      text: playlist.title ??
+                                                          'Playlist' +
+                                                              ' shuffle'.i18n));
                                           tracklist.shuffle();
                                           GetIt.I<AudioPlayerHandler>()
                                               .playFromTrackList(
@@ -3349,12 +3417,25 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                         ...List.generate(playlist.tracks!.length, (i) {
                           Track t = sorted[i];
                           return TrackTile(t, onTap: () {
-                            Playlist p = Playlist(
-                                title: playlist.title,
-                                id: playlist.id,
-                                tracks: sorted);
-                            GetIt.I<AudioPlayerHandler>()
-                                .playFromPlaylist(p, t.id!);
+                            playlist.trackCount == playlist.tracks?.length
+                                ? GetIt.I<AudioPlayerHandler>()
+                                    .playFromPlaylist(
+                                        Playlist(
+                                            title: playlist.title,
+                                            id: playlist.id,
+                                            tracks: playlist.tracks),
+                                        t.id ?? '')
+                                : deezerAPI
+                                    .fullPlaylist(playlist.id ?? '')
+                                    .then((Playlist p) => {
+                                          GetIt.I<AudioPlayerHandler>()
+                                              .playFromPlaylist(
+                                                  Playlist(
+                                                      title: p.title,
+                                                      id: p.id,
+                                                      tracks: p.tracks),
+                                                  t.id ?? '')
+                                        });
                           }, onHold: () {
                             MenuSheet m = MenuSheet();
                             m.defaultTrackMenu(t, context: context, options: [
