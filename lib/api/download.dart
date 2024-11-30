@@ -529,7 +529,10 @@ class DownloadManager {
 
   //Get all offline playlists
   Future<List<Playlist>> getOfflinePlaylists() async {
-    List rawPlaylists = await db!.query('Playlists', columns: ['id']);
+    List rawPlaylists = await db!.query('Playlists',
+        columns: ['id'],
+        where: 'id != ?',
+        whereArgs: [deezerAPI.favoritesPlaylistId]);
     List<Playlist> out = [];
     for (Map rawPlaylist in rawPlaylists) {
       var offlinePlayList = await getOfflinePlaylist(rawPlaylist['id']);

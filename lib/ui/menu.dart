@@ -52,7 +52,7 @@ class MenuSheet {
               padding: EdgeInsets.symmetric(vertical: 12.0),
               clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
-                  color: scaffoldBackgroundColor,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   border: Border.all(color: Colors.transparent),
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(18),
@@ -87,7 +87,7 @@ class MenuSheet {
               padding: EdgeInsets.symmetric(vertical: 12.0),
               clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
-                  color: scaffoldBackgroundColor,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   border: Border.all(color: Colors.transparent),
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(18),

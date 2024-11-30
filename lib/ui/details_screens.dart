@@ -216,7 +216,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                               decoration: BoxDecoration(
                                                                   gradient: LinearGradient(
                                                                       colors: [
-                                                                        scaffoldBackgroundColor
+                                                                        Theme.of(context)
+                                                                            .scaffoldBackgroundColor
                                                                             .withOpacity(.6),
                                                                         Colors
                                                                             .transparent
@@ -250,8 +251,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                               Container(
                                                   clipBehavior: Clip.hardEdge,
                                                   decoration: BoxDecoration(
-                                                      color:
-                                                          scaffoldBackgroundColor,
+                                                      color: Theme.of(context)
+                                                          .scaffoldBackgroundColor,
                                                       border: Border.all(
                                                           color: Colors
                                                               .transparent),
@@ -503,9 +504,9 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                 color: Theme.of(context)
                                                     .primaryColor,
                                                 border: Border.all(
-                                                    color:
-                                                        scaffoldBackgroundColor
-                                                            .withOpacity(0)),
+                                                    color: Theme.of(context)
+                                                        .scaffoldBackgroundColor
+                                                        .withOpacity(0)),
                                                 borderRadius:
                                                     BorderRadius.circular(100),
                                               ),
@@ -637,20 +638,28 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                 children: [
                                                   Container(
                                                     decoration: BoxDecoration(
-                                                        gradient: LinearGradient(
-                                                            colors: [
-                                                              scaffoldBackgroundColor
-                                                                  .withOpacity(
-                                                                      .6),
-                                                              scaffoldBackgroundColor
-                                                                  .withOpacity(
-                                                                      0)
-                                                            ],
-                                                            begin: Alignment
-                                                                .topCenter,
-                                                            end: Alignment
-                                                                .bottomCenter,
-                                                            stops: [0.0, 0.7])),
+                                                        gradient:
+                                                            LinearGradient(
+                                                                colors: [
+                                                                  Theme.of(
+                                                                          context)
+                                                                      .scaffoldBackgroundColor
+                                                                      .withOpacity(
+                                                                          .6),
+                                                                  Theme.of(
+                                                                          context)
+                                                                      .scaffoldBackgroundColor
+                                                                      .withOpacity(
+                                                                          0)
+                                                                ],
+                                                                begin: Alignment
+                                                                    .topCenter,
+                                                                end: Alignment
+                                                                    .bottomCenter,
+                                                                stops: [
+                                                                  0.0,
+                                                                  0.7
+                                                                ])),
                                                     child: SizedBox(
                                                       width:
                                                           MediaQuery.of(context)
@@ -667,7 +676,9 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                       decoration: BoxDecoration(
                                                           gradient: LinearGradient(
                                                               colors: [
-                                                                scaffoldBackgroundColor
+                                                                Theme.of(
+                                                                        context)
+                                                                    .scaffoldBackgroundColor
                                                                     .withOpacity(
                                                                         .6),
                                                                 Colors
@@ -700,7 +711,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                       ),
                                       Container(
                                           decoration: BoxDecoration(
-                                              color: scaffoldBackgroundColor),
+                                              color: Theme.of(context)
+                                                  .scaffoldBackgroundColor),
                                           child: Column(
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment:
@@ -972,7 +984,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                       decoration: BoxDecoration(
                                         color: Theme.of(context).primaryColor,
                                         border: Border.all(
-                                            color: scaffoldBackgroundColor
+                                            color: Theme.of(context)
+                                                .scaffoldBackgroundColor
                                                 .withOpacity(0)),
                                         borderRadius:
                                             BorderRadius.circular(100),
@@ -1319,9 +1332,9 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                   color: Theme.of(context)
                                                       .primaryColor,
                                                   border: Border.all(
-                                                      color:
-                                                          scaffoldBackgroundColor
-                                                              .withOpacity(0)),
+                                                      color: Theme.of(context)
+                                                          .scaffoldBackgroundColor
+                                                          .withOpacity(0)),
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           100),
@@ -1457,9 +1470,9 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                               clipBehavior: Clip.hardEdge,
                                               decoration: BoxDecoration(
                                                   border: Border.all(
-                                                      color:
-                                                          scaffoldBackgroundColor
-                                                              .withOpacity(0)),
+                                                      color: Theme.of(context)
+                                                          .scaffoldBackgroundColor
+                                                          .withOpacity(0)),
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                   color: Theme.of(context)
@@ -1681,9 +1694,11 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                     decoration: BoxDecoration(
                                         gradient: LinearGradient(
                                             colors: [
-                                              scaffoldBackgroundColor
+                                              Theme.of(context)
+                                                  .scaffoldBackgroundColor
                                                   .withOpacity(.6),
-                                              scaffoldBackgroundColor
+                                              Theme.of(context)
+                                                  .scaffoldBackgroundColor
                                                   .withOpacity(0)
                                             ],
                                             begin: Alignment.topCenter,
@@ -1699,9 +1714,11 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                       decoration: BoxDecoration(
                                           gradient: LinearGradient(
                                               colors: [
-                                                scaffoldBackgroundColor
+                                                Theme.of(context)
+                                                    .scaffoldBackgroundColor
                                                     .withOpacity(.6),
-                                                scaffoldBackgroundColor
+                                                Theme.of(context)
+                                                    .scaffoldBackgroundColor
                                                     .withOpacity(0)
                                               ],
                                               begin: Alignment.bottomCenter,
@@ -1834,7 +1851,8 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                             color:
                                                 Theme.of(context).primaryColor,
                                             border: Border.all(
-                                                color: scaffoldBackgroundColor
+                                                color: Theme.of(context)
+                                                    .scaffoldBackgroundColor
                                                     .withOpacity(0)),
                                             borderRadius:
                                                 BorderRadius.circular(100),
@@ -1949,7 +1967,8 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                     clipBehavior: Clip.hardEdge,
                                     decoration: BoxDecoration(
                                         border: Border.all(
-                                            color: scaffoldBackgroundColor
+                                            color: Theme.of(context)
+                                                .scaffoldBackgroundColor
                                                 .withOpacity(0)),
                                         borderRadius: BorderRadius.circular(10),
                                         color: Theme.of(context).hintColor),
@@ -2604,7 +2623,9 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                             decoration: BoxDecoration(
                                                                 gradient: LinearGradient(
                                                                     colors: [
-                                                                      scaffoldBackgroundColor
+                                                                      Theme.of(
+                                                                              context)
+                                                                          .scaffoldBackgroundColor
                                                                           .withOpacity(
                                                                               .6),
                                                                       Colors
@@ -2639,13 +2660,12 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                             Container(
                                                 clipBehavior: Clip.hardEdge,
                                                 decoration: BoxDecoration(
-                                                    color:
-                                                        scaffoldBackgroundColor,
+                                                    color: Theme.of(context)
+                                                        .scaffoldBackgroundColor,
                                                     border: Border.all(
-                                                        color:
-                                                            scaffoldBackgroundColor
-                                                                .withOpacity(
-                                                                    0)),
+                                                        color: Theme.of(context)
+                                                            .scaffoldBackgroundColor
+                                                            .withOpacity(0)),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             5)),
@@ -2866,7 +2886,8 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                               color: Theme.of(context)
                                                   .primaryColor,
                                               border: Border.all(
-                                                  color: scaffoldBackgroundColor
+                                                  color: Theme.of(context)
+                                                      .scaffoldBackgroundColor
                                                       .withOpacity(0)),
                                               borderRadius:
                                                   BorderRadius.circular(100),
@@ -3052,10 +3073,12 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                   decoration: BoxDecoration(
                                                       gradient: LinearGradient(
                                                           colors: [
-                                                            scaffoldBackgroundColor
+                                                            Theme.of(context)
+                                                                .scaffoldBackgroundColor
                                                                 .withOpacity(
                                                                     .6),
-                                                            scaffoldBackgroundColor
+                                                            Theme.of(context)
+                                                                .scaffoldBackgroundColor
                                                                 .withOpacity(0)
                                                           ],
                                                           begin: Alignment
@@ -3077,20 +3100,28 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                 ),
                                                 Container(
                                                     decoration: BoxDecoration(
-                                                        gradient: LinearGradient(
-                                                            colors: [
-                                                              scaffoldBackgroundColor
-                                                                  .withOpacity(
-                                                                      .6),
-                                                              scaffoldBackgroundColor
-                                                                  .withOpacity(
-                                                                      0)
-                                                            ],
-                                                            begin: Alignment
-                                                                .bottomCenter,
-                                                            end: Alignment
-                                                                .topCenter,
-                                                            stops: [0.0, 0.7])),
+                                                        gradient:
+                                                            LinearGradient(
+                                                                colors: [
+                                                                  Theme.of(
+                                                                          context)
+                                                                      .scaffoldBackgroundColor
+                                                                      .withOpacity(
+                                                                          .6),
+                                                                  Theme.of(
+                                                                          context)
+                                                                      .scaffoldBackgroundColor
+                                                                      .withOpacity(
+                                                                          0)
+                                                                ],
+                                                                begin: Alignment
+                                                                    .bottomCenter,
+                                                                end: Alignment
+                                                                    .topCenter,
+                                                                stops: [
+                                                                  0.0,
+                                                                  0.7
+                                                                ])),
                                                     child: SizedBox(
                                                       width:
                                                           MediaQuery.of(context)
@@ -3110,7 +3141,8 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                     ),
                                     Container(
                                         decoration: BoxDecoration(
-                                            color: scaffoldBackgroundColor),
+                                            color: Theme.of(context)
+                                                .scaffoldBackgroundColor),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.max,
                                           mainAxisAlignment:
@@ -3364,7 +3396,8 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                     decoration: BoxDecoration(
                                       color: Theme.of(context).primaryColor,
                                       border: Border.all(
-                                          color: scaffoldBackgroundColor
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor
                                               .withOpacity(0)),
                                       borderRadius: BorderRadius.circular(100),
                                     ),

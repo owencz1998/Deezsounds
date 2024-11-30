@@ -336,8 +336,9 @@ class _LibraryTracksState extends State<LibraryTracks> {
       return;
     }
 
+    if (mounted) setState(() => _isLoading = true);
+
     if (await isConnected()) {
-      if (mounted) setState(() => _isLoading = true);
       int pos = tracks.length;
 
       if (tracks.isEmpty) {
@@ -394,6 +395,12 @@ class _LibraryTracksState extends State<LibraryTracks> {
           _isLoadingTracks = false;
         });
       }
+    } else {
+      List<Track> offlineTracks = await _loadAllOffline();
+      setState(() {
+        tracks = List.from(offlineTracks);
+        _isLoading = false;
+      });
     }
   }
 
@@ -453,8 +460,6 @@ class _LibraryTracksState extends State<LibraryTracks> {
     });
 
     _load();
-    //Load all offline tracks
-    _loadAllOffline();
 
     //Load sorting
     int? index = Sorting.index(SortSourceTypes.TRACKS);
@@ -470,6 +475,31 @@ class _LibraryTracksState extends State<LibraryTracks> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        floatingActionButton: ListenableBuilder(
+            listenable: playerBarState,
+            builder: (BuildContext context, Widget? child) {
+              return AnimatedPadding(
+                duration: Duration(milliseconds: 200),
+                padding:
+                    EdgeInsets.only(bottom: playerBarState.state ? 80 : 20),
+                child: FloatingActionButton(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    onPressed: () async {
+                      //Add to offline
+                      if (_playlist.user?.id != deezerAPI.userId) {
+                        await deezerAPI.addPlaylist(_playlist.id!);
+                      }
+                      downloadManager.addOfflinePlaylist(_playlist,
+                          private: true);
+                      MenuSheet().showDownloadStartedToast();
+                    },
+                    child: Icon(
+                      DeezerIcons.download,
+                      size: 25,
+                    )),
+              );
+            }),
         appBar: FreezerAppBar(
           'Tracks'.i18n,
           actions: [
@@ -516,7 +546,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
                 ),
               ],
               child: Icon(
-                Icons.sort,
+                DeezerIcons.sort,
                 size: 32.0,
                 semanticLabel: 'Sort'.i18n,
               ),
@@ -530,35 +560,6 @@ class _LibraryTracksState extends State<LibraryTracks> {
             child: ListView(
               controller: _scrollController,
               children: <Widget>[
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    MakePlaylistOffline(_playlist),
-                    TextButton(
-                      child: Row(
-                        children: <Widget>[
-                          const Icon(
-                            Icons.file_download,
-                            size: 32.0,
-                          ),
-                          Container(
-                            width: 4,
-                          ),
-                          Text('Download'.i18n)
-                        ],
-                      ),
-                      onPressed: () async {
-                        if (await downloadManager.addOfflinePlaylist(_playlist,
-                                private: false) !=
-                            false) {
-                          MenuSheet().showDownloadStartedToast();
-                        }
-                      },
-                    )
-                  ],
-                ),
-                const FreezerDivider(),
                 //Loved tracks
                 ...List.generate(tracks.length, (i) {
                   Track t = (tracks.length == (trackCount ?? 0))
@@ -598,35 +599,6 @@ class _LibraryTracksState extends State<LibraryTracks> {
                       )
                     ],
                   ),
-                const FreezerDivider(),
-                Text(
-                  'All offline tracks'.i18n,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                Container(
-                  height: 8,
-                ),
-                ...List.generate(allTracks.length, (i) {
-                  Track t = allTracks[i];
-                  return TrackTile(
-                    t,
-                    onTap: () {
-                      GetIt.I<AudioPlayerHandler>().playFromTrackList(
-                          allTracks,
-                          t.id!,
-                          QueueSource(
-                              id: 'allTracks',
-                              text: 'All offline tracks'.i18n,
-                              source: 'offline'));
-                    },
-                    onHold: () {
-                      MenuSheet m = MenuSheet();
-                      m.defaultTrackMenu(t, context: context);
-                    },
-                  );
-                }),
                 ListenableBuilder(
                     listenable: playerBarState,
                     builder: (BuildContext context, Widget? child) {
@@ -652,13 +624,12 @@ class _LibraryAlbumsState extends State<LibraryAlbums> {
   Sorting _sort = Sorting(sourceType: SortSourceTypes.ALBUMS);
   final ScrollController _scrollController = ScrollController();
 
-  Future<List<Album>> _loadOnlineAlbums() async {
-    if (settings.offlineMode) return [];
-    return await deezerAPI.getAlbums();
-  }
-
-  Future<List<Album>> _loadOfflineAlbums() async {
-    return await downloadManager.getOfflineAlbums();
+  Future<List<Album>> _loadAlbums() async {
+    if (await isConnected()) {
+      return await deezerAPI.getAlbums();
+    } else {
+      return await downloadManager.getOfflineAlbums();
+    }
   }
 
   Future _reverse() async {
@@ -744,13 +715,8 @@ class _LibraryAlbumsState extends State<LibraryAlbums> {
             children: <Widget>[
               Container(height: 8.0),
               AlbumList(
-                loadAlbums: _loadOnlineAlbums,
+                loadAlbums: _loadAlbums,
                 sort: _sort,
-              ),
-              AlbumList(
-                loadAlbums: _loadOfflineAlbums,
-                sort: _sort,
-                offline: true,
               ),
               ListenableBuilder(
                   listenable: playerBarState,
@@ -1118,7 +1084,11 @@ class _LibraryPlaylistsState extends State<LibraryPlaylists> {
   }
 
   Future _load() async {
-    if (!settings.offlineMode) {
+    List<Playlist> offlinePlaylists =
+        await downloadManager.getOfflinePlaylists();
+    if (mounted) setState(() => _playlists = offlinePlaylists);
+
+    if (await isConnected()) {
       try {
         List<Playlist> playlists = await deezerAPI.getPlaylists();
         if (mounted) setState(() => _playlists = playlists);
@@ -1294,56 +1264,6 @@ class _LibraryPlaylistsState extends State<LibraryPlaylists> {
                     },
                   );
                 }),
-
-              FutureBuilder(
-                future: downloadManager.getOfflinePlaylists(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError || !snapshot.hasData) {
-                    return const SizedBox(
-                      height: 0,
-                      width: 0,
-                    );
-                  }
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const SizedBox(
-                      height: 0,
-                      width: 0,
-                    );
-                  }
-
-                  List<Playlist> playlists = snapshot.data!;
-                  return Column(
-                    children: <Widget>[
-                      const FreezerDivider(),
-                      Text(
-                        'Offline playlists'.i18n,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            fontSize: 24.0, fontWeight: FontWeight.bold),
-                      ),
-                      ...List.generate(playlists.length, (i) {
-                        Playlist p = playlists[i];
-                        return PlaylistTile(
-                          p,
-                          onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (context) => PlaylistDetails(p))),
-                          onHold: () {
-                            MenuSheet m = MenuSheet();
-                            m.defaultPlaylistMenu(p, context: context,
-                                onRemove: () {
-                              setState(() {
-                                playlists.remove(p);
-                                _playlists!.remove(p);
-                              });
-                            });
-                          },
-                        );
-                      })
-                    ],
-                  );
-                },
-              ),
               ListenableBuilder(
                   listenable: playerBarState,
                   builder: (BuildContext context, Widget? child) {

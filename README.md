@@ -2,7 +2,7 @@
 
 [![Latest Version](https://img.shields.io/github/v/release/PetitPrinc3/Deezer?color=blue)](../../releases/latest)
 [![Release date](https://img.shields.io/github/release-date/PetitPrinc3/Deezer)](../../releases/latest)
-[![Downloads Original](https://img.shields.io/github/downloads/DJDoubleD/ReFreezer/total?color=blue&label=ReFreezer%20downloads)](../../releases)
+[![Downloads Refreezer](https://img.shields.io/github/downloads/DJDoubleD/ReFreezer/total?color=blue&label=ReFreezer%20downloads)](../../releases)
 [![Downloads MOD](https://img.shields.io/github/downloads/PetitPrinc3/Deezer/total?color=blue&label=MOD%20downloads)](../../releases)
 [![Flutter Version](https://shields.io/badge/Flutter-v3.24.4-darkgreen.svg)](https://docs.flutter.dev/tools/sdk)
 [![Dart Version](https://shields.io/badge/Dart-v3.5.4-darkgreen.svg)](https://dart.dev/get-dart)
@@ -71,12 +71,14 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
 - If queue is cleared and player bar is dismissed, it will not be brought back up if the user clicks back on the formerly playing track.
 - Lyrics are re-fetched from api each time the player is brought back. This is because the API does not include informations regarding the lyrics in the track model.
 - Player bar does not always update its color on track tile tap or various other scenarios.
+- App becomes laggy when queue is opened. Unable to diagnose yet...
 
 ### :building_construction: Upcoming features
-- Merge offline tracks and online tracks under tracks (same for playlists, albums, etc.)
 - Caching information to avoid reloading every time (eg. favorites screen)
 - Turn the mod into a skin for the official refreezer app
 - NavigationRail for landscape mode on left side of screen
+- Deezer "playing" animation instead of highlight
+- Rebranding to "NotDeezer" ?
 
 ### :rocket: MOD Features :
 - Floating player bar with background color based on title artwork

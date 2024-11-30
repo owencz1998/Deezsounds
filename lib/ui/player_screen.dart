@@ -94,7 +94,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
               end: Alignment.bottomCenter,
               colors: [
                 palette.dominantColor!.color.withOpacity(0.7),
-                Settings.deezerBg
+                scaffoldBackgroundColor
               ],
               stops: const [
                 0.0,
