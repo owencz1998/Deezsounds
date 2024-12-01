@@ -369,7 +369,7 @@ class SmartTrackListTile extends StatelessWidget {
                     CachedImage(
                       width: 128,
                       height: 128,
-                      url: smartTrackList.cover?.thumb ?? '',
+                      url: smartTrackList.cover?.full ?? '',
                       rounded: true,
                     ),
                     SizedBox(
@@ -425,7 +425,7 @@ class FlowTrackListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        width: 150,
+        width: 120,
         child: InkWell(
           onTap: onTap,
           onLongPress: onHold,
@@ -436,9 +436,9 @@ class FlowTrackListTile extends StatelessWidget {
                 height: 4,
               ),
               CachedImage(
-                url: deezerFlow.cover?.thumb ?? '',
+                url: deezerFlow.cover?.full ?? '',
                 circular: true,
-                width: 100,
+                width: 90,
               ),
               Container(
                 height: 8,

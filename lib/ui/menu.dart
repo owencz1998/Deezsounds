@@ -7,7 +7,6 @@ import 'package:get_it/get_it.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
 import 'package:refreezer/settings.dart';
-import 'package:refreezer/ui/player_screen.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';

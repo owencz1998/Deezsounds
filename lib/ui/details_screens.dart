@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
 import 'package:refreezer/main.dart';
 import 'package:refreezer/settings.dart';
-import 'package:refreezer/ui/player_screen.dart';
 import 'package:refreezer/utils/navigator_keys.dart';
 import 'package:share_plus/share_plus.dart';
 
