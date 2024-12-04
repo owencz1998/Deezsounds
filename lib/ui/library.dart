@@ -2,6 +2,7 @@ import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
+import 'package:fluttericon/octicons_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
@@ -93,7 +94,9 @@ class LibraryScreen extends StatelessWidget {
             leading: const LeadingIcon(DeezerIcons.shuffle,
                 color: Color(0xffeca704)),
             onTap: () async {
-              List<Track> tracks = await deezerAPI.libraryShuffle();
+              List<Track> tracks = (await isConnected())
+                  ? await deezerAPI.libraryShuffle()
+                  : await downloadManager.allOfflineTracks();
               GetIt.I<AudioPlayerHandler>().playFromTrackList(
                   tracks,
                   tracks[0].id!,
@@ -396,11 +399,13 @@ class _LibraryTracksState extends State<LibraryTracks> {
         });
       }
     } else {
-      List<Track> offlineTracks = await _loadAllOffline();
-      setState(() {
-        tracks = List.from(offlineTracks);
-        _isLoading = false;
-      });
+      List<Track> tracks = await downloadManager.allOfflineTracks();
+      if (mounted) {
+        setState(() {
+          allTracks = tracks;
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -431,15 +436,6 @@ class _LibraryTracksState extends State<LibraryTracks> {
     if (mounted) {
       setState(() {
         tracks = p?.tracks ?? [];
-      });
-    }
-  }
-
-  Future _loadAllOffline() async {
-    List<Track> tracks = await downloadManager.allOfflineTracks();
-    if (mounted) {
-      setState(() {
-        allTracks = tracks;
       });
     }
   }
@@ -625,10 +621,17 @@ class _LibraryAlbumsState extends State<LibraryAlbums> {
   final ScrollController _scrollController = ScrollController();
 
   Future<List<Album>> _loadAlbums() async {
+    List<Album> offlineAlbums = await downloadManager.getOfflineAlbums();
     if (await isConnected()) {
-      return await deezerAPI.getAlbums();
+      List<Album> onlineAlbums = await deezerAPI.getAlbums();
+      for (int i = 0; i < onlineAlbums.length; i++) {
+        if (onlineAlbums[i].isIn(offlineAlbums)) {
+          onlineAlbums[i].offline = true;
+        }
+      }
+      return onlineAlbums;
     } else {
-      return await downloadManager.getOfflineAlbums();
+      return offlineAlbums;
     }
   }
 
@@ -853,6 +856,16 @@ class _AlbumListState extends State<AlbumList> {
                   });
                 });
               },
+              trailing: (album.offline ?? false)
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2.0),
+                      child: Icon(
+                        Octicons.primitive_dot,
+                        color: Colors.green,
+                        size: 12.0,
+                      ),
+                    )
+                  : SizedBox(),
             );
           },
         ),
