@@ -64,9 +64,8 @@ class DeezerAPI {
     http.Response res = await http
         .post(uri, headers: headers, body: jsonEncode(params))
         .catchError((e) {
-      return http.Response("'error': '" + e.toString() + "'", 200);
+      return http.Response('"error": "' + e.toString() + '"', 200);
     });
-    if (res.body == '') res;
     dynamic body = jsonDecode(res.body);
     //Grab SID
     if (method == 'deezer.getUserData' && res.headers['set-cookie'] != null) {

@@ -71,7 +71,7 @@ This branch focuses on the development of this app while the ReFreezer_Skin bran
 - If queue is cleared and player bar is dismissed, it will not be brought back up if the user clicks back on the formerly playing track.
 - Lyrics are re-fetched from api each time the player is brought back. This is because the API does not include informations regarding the lyrics in the track model.
 - Player bar does not always update its color on track tile tap or various other scenarios.
-- App becomes laggy when queue is opened. Unable to diagnose yet...
+- App becomes laggy when queue is opened. This is because of the image loading and caching process.
 
 ### :building_construction: Upcoming features
 - Caching information to avoid reloading every time (eg. favorites screen)

@@ -302,7 +302,11 @@ class AudioPlayerHandler extends BaseAudioHandler
 
   @override
   Future<void> updateQueue(List<MediaItem> newQueue) async {
-    await _playlist.clear();
+    try {
+      await _playlist.clear();
+    } catch (e) {
+      Logger.root.log(Level.WARNING, 'Unable to clear queue.');
+    }
     if (newQueue.isNotEmpty) {
       await _playlist.addAll(await _itemsToSources(newQueue));
     } else {
