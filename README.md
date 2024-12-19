@@ -48,20 +48,20 @@ This repository originates from [ReFreezer](https://github.com/DJDoubleD/ReFreez
 
 ## :star2: Features & changes
 
-### :lady_beetle: Bugs
+#### :lady_beetle: Bugs
 - If queue is cleared and player bar is dismissed, it will not be brought back up if the user clicks back on the formerly playing track.
 - Lyrics are re-fetched from api each time the player is brought back. This is because the API does not include informations regarding the lyrics in the track model.
 - Player bar does not always update its color on track tile tap or various other scenarios.
 - Favorite tracks playlist id is not properly saved (no/minor UX consequences).
 - Queue screen is laggy. This seems to be because of how the images are loaded.
 
-### :building_construction: Upcoming features
+#### :building_construction: Upcoming features
 - Caching information to avoid reloading every time (eg. favorites screen)
 - Turn the mod into a skin for the official refreezer app
 - Deezer "playing" animation instead of highlight
 - Download progress on track tiles
 
-### :rocket: Definitely Not Deezer Features :
+#### :rocket: Definitely Not Deezer Features :
 - Floating player bar with background color based on title artwork
 - Deezer original icons
 - Deezer font
@@ -73,7 +73,7 @@ This repository originates from [ReFreezer](https://github.com/DJDoubleD/ReFreez
 - Downloads are stored within the app storage (Android/data/package) and can be exported to local storage under settings with full tags
 - Fixed lyrics support
 
-### :rocket: [ReFreezer Features](https://github.com/DJDoubleD/refreezer)
+#### :rocket: [ReFreezer Features](https://github.com/DJDoubleD/refreezer)
 
 ## :pick: Compile from source
 
