@@ -239,8 +239,10 @@ class Album {
 
   String? get artistString =>
       artists?.map<String>((art) => art.name ?? '').join(', ');
-  Duration get duration =>
-      Duration(seconds: tracks!.fold(0, (v, t) => v += t.duration!.inSeconds));
+  Duration get duration => tracks == null
+      ? Duration()
+      : Duration(
+          seconds: tracks!.fold(0, (v, t) => v += t.duration!.inSeconds));
   String get durationString =>
       "${duration.inMinutes}:${duration.inSeconds.remainder(60).toString().padLeft(2, '0')}";
   String? get fansString => NumberFormat.compact().format(fans);

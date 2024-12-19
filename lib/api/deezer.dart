@@ -64,8 +64,9 @@ class DeezerAPI {
     http.Response res = await http
         .post(uri, headers: headers, body: jsonEncode(params))
         .catchError((e) {
-      return http.Response('"error": "' + e.toString() + '"', 200);
+      return http.Response('', 200);
     });
+    if (res.body == '') return Map();
     dynamic body = jsonDecode(res.body);
     //Grab SID
     if (method == 'deezer.getUserData' && res.headers['set-cookie'] != null) {
@@ -231,7 +232,15 @@ class DeezerAPI {
       'header': true,
       'lang': settings.deezerLanguage
     });
-    if (data['results']['DATA'] == null) return Album();
+    while (data['results']?['DATA'] == null &&
+        data['payload']?['FALLBACK']?['ALB_ID'] != null) {
+      data = await callGwApi('deezer.pageAlbum', params: {
+        'alb_id': data['payload']?['FALLBACK']?['ALB_ID'],
+        'header': true,
+        'lang': settings.deezerLanguage
+      });
+    }
+    if (data['results']?['DATA'] == null) return Album();
     return Album.fromPrivateJson(data['results']['DATA'],
         songsJson: data['results']['SONGS']);
   }
@@ -273,6 +282,7 @@ class DeezerAPI {
       'tags': true,
       'start': 0
     });
+    if (data['results'] == null) return Playlist();
     return Playlist.fromPrivateJson(data['results']['DATA'],
         songsJson: data['results']['SONGS']);
   }

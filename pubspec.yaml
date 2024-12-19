@@ -95,7 +95,7 @@ dependencies:
   move_to_background:
     path: ./move_to_background
   numberpicker: ^2.1.2
-  open_filex: ^4.4.0
+  open_filex: ^4.6.0
   package_info_plus: ^8.0.0
   palette_generator: ^0.3.3+3
   path: ^1.8.3

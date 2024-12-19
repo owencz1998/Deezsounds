@@ -491,101 +491,204 @@ class _MainScreenState extends State<MainScreen>
         // Check _initialization status
         if (snapshot.connectionState == ConnectionState.done) {
           // When _initialization is done, render app
-          return KeyboardListener(
-              focusNode: FocusNode(),
-              onKeyEvent: (event) =>
-                  _handleKey(event, navigationBarFocusNode, screenFocusNode),
-              child: Scaffold(
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                bottomNavigationBar: FocusScope(
-                    node: navigationBarFocusNode,
-                    child: Theme(
-                        data: Theme.of(context).copyWith(
-                            canvasColor:
-                                Theme.of(context).scaffoldBackgroundColor),
-                        child: BottomNavigationBar(
-                          type: BottomNavigationBarType.fixed,
-                          unselectedItemColor:
-                              Theme.of(context).unselectedWidgetColor,
-                          currentIndex: _selected,
-                          onTap: (int index) async {
-                            //Pop all routes until home screen
-                            while (customNavigatorKey.currentState!.canPop()) {
-                              await customNavigatorKey.currentState!.maybePop();
-                            }
+          return OrientationBuilder(
+            builder: (context, orientation) {
+              return KeyboardListener(
+                  focusNode: FocusNode(),
+                  onKeyEvent: (event) => _handleKey(
+                      event, navigationBarFocusNode, screenFocusNode),
+                  child: Scaffold(
+                      backgroundColor:
+                          Theme.of(context).scaffoldBackgroundColor,
+                      bottomNavigationBar: orientation == Orientation.portrait
+                          ? FocusScope(
+                              node: navigationBarFocusNode,
+                              child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                      canvasColor: Theme.of(context)
+                                          .scaffoldBackgroundColor),
+                                  child: BottomNavigationBar(
+                                    type: BottomNavigationBarType.fixed,
+                                    unselectedItemColor:
+                                        Theme.of(context).unselectedWidgetColor,
+                                    currentIndex: _selected,
+                                    onTap: (int index) async {
+                                      //Pop all routes until home screen
+                                      while (customNavigatorKey.currentState!
+                                          .canPop()) {
+                                        await customNavigatorKey.currentState!
+                                            .maybePop();
+                                      }
 
-                            await customNavigatorKey.currentState!.maybePop();
+                                      await customNavigatorKey.currentState!
+                                          .maybePop();
 
-                            setState(() {
-                              _selected = index;
-                            });
-                            //Fix statusbar
-                            SystemChrome.setSystemUIOverlayStyle(
-                                const SystemUiOverlayStyle(
-                              statusBarColor: Colors.transparent,
-                            ));
-                          },
-                          selectedItemColor:
-                              settings.primaryColor.withOpacity(0.8),
-                          showUnselectedLabels: true,
-                          selectedLabelStyle:
-                              TextStyle(color: settings.primaryColor),
-                          unselectedLabelStyle:
-                              TextStyle(color: Settings.secondaryText),
-                          items: <BottomNavigationBarItem>[
-                            BottomNavigationBarItem(
-                                activeIcon: const Icon(DeezerIcons.house_fill),
-                                icon: const Icon(DeezerIcons.house),
-                                label: 'Home'.i18n),
-                            BottomNavigationBarItem(
-                                activeIcon:
-                                    const Icon(DeezerIcons.compass_fill),
-                                icon: const Icon(DeezerIcons.compass),
-                                label: 'Explore'.i18n),
-                            BottomNavigationBarItem(
-                                activeIcon: const Icon(DeezerIcons.heart_fill),
-                                icon: const Icon(DeezerIcons.heart),
-                                label: 'Favorites'.i18n),
-                            BottomNavigationBarItem(
-                              activeIcon: const Icon(DeezerIcons.search_fill),
-                              icon: const Icon(DeezerIcons.search),
-                              label: 'Search'.i18n,
+                                      setState(() {
+                                        _selected = index;
+                                      });
+                                      //Fix statusbar
+                                      SystemChrome.setSystemUIOverlayStyle(
+                                          const SystemUiOverlayStyle(
+                                        statusBarColor: Colors.transparent,
+                                      ));
+                                    },
+                                    selectedItemColor:
+                                        settings.primaryColor.withOpacity(0.8),
+                                    showUnselectedLabels: true,
+                                    selectedLabelStyle:
+                                        TextStyle(color: settings.primaryColor),
+                                    unselectedLabelStyle: TextStyle(
+                                        color: Settings.secondaryText),
+                                    items: <BottomNavigationBarItem>[
+                                      BottomNavigationBarItem(
+                                          activeIcon: const Icon(
+                                              DeezerIcons.house_fill),
+                                          icon: const Icon(DeezerIcons.house),
+                                          label: 'Home'.i18n),
+                                      BottomNavigationBarItem(
+                                          activeIcon: const Icon(
+                                              DeezerIcons.compass_fill),
+                                          icon: const Icon(DeezerIcons.compass),
+                                          label: 'Explore'.i18n),
+                                      BottomNavigationBarItem(
+                                          activeIcon: const Icon(
+                                              DeezerIcons.heart_fill),
+                                          icon: const Icon(DeezerIcons.heart),
+                                          label: 'Favorites'.i18n),
+                                      BottomNavigationBarItem(
+                                        activeIcon:
+                                            const Icon(DeezerIcons.search_fill),
+                                        icon: const Icon(DeezerIcons.search),
+                                        label: 'Search'.i18n,
+                                      ),
+                                      BottomNavigationBarItem(
+                                          activeIcon:
+                                              const Icon(DeezerIcons.settings),
+                                          icon:
+                                              const Icon(DeezerIcons.settings),
+                                          label: 'Settings'.i18n)
+                                    ],
+                                  )))
+                          : null,
+                      body: Row(
+                        children: [
+                          if (orientation == Orientation.landscape)
+                            LayoutBuilder(builder: (context, constraints) {
+                              return SingleChildScrollView(
+                                  physics: NeverScrollableScrollPhysics(),
+                                  child: ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                          minHeight: constraints.maxHeight),
+                                      child: IntrinsicHeight(
+                                          child: NavigationRail(
+                                        destinations: [
+                                          NavigationRailDestination(
+                                              selectedIcon: const Icon(
+                                                  DeezerIcons.house_fill),
+                                              icon:
+                                                  const Icon(DeezerIcons.house),
+                                              label: Text('Home'.i18n)),
+                                          NavigationRailDestination(
+                                              selectedIcon: const Icon(
+                                                  DeezerIcons.compass_fill),
+                                              icon: const Icon(
+                                                  DeezerIcons.compass),
+                                              label: Text('Explore'.i18n)),
+                                          NavigationRailDestination(
+                                              selectedIcon: const Icon(
+                                                  DeezerIcons.heart_fill),
+                                              icon:
+                                                  const Icon(DeezerIcons.heart),
+                                              label: Text('Favorites'.i18n)),
+                                          NavigationRailDestination(
+                                            selectedIcon: const Icon(
+                                                DeezerIcons.search_fill),
+                                            icon:
+                                                const Icon(DeezerIcons.search),
+                                            label: Text('Search'.i18n),
+                                          ),
+                                          NavigationRailDestination(
+                                              selectedIcon: const Icon(
+                                                  DeezerIcons.settings),
+                                              icon: const Icon(
+                                                  DeezerIcons.settings),
+                                              label: Text('Settings'.i18n))
+                                        ],
+                                        selectedIndex: _selected,
+                                        onDestinationSelected:
+                                            (int index) async {
+                                          //Pop all routes until home screen
+                                          while (customNavigatorKey
+                                              .currentState!
+                                              .canPop()) {
+                                            await customNavigatorKey
+                                                .currentState!
+                                                .maybePop();
+                                          }
+
+                                          await customNavigatorKey.currentState!
+                                              .maybePop();
+
+                                          setState(() {
+                                            _selected = index;
+                                          });
+                                          //Fix statusbar
+                                          SystemChrome.setSystemUIOverlayStyle(
+                                              const SystemUiOverlayStyle(
+                                            statusBarColor: Colors.transparent,
+                                          ));
+                                        },
+                                        selectedIconTheme: IconThemeData(
+                                            color: settings.primaryColor),
+                                        groupAlignment: 0,
+                                        selectedLabelTextStyle: TextStyle(
+                                            color: settings.primaryColor),
+                                        unselectedIconTheme: IconThemeData(
+                                            color: Settings.secondaryText),
+                                        unselectedLabelTextStyle: TextStyle(
+                                            color: Settings.secondaryText),
+                                        labelType: NavigationRailLabelType.all,
+                                        backgroundColor:
+                                            Colors.white.withAlpha(30),
+                                      ))));
+                            }),
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                CustomNavigator(
+                                    navigatorKey: customNavigatorKey,
+                                    home: Focus(
+                                      focusNode: screenFocusNode,
+                                      skipTraversal: true,
+                                      canRequestFocus: false,
+                                      child: _screens[_selected],
+                                    ),
+                                    pageRoute: PageRoutes.materialPageRoute),
+                                Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    margin: MediaQuery.of(context)
+                                                .orientation ==
+                                            Orientation.portrait
+                                        ? EdgeInsets.all(8)
+                                        : EdgeInsets.fromLTRB(
+                                            MediaQuery.of(context).size.width *
+                                                    0.4 +
+                                                8,
+                                            8,
+                                            8,
+                                            8),
+                                    child: const PlayerBar(),
+                                  ),
+                                ),
+                              ],
                             ),
-                            BottomNavigationBarItem(
-                                activeIcon: const Icon(DeezerIcons.settings),
-                                icon: const Icon(DeezerIcons.settings),
-                                label: 'Settings'.i18n)
-                          ],
-                        ))),
-                body: Stack(
-                  children: [
-                    CustomNavigator(
-                        navigatorKey: customNavigatorKey,
-                        home: Focus(
-                          focusNode: screenFocusNode,
-                          skipTraversal: true,
-                          canRequestFocus: false,
-                          child: _screens[_selected],
-                        ),
-                        pageRoute: PageRoutes.materialPageRoute),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        color: Colors.transparent,
-                        margin: MediaQuery.of(context).orientation ==
-                                Orientation.portrait
-                            ? EdgeInsets.all(8)
-                            : EdgeInsets.fromLTRB(
-                                MediaQuery.of(context).size.width * 0.4 + 8,
-                                8,
-                                8,
-                                8),
-                        child: const PlayerBar(),
-                      ),
-                    ),
-                  ],
-                ),
-              ));
+                          )
+                        ],
+                      )));
+            },
+          );
         } else {
           // While audio_service is initializing
           return Scaffold(

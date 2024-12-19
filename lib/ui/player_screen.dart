@@ -145,7 +145,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   image: _blurImage ?? const NetworkImage(''),
                                   fit: BoxFit.fill,
                                   colorFilter: ColorFilter.mode(
-                                      Colors.black.withOpacity(0.25),
+                                      Colors.black.withAlpha(65),
                                       BlendMode.dstATop))),
                           child: BackdropFilter(
                             filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
@@ -1314,11 +1314,11 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
           : ReorderableListView.builder(
               scrollController: _scrollController,
               itemCount: queueState.queue.length,
-              onReorder: (int oldIndex, int newIndex) async {
+              onReorder: (int oldIndex, int newIndex) {
                 // Circumvent bug in ReorderableListView that won't be fixed: https://github.com/flutter/flutter/pull/93146#issuecomment-1032082749
                 if (newIndex > oldIndex) newIndex -= 1;
                 if (oldIndex == newIndex) return;
-                await audioHandler.moveQueueItem(oldIndex, newIndex);
+                audioHandler.moveQueueItem(oldIndex, newIndex);
               },
               itemBuilder: (context, index) {
                 final mediaItem = queueState.queue[index];

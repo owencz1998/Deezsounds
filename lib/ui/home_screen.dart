@@ -94,14 +94,27 @@ class FreezerTitle extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Image.asset('assets/icon.png', width: 48, height: 48),
+          Image.asset('assets/icon.png', width: 54, height: 54),
           Container(width: 12.0),
-          const Text(
-            'Deezer',
-            style: TextStyle(
-                fontSize: 64,
-                fontWeight: FontWeight.w700,
-                fontFamily: 'Deezer'),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Definitely not',
+                style: TextStyle(fontSize: 14),
+                textAlign: TextAlign.start,
+              ),
+              Text(
+                'Deezer',
+                style: TextStyle(
+                    fontSize: 64,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Deezer'),
+                textAlign: TextAlign.start,
+              )
+            ],
           )
         ],
       ),

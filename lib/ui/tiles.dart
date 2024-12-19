@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fluttericon/octicons_icons.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 import 'package:refreezer/settings.dart';
 import 'package:refreezer/ui/details_screens.dart';
 import 'package:refreezer/ui/favorite_screen.dart';
@@ -32,6 +33,8 @@ class _TrackTileState extends State<TrackTile> {
   StreamSubscription? _mediaItemSub;
   bool _isOffline = false;
   bool nowPlaying = false;
+  bool nowDownloading = false;
+  double downloadProgress = 0.0;
 
   /*bool get nowPlaying {
     if (GetIt.I<AudioPlayerHandler>().mediaItem.value == null) return false;
@@ -66,56 +69,64 @@ class _TrackTileState extends State<TrackTile> {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      dense: true,
-      title: Text(
-        widget.track.title ?? '',
-        maxLines: 1,
-        overflow: TextOverflow.clip,
-        style: TextStyle(
-            color: nowPlaying ? Theme.of(context).primaryColor : null),
-      ),
-      subtitle: Text(
-        widget.track.artistString ?? '',
-        maxLines: 1,
-      ),
-      leading: CachedImage(
-        url: widget.track.albumArt?.thumb ?? '',
-        width: 48,
-      ),
-      onTap: widget.onTap,
-      onLongPress: widget.onHold,
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (_isOffline)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 2.0),
-              child: Icon(
-                Octicons.primitive_dot,
-                color: Colors.green,
-                size: 12.0,
+    return Column(children: [
+      ListTile(
+        dense: true,
+        title: Text(
+          widget.track.title ?? '',
+          maxLines: 1,
+          overflow: TextOverflow.clip,
+          style: TextStyle(
+              color: nowPlaying ? Theme.of(context).primaryColor : null),
+        ),
+        subtitle: Text(
+          widget.track.artistString ?? '',
+          maxLines: 1,
+        ),
+        leading: CachedImage(
+          url: widget.track.albumArt?.thumb ?? '',
+          width: 48,
+        ),
+        onTap: widget.onTap,
+        onLongPress: widget.onHold,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_isOffline)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 2.0),
+                child: Icon(
+                  Octicons.primitive_dot,
+                  color: Colors.green,
+                  size: 12.0,
+                ),
               ),
-            ),
-          if (widget.track.explicit ?? false)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 2.0),
+            if (widget.track.explicit ?? false)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 2.0),
+                child: Text(
+                  'E',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            SizedBox(
+              width: 42.0,
               child: Text(
-                'E',
-                style: TextStyle(color: Colors.red),
+                widget.track.durationString ?? '',
+                textAlign: TextAlign.center,
               ),
             ),
-          SizedBox(
-            width: 42.0,
-            child: Text(
-              widget.track.durationString ?? '',
-              textAlign: TextAlign.center,
-            ),
-          ),
-          widget.trailing ?? const SizedBox(width: 0, height: 0)
-        ],
+            widget.trailing ?? const SizedBox(width: 0, height: 0)
+          ],
+        ),
       ),
-    );
+      if (nowDownloading)
+        LinearProgressIndicator(
+          value: downloadProgress,
+          color: Colors.green.shade400,
+          minHeight: 1.0,
+        )
+    ]);
   }
 }
 

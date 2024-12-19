@@ -339,8 +339,6 @@ class _LibraryTracksState extends State<LibraryTracks> {
       return;
     }
 
-    if (mounted) setState(() => _isLoading = true);
-
     if (await isConnected()) {
       int pos = tracks.length;
 
@@ -387,7 +385,14 @@ class _LibraryTracksState extends State<LibraryTracks> {
       }
       //On error load offline
       if (t == null) {
-        await _loadOffline();
+        t = await downloadManager.allOfflineTracks();
+        if (mounted) {
+          setState(() {
+            tracks = t ?? [];
+            _isLoading = false;
+            _isLoadingTracks = false;
+          });
+        }
         return;
       }
       if (mounted) {
@@ -399,11 +404,12 @@ class _LibraryTracksState extends State<LibraryTracks> {
         });
       }
     } else {
-      List<Track> tracks = await downloadManager.allOfflineTracks();
+      List<Track> t = await downloadManager.allOfflineTracks();
       if (mounted) {
         setState(() {
-          allTracks = tracks;
+          tracks = t;
           _isLoading = false;
+          _isLoadingTracks = false;
         });
       }
     }
@@ -430,16 +436,6 @@ class _LibraryTracksState extends State<LibraryTracks> {
     }
   }
 
-  Future _loadOffline() async {
-    Playlist? p = await downloadManager
-        .getOfflinePlaylist(deezerAPI.favoritesPlaylistId ?? '');
-    if (mounted) {
-      setState(() {
-        tracks = p?.tracks ?? [];
-      });
-    }
-  }
-
   //Update tracks with favorite true
   void _makeFavorite() {
     for (int i = 0; i < tracks.length; i++) {
@@ -449,6 +445,8 @@ class _LibraryTracksState extends State<LibraryTracks> {
 
   @override
   void initState() {
+    if (mounted) setState(() => _isLoading = true);
+
     _scrollController.addListener(() {
       //Load more tracks on scroll
       double off = _scrollController.position.maxScrollExtent * 0.90;
@@ -471,7 +469,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        /*floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: ListenableBuilder(
             listenable: playerBarState,
             builder: (BuildContext context, Widget? child) {
@@ -495,7 +493,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
                       size: 25,
                     )),
               );
-            }),
+            }),*/
         appBar: FreezerAppBar(
           'Tracks'.i18n,
           actions: [
@@ -550,62 +548,66 @@ class _LibraryTracksState extends State<LibraryTracks> {
             Container(width: 8.0),
           ],
         ),
-        body: DraggableScrollbar.rrect(
-            controller: _scrollController,
-            backgroundColor: Theme.of(context).primaryColor,
-            child: ListView(
-              controller: _scrollController,
-              children: <Widget>[
-                //Loved tracks
-                ...List.generate(tracks.length, (i) {
-                  Track t = (tracks.length == (trackCount ?? 0))
-                      ? _sorted[i]
-                      : tracks[i];
-                  return TrackTile(
-                    t,
-                    onTap: () {
-                      GetIt.I<AudioPlayerHandler>().playFromTrackList(
-                          (tracks.length == (trackCount ?? 0))
-                              ? _sorted
-                              : tracks,
-                          t.id!,
-                          QueueSource(
-                              id: deezerAPI.favoritesPlaylistId,
-                              text: 'Favorites'.i18n,
-                              source: 'playlist'));
-                    },
-                    onHold: () {
-                      MenuSheet m = MenuSheet();
-                      m.defaultTrackMenu(t, context: context, onRemove: () {
-                        setState(() {
-                          tracks.removeWhere((track) => t.id == track.id);
-                        });
-                      });
-                    },
-                  );
-                }),
-                if (_isLoading)
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 8.0, horizontal: 2.0),
-                        child: CircularProgressIndicator(),
-                      )
-                    ],
-                  ),
-                ListenableBuilder(
-                    listenable: playerBarState,
-                    builder: (BuildContext context, Widget? child) {
-                      return AnimatedPadding(
-                        duration: Duration(milliseconds: 200),
-                        padding: EdgeInsets.only(
-                            bottom: playerBarState.state ? 80 : 0),
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(
+                    color: Theme.of(context).primaryColor))
+            : DraggableScrollbar.rrect(
+                controller: _scrollController,
+                backgroundColor: Theme.of(context).primaryColor,
+                child: ListView(
+                  controller: _scrollController,
+                  children: <Widget>[
+                    //Loved tracks
+                    ...List.generate(tracks.length, (i) {
+                      Track t = (tracks.length == (trackCount ?? 0))
+                          ? _sorted[i]
+                          : tracks[i];
+                      return TrackTile(
+                        t,
+                        onTap: () {
+                          GetIt.I<AudioPlayerHandler>().playFromTrackList(
+                              (tracks.length == (trackCount ?? 0))
+                                  ? _sorted
+                                  : tracks,
+                              t.id!,
+                              QueueSource(
+                                  id: deezerAPI.favoritesPlaylistId,
+                                  text: 'Favorites'.i18n,
+                                  source: 'playlist'));
+                        },
+                        onHold: () {
+                          MenuSheet m = MenuSheet();
+                          m.defaultTrackMenu(t, context: context, onRemove: () {
+                            setState(() {
+                              tracks.removeWhere((track) => t.id == track.id);
+                            });
+                          });
+                        },
                       );
                     }),
-              ],
-            )));
+                    if (_isLoadingTracks)
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 2.0),
+                            child: CircularProgressIndicator(),
+                          )
+                        ],
+                      ),
+                    ListenableBuilder(
+                        listenable: playerBarState,
+                        builder: (BuildContext context, Widget? child) {
+                          return AnimatedPadding(
+                            duration: Duration(milliseconds: 200),
+                            padding: EdgeInsets.only(
+                                bottom: playerBarState.state ? 80 : 0),
+                          );
+                        }),
+                  ],
+                )));
   }
 }
 

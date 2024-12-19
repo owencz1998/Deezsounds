@@ -5,6 +5,7 @@ import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:refreezer/main.dart';
 
 import '../api/download.dart';
 import '../translations.i18n.dart';
@@ -214,6 +215,15 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                   await _load();
                 },
               ),
+            ListenableBuilder(
+                listenable: playerBarState,
+                builder: (BuildContext context, Widget? child) {
+                  return AnimatedPadding(
+                    duration: Duration(milliseconds: 200),
+                    padding:
+                        EdgeInsets.only(bottom: playerBarState.state ? 80 : 0),
+                  );
+                }),
           ],
         ));
   }
@@ -318,12 +328,21 @@ class DownloadTile extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          title: Text(download.title!),
-          leading: CachedImage(url: download.image!),
+          dense: true,
+          title: Text(
+            download.title!,
+            maxLines: 1,
+            overflow: TextOverflow.clip,
+          ),
           subtitle:
               Text(subtitle(), maxLines: 1, overflow: TextOverflow.ellipsis),
-          trailing: trailing(),
+          leading: CachedImage(
+            url: download.image!,
+            width: 48,
+          ),
           onTap: () => onClick(context),
+          onLongPress: () => onClick(context),
+          trailing: trailing(),
         ),
         if (download.state == DownloadState.DOWNLOADING)
           LinearProgressIndicator(

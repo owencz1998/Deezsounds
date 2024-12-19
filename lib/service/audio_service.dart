@@ -328,7 +328,8 @@ class AudioPlayerHandler extends BaseAudioHandler
 
     if (_player.shuffleModeEnabled) {
       // Get the shuffled index of the media item
-      final shuffledIndex = _player.shuffleIndices!.indexOf(index);
+      final shuffledIndex = _player.shuffleIndices![index];
+
       await _playlist.removeAt(shuffledIndex);
     } else {
       await _playlist.removeAt(index);

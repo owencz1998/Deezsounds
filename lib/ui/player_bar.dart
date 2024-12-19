@@ -66,7 +66,9 @@ class _PlayerBarState extends State<PlayerBar> {
 
   double get _progress {
     if (GetIt.I<AudioPlayerHandler>().playbackState.value.processingState ==
-        AudioProcessingState.idle) return 0.0;
+        AudioProcessingState.idle) {
+      return 0.0;
+    }
     if (GetIt.I<AudioPlayerHandler>().mediaItem.value == null) return 0.0;
     if (GetIt.I<AudioPlayerHandler>().mediaItem.value?.duration?.inSeconds ==
         0) {
@@ -135,7 +137,6 @@ class _PlayerBarState extends State<PlayerBar> {
                     children: <Widget>[
                       ListTile(
                           dense: true,
-                          horizontalTitleGap: 4.0,
                           focusNode: focusNode,
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 8.0),

@@ -4,9 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
 import 'package:refreezer/main.dart';
 import 'package:refreezer/settings.dart';
+import 'package:refreezer/utils/connectivity.dart';
 import 'package:refreezer/utils/navigator_keys.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -40,19 +42,26 @@ class _AlbumDetailsState extends State<AlbumDetails> {
   int _currentPage = 0;
 
   Future _loadAlbum() async {
-    setState(() => _isLoading = true);
+    if (mounted) setState(() => _isLoading = true);
     //Get album from API, if doesn't have tracks
     if ((album.tracks ?? []).isEmpty) {
       try {
-        Album a = await deezerAPI.album(album.id ?? '');
-        //Preserve library
-        a.library = album.library;
-        setState(() => album = a);
+        if (await isConnected()) {
+          Album a = await deezerAPI.album(album.id ?? '');
+          //Preserve library
+          a.library = album.library;
+          if (mounted && a.id != null) setState(() => album = a);
+        } else {
+          Album? a = await downloadManager.getOfflineAlbum(album.id ?? '');
+          //Preserve library
+          a?.library = album.library;
+          if (mounted && a?.id != null) setState(() => album = a ?? Album());
+        }
       } catch (e) {
-        setState(() => _error = true);
+        if (mounted) setState(() => _error = true);
       }
     }
-    setState(() => _isLoading = false);
+    if (mounted) setState(() => _isLoading = false);
   }
 
   //Get count of CDs in album
@@ -132,14 +141,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                           horizontalTitleGap: 8.0,
                                           leading: IconButton(
                                               onPressed: () async {
-                                                while (customNavigatorKey
-                                                    .currentState!
-                                                    .canPop()) {
-                                                  await customNavigatorKey
-                                                      .currentState!
-                                                      .maybePop();
-                                                }
-
                                                 await customNavigatorKey
                                                     .currentState!
                                                     .maybePop();
@@ -192,7 +193,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                     children: [
                                                       CachedImage(
                                                         url: album.art?.full ??
-                                                            '',
+                                                            album.art?.thumb ??
+                                                            'assets/cover.jpg',
                                                         width: MediaQuery.of(
                                                                     context)
                                                                 .size
@@ -541,9 +543,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                 ],
                               ),
                             ),
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height,
-                              width: MediaQuery.of(context).size.width * 0.6,
+                            Expanded(
                               child: ListView(
                                 children: [
                                   ...List.generate((album.tracks?.length ?? 0),
@@ -621,7 +621,9 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                           Stack(
                                             children: [
                                               CachedImage(
-                                                url: album.art?.full ?? '',
+                                                url: album.art?.fullUrl ??
+                                                    album.art?.thumbUrl ??
+                                                    'assets/cover.jpg',
                                                 width: MediaQuery.of(context)
                                                     .size
                                                     .width,
@@ -823,14 +825,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                           children: [
                                             IconButton(
                                                 onPressed: () async {
-                                                  while (customNavigatorKey
-                                                      .currentState!
-                                                      .canPop()) {
-                                                    await customNavigatorKey
-                                                        .currentState!
-                                                        .maybePop();
-                                                  }
-
                                                   await customNavigatorKey
                                                       .currentState!
                                                       .maybePop();
@@ -1202,14 +1196,6 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                           horizontalTitleGap: 8.0,
                                           leading: IconButton(
                                               onPressed: () async {
-                                                while (customNavigatorKey
-                                                    .currentState!
-                                                    .canPop()) {
-                                                  await customNavigatorKey
-                                                      .currentState!
-                                                      .maybePop();
-                                                }
-
                                                 await customNavigatorKey
                                                     .currentState!
                                                     .maybePop();
@@ -1374,9 +1360,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                 ],
                               ),
                             ),
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height,
-                              width: MediaQuery.of(context).size.width * 0.6,
+                            Expanded(
                               child: ListView(
                                 children: [
                                   Padding(
@@ -1749,14 +1733,6 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                       children: [
                                         IconButton(
                                             onPressed: () async {
-                                              while (customNavigatorKey
-                                                  .currentState!
-                                                  .canPop()) {
-                                                await customNavigatorKey
-                                                    .currentState!
-                                                    .maybePop();
-                                              }
-
                                               await customNavigatorKey
                                                   .currentState!
                                                   .maybePop();
@@ -2400,7 +2376,9 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
     // Got all tracks, return
     if (_isLoadingTracks ||
         playlist.tracks!.length >=
-            (playlist.trackCount ?? playlist.tracks!.length)) return;
+            (playlist.trackCount ?? playlist.tracks!.length)) {
+      return;
+    }
 
     setState(() => _isLoadingTracks = true);
     int pos = playlist.tracks!.length;
@@ -2542,14 +2520,6 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                         horizontalTitleGap: 8.0,
                                         leading: IconButton(
                                             onPressed: () async {
-                                              while (customNavigatorKey
-                                                  .currentState!
-                                                  .canPop()) {
-                                                await customNavigatorKey
-                                                    .currentState!
-                                                    .maybePop();
-                                              }
-
                                               await customNavigatorKey
                                                   .currentState!
                                                   .maybePop();
@@ -2947,26 +2917,18 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                               ],
                             ),
                           ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height,
-                            width: MediaQuery.of(context).size.width * 0.6,
+                          Expanded(
                             child: ListView(
                               controller: _scrollController,
                               children: [
                                 ...List.generate((playlist.tracks?.length ?? 0),
                                     (i) {
                                   Track t = (playlist.tracks ?? [])[i];
-                                  return TrackTile(t, onTap: () {
-                                    playlist.trackCount ==
-                                            playlist.tracks?.length
-                                        ? GetIt.I<AudioPlayerHandler>()
-                                            .playFromPlaylist(
-                                                Playlist(
-                                                    title: playlist.title,
-                                                    id: playlist.id,
-                                                    tracks: playlist.tracks),
-                                                t.id ?? '')
-                                        : deezerAPI
+                                  return TrackTile(t, onTap: () async {
+                                    (playlist.trackCount !=
+                                                playlist.tracks?.length &&
+                                            await isConnected())
+                                        ? deezerAPI
                                             .fullPlaylist(playlist.id ?? '')
                                             .then((Playlist p) => {
                                                   GetIt.I<AudioPlayerHandler>()
@@ -2976,7 +2938,14 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                               id: p.id,
                                                               tracks: p.tracks),
                                                           t.id ?? '')
-                                                });
+                                                })
+                                        : GetIt.I<AudioPlayerHandler>()
+                                            .playFromPlaylist(
+                                                Playlist(
+                                                    title: playlist.title,
+                                                    id: playlist.id,
+                                                    tracks: playlist.tracks),
+                                                t.id ?? '');
                                   }, onHold: () {
                                     MenuSheet m = MenuSheet();
                                     m.defaultTrackMenu(t,
@@ -3234,14 +3203,6 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                         children: [
                                           IconButton(
                                               onPressed: () async {
-                                                while (customNavigatorKey
-                                                    .currentState!
-                                                    .canPop()) {
-                                                  await customNavigatorKey
-                                                      .currentState!
-                                                      .maybePop();
-                                                }
-
                                                 await customNavigatorKey
                                                     .currentState!
                                                     .maybePop();
@@ -3405,7 +3366,8 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                           List<Track> tracklist =
                                               List.from(playlist.tracks ?? []);
                                           if (playlist.trackCount !=
-                                              tracklist.length) {
+                                                  tracklist.length &&
+                                              await isConnected()) {
                                             playlist =
                                                 await deezerAPI.fullPlaylist(
                                                     playlist.id ?? '');
@@ -3448,16 +3410,10 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                         const FreezerDivider(),
                         ...List.generate(playlist.tracks!.length, (i) {
                           Track t = sorted[i];
-                          return TrackTile(t, onTap: () {
-                            playlist.trackCount == playlist.tracks?.length
-                                ? GetIt.I<AudioPlayerHandler>()
-                                    .playFromPlaylist(
-                                        Playlist(
-                                            title: playlist.title,
-                                            id: playlist.id,
-                                            tracks: playlist.tracks),
-                                        t.id ?? '')
-                                : deezerAPI
+                          return TrackTile(t, onTap: () async {
+                            (playlist.trackCount != playlist.tracks?.length &&
+                                    await isConnected())
+                                ? deezerAPI
                                     .fullPlaylist(playlist.id ?? '')
                                     .then((Playlist p) => {
                                           GetIt.I<AudioPlayerHandler>()
@@ -3467,7 +3423,14 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                       id: p.id,
                                                       tracks: p.tracks),
                                                   t.id ?? '')
-                                        });
+                                        })
+                                : GetIt.I<AudioPlayerHandler>()
+                                    .playFromPlaylist(
+                                        Playlist(
+                                            title: playlist.title,
+                                            id: playlist.id,
+                                            tracks: playlist.tracks),
+                                        t.id ?? '');
                           }, onHold: () {
                             MenuSheet m = MenuSheet();
                             m.defaultTrackMenu(t, context: context, options: [

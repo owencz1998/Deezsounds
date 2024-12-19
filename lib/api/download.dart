@@ -275,10 +275,12 @@ class DownloadManager {
 
     //Get path
     String path = _generatePath(track, private, isSingleton: isSingleton);
-    await platform.invokeMethod('addDownloads', [
-      await Download.jsonFromTrack(track, path,
-          private: private, quality: quality)
-    ]);
+    if (!(await File(path).exists())) {
+      await platform.invokeMethod('addDownloads', [
+        await Download.jsonFromTrack(track, path,
+            private: private, quality: quality)
+      ]);
+    }
     await start();
     return true;
   }
@@ -317,8 +319,11 @@ class DownloadManager {
     //Create downloads
     List<Map> out = [];
     for (Track t in (album.tracks ?? [])) {
-      out.add(await Download.jsonFromTrack(t, _generatePath(t, private),
-          private: private, quality: quality));
+      String tPath = _generatePath(t, private);
+      if (!(await File(tPath).exists())) {
+        out.add(await Download.jsonFromTrack(t, tPath,
+            private: private, quality: quality));
+      }
     }
     await platform.invokeMethod('addDownloads', out);
     await start();
@@ -361,16 +366,16 @@ class DownloadManager {
     List<Map> out = [];
     for (int i = 0; i < (playlist.tracks?.length ?? 0); i++) {
       Track t = playlist.tracks![i];
-      out.add(await Download.jsonFromTrack(
-          t,
-          _generatePath(
-            t,
-            private,
-            playlistName: playlist.title,
-            playlistTrackNumber: i,
-          ),
-          private: private,
-          quality: quality));
+      String tPath = _generatePath(
+        t,
+        private,
+        playlistName: playlist.title,
+        playlistTrackNumber: i,
+      );
+      if (!(await File(tPath).exists())) {
+        out.add(await Download.jsonFromTrack(t, tPath,
+            private: private, quality: quality));
+      }
     }
     await platform.invokeMethod('addDownloads', out);
     await start();
@@ -532,7 +537,7 @@ class DownloadManager {
     List rawPlaylists = await db!.query('Playlists',
         columns: ['id'],
         where: 'id != ?',
-        whereArgs: [deezerAPI.favoritesPlaylistId]);
+        whereArgs: [deezerAPI.favoritesPlaylistId ?? '']);
     List<Playlist> out = [];
     for (Map rawPlaylist in rawPlaylists) {
       var offlinePlayList = await getOfflinePlaylist(rawPlaylist['id']);
