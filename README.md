@@ -21,7 +21,7 @@ This is an app that uses both public and internal Deezer APIs to provide similar
 This repository originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD.  
 
 >[!CAUTION]
-> Providing this app is illegal.
+> Providing this app is illegal.  
 > I will only maintain this app for a short period of time because of my personal lyability.
 
 >[!NOTE]
