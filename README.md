@@ -61,7 +61,7 @@ This repository originates from [ReFreezer](https://github.com/DJDoubleD/ReFreez
 - Deezer "playing" animation instead of highlight
 - Download progress on track tiles
 
-### :rocket: MOD Features :
+### :rocket: Definitely Not Deezer Features :
 - Floating player bar with background color based on title artwork
 - Deezer original icons
 - Deezer font
