@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
+import 'package:refreezer/api/download.dart';
 
 import '../api/definitions.dart';
 import '../api/spotify.dart';
@@ -295,6 +296,10 @@ class DeezerAPI {
   //Add track to favorites
   Future addFavoriteTrack(String id) async {
     await callGwApi('favorite_song.add', params: {'SNG_ID': id});
+    if (await downloadManager.checkOffline(
+        playlist: Playlist(id: favoritesPlaylistId))) {
+      downloadManager.updateOfflinePlaylist(Playlist(id: favoritesPlaylistId));
+    }
   }
 
   //Add album to favorites/library

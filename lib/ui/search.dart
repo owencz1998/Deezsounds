@@ -428,8 +428,6 @@ class _SearchScreenState extends State<SearchScreen> {
                       },
                       trailing: _removeHistoryItemWidget(i),
                     );
-                  default:
-                    return Container();
                 }
               }),
 

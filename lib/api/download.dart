@@ -413,16 +413,19 @@ class DownloadManager {
       List<Map> out = [];
       for (int i = 0; i < toDowload.length; i++) {
         Track t = toDowload[i];
-        out.add(await Download.jsonFromTrack(
+        String tPath = _generatePath(
           t,
-          _generatePath(
+          true,
+          playlistName: playlist.title,
+          playlistTrackNumber: i,
+        );
+        if (!(await File(tPath).exists())) {
+          out.add(await Download.jsonFromTrack(
             t,
-            true,
-            playlistName: playlist.title,
-            playlistTrackNumber: i,
-          ),
-          private: true,
-        ));
+            tPath,
+            private: true,
+          ));
+        }
       }
       await platform.invokeMethod('addDownloads', out);
       await start();

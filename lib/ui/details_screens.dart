@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
-import 'package:logging/logging.dart';
 import 'package:refreezer/fonts/deezer_icons.dart';
 import 'package:refreezer/main.dart';
 import 'package:refreezer/settings.dart';

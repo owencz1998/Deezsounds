@@ -31,10 +31,11 @@ class TrackTile extends StatefulWidget {
 
 class _TrackTileState extends State<TrackTile> {
   StreamSubscription? _mediaItemSub;
+  StreamSubscription? _downloadItemSub;
   bool _isOffline = false;
   bool nowPlaying = false;
   bool nowDownloading = false;
-  double downloadProgress = 0.0;
+  double downloadProgress = 0;
 
   /*bool get nowPlaying {
     if (GetIt.I<AudioPlayerHandler>().mediaItem.value == null) return false;
@@ -58,12 +59,49 @@ class _TrackTileState extends State<TrackTile> {
       }
     });
 
+    //Listen to download change to drop progress indicator
+    _downloadItemSub = downloadManager.serviceEvents.stream.listen((e) async {
+      List<Download> downloads = await downloadManager.getDownloads();
+
+      if (e['action'] == 'onProgress') {
+        setState(() {
+          for (Map su in e['data']) {
+            downloads
+                .firstWhere((d) => d.id == su['id'], orElse: () => Download())
+                .updateFromJson(su);
+          }
+        });
+      }
+
+      for (int i = 0; i < downloads.length; i++) {
+        if (downloads[i].trackId == widget.track.id) {
+          if (downloads[i].state != DownloadState.DONE) {
+            if (mounted) {
+              setState(() {
+                nowDownloading = true;
+                downloadProgress = downloads[i].progress;
+                Logger.root.info(downloadProgress);
+              });
+            }
+          } else {
+            if (mounted) {
+              setState(() {
+                nowDownloading = false;
+                _isOffline = true;
+              });
+            }
+          }
+        }
+      }
+    });
+
     super.initState();
   }
 
   @override
   void dispose() {
     _mediaItemSub?.cancel();
+    _downloadItemSub?.cancel();
     super.dispose();
   }
 
@@ -124,7 +162,8 @@ class _TrackTileState extends State<TrackTile> {
         LinearProgressIndicator(
           value: downloadProgress,
           color: Colors.green.shade400,
-          minHeight: 1.0,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          minHeight: 1,
         )
     ]);
   }

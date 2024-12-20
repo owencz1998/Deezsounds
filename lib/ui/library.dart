@@ -286,8 +286,6 @@ class _LibraryTracksState extends State<LibraryTracks> {
   int? trackCount;
   Sorting _sort = Sorting(sourceType: SortSourceTypes.TRACKS);
 
-  Playlist get _playlist => Playlist(id: deezerAPI.favoritesPlaylistId);
-
   List<Track> get _sorted {
     List<Track> tcopy = List.from(tracks);
     tcopy.sort((a, b) => a.addedDate!.compareTo(b.addedDate!));

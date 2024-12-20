@@ -54,12 +54,12 @@ This repository originates from [ReFreezer](https://github.com/DJDoubleD/ReFreez
 - Player bar does not always update its color on track tile tap or various other scenarios.
 - Favorite tracks playlist id is not properly saved (no/minor UX consequences).
 - Queue screen is laggy. This seems to be because of how the images are loaded.
+- Tracks removed from playlist/favorites will not disappear immediately from the detailed screen.
 
 #### :building_construction: Upcoming features
 - Caching information to avoid reloading every time (eg. favorites screen)
 - Turn the mod into a skin for the official refreezer app
 - Deezer "playing" animation instead of highlight
-- Download progress on track tiles
 
 #### :rocket: Definitely Not Deezer Features :
 - Floating player bar with background color based on title artwork
