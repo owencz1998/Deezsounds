@@ -13,9 +13,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:refreezer/fonts/deezer_icons.dart';
-import 'package:refreezer/main.dart';
-import 'package:refreezer/settings.dart';
+import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/main.dart';
+import 'package:deezer/settings.dart';
 
 import '../api/cache.dart';
 import '../api/download.dart';
@@ -34,7 +34,7 @@ class UpdaterScreen extends StatefulWidget {
 class _UpdaterScreenState extends State<UpdaterScreen> {
   bool _loading = true;
   bool _error = false;
-  ReFreezerLatest? _latestRelease;
+  DeezerLatest? _latestRelease;
   Version _currentVersion = Version.parse('0.0.0');
   String? _arch;
   double _progress = 0.0;
@@ -68,7 +68,7 @@ class _UpdaterScreenState extends State<UpdaterScreen> {
 
     //Load from website
     try {
-      ReFreezerLatest latestRelease = await ReFreezerLatest.fetch();
+      DeezerLatest latestRelease = await DeezerLatest.fetch();
       setState(() {
         _latestRelease = latestRelease;
         _loading = false;
@@ -80,7 +80,7 @@ class _UpdaterScreenState extends State<UpdaterScreen> {
     }
   }
 
-  ReFreezerDownload? get _versionDownload {
+  DeezerDownload? get _versionDownload {
     return _latestRelease?.downloads.firstWhereOrNull(
       (d) => d.architectures
           .any((arch) => arch.toLowerCase() == _arch?.toLowerCase()),
@@ -288,11 +288,11 @@ class _UpdaterScreenState extends State<UpdaterScreen> {
   }
 }
 
-class ReFreezerLatest {
+class DeezerLatest {
   final String versionString;
   final Version version;
   final String changelog;
-  final List<ReFreezerDownload> downloads;
+  final List<DeezerDownload> downloads;
 
   static const Map<String, List<String>> abiMap = {
     'arm64-v8a': ['arm64', 'aarch64'],
@@ -300,13 +300,13 @@ class ReFreezerLatest {
     'x86_64': ['x86_64'],
   };
 
-  ReFreezerLatest({
+  DeezerLatest({
     required this.versionString,
     required this.changelog,
     required this.downloads,
   }) : version = Version.tryParse(versionString) ?? Version.parse('0.0.0');
 
-  static Future<ReFreezerLatest> fetch() async {
+  static Future<DeezerLatest> fetch() async {
     http.Response res = await http.get(
       Uri.parse(
           'https://api.github.com/repos/PetitPrinc3/Deezer/releases/latest'),
@@ -320,13 +320,13 @@ class ReFreezerLatest {
 
     Map<String, dynamic> data = jsonDecode(res.body);
 
-    List<ReFreezerDownload> downloads = (data['assets'] as List)
+    List<DeezerDownload> downloads = (data['assets'] as List)
         .map((asset) {
           String abi = abiMap.keys.firstWhere(
             (key) => asset['name'].contains(key),
             orElse: () => 'unknown',
           );
-          return ReFreezerDownload(
+          return DeezerDownload(
             abi: abi,
             directUrl: asset['browser_download_url'],
           );
@@ -334,7 +334,7 @@ class ReFreezerLatest {
         .where((download) => download.abi != 'unknown')
         .toList();
 
-    return ReFreezerLatest(
+    return DeezerLatest(
       versionString: data['tag_name'],
       changelog: data['body'],
       downloads: downloads,
@@ -386,9 +386,9 @@ class ReFreezerLatest {
 
       AndroidNotificationDetails androidNotificationDetails =
           AndroidNotificationDetails(
-        'refreezerupdates',
-        'ReFreezer Updates'.i18n,
-        channelDescription: 'ReFreezer Updates'.i18n,
+        'definitelynotdeezerupdates',
+        'Definitely Not Deezer Updates'.i18n,
+        channelDescription: 'Definitely Not Deezer Updates'.i18n,
         importance: Importance.high,
         priority: Priority.high,
       );
@@ -407,11 +407,11 @@ class ReFreezerLatest {
   }
 }
 
-class ReFreezerDownload {
+class DeezerDownload {
   final String abi;
   final String directUrl;
   final List<String> architectures;
 
-  ReFreezerDownload({required this.abi, required this.directUrl})
-      : architectures = ReFreezerLatest.abiMap[abi] ?? [abi];
+  DeezerDownload({required this.abi, required this.directUrl})
+      : architectures = DeezerLatest.abiMap[abi] ?? [abi];
 }

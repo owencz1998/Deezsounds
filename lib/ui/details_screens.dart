@@ -4,11 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
-import 'package:refreezer/fonts/deezer_icons.dart';
-import 'package:refreezer/main.dart';
-import 'package:refreezer/settings.dart';
-import 'package:refreezer/utils/connectivity.dart';
-import 'package:refreezer/utils/navigator_keys.dart';
+import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/main.dart';
+import 'package:deezer/settings.dart';
+import 'package:deezer/utils/connectivity.dart';
+import 'package:deezer/utils/navigator_keys.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../api/cache.dart';

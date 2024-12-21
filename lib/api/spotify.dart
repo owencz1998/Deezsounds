@@ -190,7 +190,7 @@ class SpotifyAPIWrapper {
       //Exit window
       request.response.headers.set('Content-Type', 'text/html; charset=UTF-8');
       request.response.write(
-          '<body><h1>You can close this page and go back to ReFreezer.</h1></body><script>window.close();</script>');
+          '<body><h1>You can close this page and go back to Definitely Not Deezer.</h1></body><script>window.close();</script>');
       request.response.close();
       //Get token
       if (request.uri.queryParameters['code'] != null) {

@@ -39,7 +39,7 @@
         android:name="${applicationName}"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher_round"
-        android:label="ReFreezer"
+        android:label="Deezer"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true">
 
@@ -50,7 +50,7 @@
             android:enabled="true"
             android:exported="false"
             android:stopWithTask="false"
-            android:process=":ReFreezerDownloadService" />
+            android:process=":DefinitelyNotDeezerDownloadService" />
 
         <activity
             android:name=".MainActivity"

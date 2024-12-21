@@ -13,8 +13,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:refreezer/utils/connectivity.dart';
-import 'package:refreezer/utils/env.dart';
+import 'package:deezer/utils/connectivity.dart';
+import 'package:deezer/utils/env.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:scrobblenaut/scrobblenaut.dart';
 
@@ -30,12 +30,12 @@ Future<AudioPlayerHandler> initAudioService() async {
   return await AudioService.init(
     builder: () => AudioPlayerHandler(),
     config: const AudioServiceConfig(
-        androidNotificationChannelId: 'r.r.refreezer.audio',
-        androidNotificationChannelName: 'ReFreezer',
+        androidNotificationChannelId: 'definitely.not.deezer.audio',
+        androidNotificationChannelName: 'Deezer',
         androidNotificationOngoing: true,
         androidStopForegroundOnPause: true,
         androidNotificationClickStartsActivity: true,
-        androidNotificationChannelDescription: 'ReFreezer',
+        androidNotificationChannelDescription: 'Deezer',
         androidNotificationIcon: 'drawable/ic_logo'),
   );
 }

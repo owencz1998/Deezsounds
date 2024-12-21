@@ -23,9 +23,10 @@ DownloadManager downloadManager = DownloadManager();
 
 class DownloadManager {
   //Platform channels
-  static const MethodChannel platform = MethodChannel('r.r.refreezer/native');
+  static const MethodChannel platform =
+      MethodChannel('definitely.not.deezer/native');
   static const EventChannel eventChannel =
-      EventChannel('r.r.refreezer/downloads');
+      EventChannel('definitely.not.deezer/downloads');
 
   bool running = false;
   int queueSize = 0;
@@ -311,7 +312,7 @@ class DownloadManager {
       b.insert('Albums', album.toSQL(off: true),
           conflictAlgorithm: ConflictAlgorithm.replace);
       for (Track t in album.tracks ?? []) {
-        b = await _addTrackToDB(b, t, false);
+        b = await _addTrackToDB(b, t, true);
       }
       await b.commit();
     }
@@ -354,7 +355,7 @@ class DownloadManager {
       b.insert('Playlists', playlist.toSQL(),
           conflictAlgorithm: ConflictAlgorithm.replace);
       for (Track t in (playlist.tracks ?? [])) {
-        b = await _addTrackToDB(b, t, false);
+        b = await _addTrackToDB(b, t, true);
         //Cache art
         DefaultCacheManager().getSingleFile(t.albumArt?.thumb ?? '');
         DefaultCacheManager().getSingleFile(t.albumArt?.full ?? '');
@@ -402,7 +403,7 @@ class DownloadManager {
         if ((await getOfflineTrack(t.id!)) == null) {
           toDowload.add(t);
         }
-        b = await _addTrackToDB(b, t, false);
+        b = await _addTrackToDB(b, t, true);
         //Cache art
         DefaultCacheManager().getSingleFile(t.albumArt?.thumb ?? '');
         DefaultCacheManager().getSingleFile(t.albumArt?.full ?? '');

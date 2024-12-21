@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:refreezer/fonts/deezer_icons.dart';
-import 'package:refreezer/main.dart';
+import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/main.dart';
 
 import '../api/deezer.dart';
 import '../api/definitions.dart';

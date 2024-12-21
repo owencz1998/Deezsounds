@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:fluttericon/octicons_icons.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
-import 'package:refreezer/settings.dart';
-import 'package:refreezer/ui/details_screens.dart';
-import 'package:refreezer/ui/favorite_screen.dart';
-import 'package:refreezer/ui/menu.dart';
+import 'package:deezer/settings.dart';
+import 'package:deezer/ui/details_screens.dart';
+import 'package:deezer/ui/favorite_screen.dart';
+import 'package:deezer/ui/menu.dart';
+import 'package:lottie/lottie.dart';
 
 import '../api/deezer.dart';
 import '../api/definitions.dart';
@@ -29,11 +30,14 @@ class TrackTile extends StatefulWidget {
   _TrackTileState createState() => _TrackTileState();
 }
 
+enum PlayingState { NONE, PLAYING, PAUSED }
+
 class _TrackTileState extends State<TrackTile> {
   StreamSubscription? _mediaItemSub;
+  StreamSubscription? _stateSub;
   StreamSubscription? _downloadItemSub;
   bool _isOffline = false;
-  bool nowPlaying = false;
+  PlayingState nowPlaying = PlayingState.NONE;
   bool nowDownloading = false;
   double downloadProgress = 0;
 
@@ -46,16 +50,36 @@ class _TrackTileState extends State<TrackTile> {
   void initState() {
     //Listen to media item changes, update text color if currently playing
     _mediaItemSub = GetIt.I<AudioPlayerHandler>().mediaItem.listen((item) {
-      if (mounted) {
-        setState(() {
-          nowPlaying = widget.track.id == item?.id;
+      if (widget.track.id == item?.id) {
+        if (mounted) {
+          setState(() {
+            nowPlaying =
+                GetIt.I<AudioPlayerHandler>().playbackState.value.playing
+                    ? PlayingState.PLAYING
+                    : PlayingState.PAUSED;
+            _stateSub =
+                GetIt.I<AudioPlayerHandler>().playbackState.listen((state) {
+              if (mounted) {
+                setState(() {
+                  nowPlaying = state.playing
+                      ? PlayingState.PLAYING
+                      : PlayingState.PAUSED;
+                });
+              }
+            });
+          });
+        }
+      } else {
+        setState(() async {
+          await _stateSub?.cancel();
+          nowPlaying = PlayingState.NONE;
         });
       }
     });
     //Check if offline
     downloadManager.checkOffline(track: widget.track).then((b) {
       if (mounted) {
-        setState(() => _isOffline = b);
+        setState(() => _isOffline = b || (widget.track.offline ?? false));
       }
     });
 
@@ -102,6 +126,7 @@ class _TrackTileState extends State<TrackTile> {
   void dispose() {
     _mediaItemSub?.cancel();
     _downloadItemSub?.cancel();
+    _stateSub?.cancel();
     super.dispose();
   }
 
@@ -115,15 +140,46 @@ class _TrackTileState extends State<TrackTile> {
           maxLines: 1,
           overflow: TextOverflow.clip,
           style: TextStyle(
-              color: nowPlaying ? Theme.of(context).primaryColor : null),
+              fontWeight:
+                  nowPlaying != PlayingState.NONE ? FontWeight.bold : null),
         ),
         subtitle: Text(
           widget.track.artistString ?? '',
           maxLines: 1,
         ),
-        leading: CachedImage(
-          url: widget.track.albumArt?.thumb ?? '',
-          width: 48,
+        leading: Stack(
+          children: [
+            CachedImage(
+              url: widget.track.albumArt?.thumb ?? '',
+              width: 48,
+            ),
+            if (nowPlaying == PlayingState.PLAYING)
+              Container(
+                width: 48,
+                height: 48,
+                color: Colors.black.withAlpha(30),
+                child: Center(
+                    child: Lottie.asset('assets/animations/playing_wave.json',
+                        repeat: true,
+                        frameRate: FrameRate(60),
+                        fit: BoxFit.cover,
+                        width: 40,
+                        height: 40)),
+              ),
+            if (nowPlaying == PlayingState.PAUSED)
+              Container(
+                width: 48,
+                height: 48,
+                color: Colors.black.withAlpha(30),
+                child: Center(
+                    child: Lottie.asset('assets/animations/pausing_wave.json',
+                        repeat: false,
+                        frameRate: FrameRate(60),
+                        fit: BoxFit.cover,
+                        width: 40,
+                        height: 40)),
+              ),
+          ],
         ),
         onTap: widget.onTap,
         onLongPress: widget.onHold,

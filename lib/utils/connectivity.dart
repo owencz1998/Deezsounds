@@ -1,5 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:refreezer/settings.dart';
+import 'package:deezer/settings.dart';
 
 Future<bool> isConnected() async {
   List<ConnectivityResult> connectivity =

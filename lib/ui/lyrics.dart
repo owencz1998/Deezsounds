@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
-import 'package:refreezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/deezer_icons.dart';
 
 import '../api/deezer.dart';
 import '../api/definitions.dart';

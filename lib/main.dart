@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:custom_navigator/custom_navigator.dart';
 import 'package:lottie/lottie.dart';
-import 'package:refreezer/fonts/deezer_icons.dart';
-import 'package:refreezer/ui/favorite_screen.dart';
-import 'package:refreezer/ui/restartable.dart';
-import 'package:refreezer/ui/settings_screen.dart';
+import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/ui/favorite_screen.dart';
+import 'package:deezer/ui/restartable.dart';
+import 'package:deezer/ui/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
@@ -307,7 +307,7 @@ class _MainScreenState extends State<MainScreen>
 
     //Check for updates on background
     Future.delayed(const Duration(seconds: 5), () {
-      ReFreezerLatest.checkUpdate();
+      DeezerLatest.checkUpdate();
     });
 
     //Restore saved queue

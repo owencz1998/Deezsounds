@@ -5,9 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:fluttericon/typicons_icons.dart';
 import 'package:get_it/get_it.dart';
-import 'package:refreezer/fonts/deezer_icons.dart';
-import 'package:refreezer/main.dart';
-import 'package:refreezer/settings.dart';
+import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/main.dart';
+import 'package:deezer/settings.dart';
 
 import '../api/cache.dart';
 import '../api/deezer.dart';

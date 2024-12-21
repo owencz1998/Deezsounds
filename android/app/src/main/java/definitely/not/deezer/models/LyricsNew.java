@@ -1,4 +1,4 @@
-package r.r.refreezer.models;
+package definitely.not.deezer.models;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

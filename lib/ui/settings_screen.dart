@@ -21,12 +21,12 @@ import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:refreezer/api/definitions.dart';
-import 'package:refreezer/api/download.dart';
-import 'package:refreezer/ui/log_screen.dart';
+import 'package:deezer/api/definitions.dart';
+import 'package:deezer/api/download.dart';
+import 'package:deezer/ui/log_screen.dart';
 import 'package:scrobblenaut/scrobblenaut.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:refreezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/deezer_icons.dart';
 
 import '../api/cache.dart';
 import '../api/deezer.dart';
@@ -1405,7 +1405,7 @@ class _GeneralSettingsState extends State<GeneralSettings> {
           ListTile(
             title: Text('Enable equalizer'.i18n),
             subtitle: Text(
-                'Might enable some equalizer apps to work. Requires restart of ReFreezer'
+                'Might enable some equalizer apps to work. Requires restart of Definitely Not Deezer'
                     .i18n),
             leading: const Icon(Icons.equalizer),
             trailing: Switch(

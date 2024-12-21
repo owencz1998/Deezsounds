@@ -4,7 +4,7 @@ import 'dart:math';
 
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
-import 'package:refreezer/api/download.dart';
+import 'package:deezer/api/download.dart';
 
 import '../api/definitions.dart';
 import '../api/spotify.dart';

@@ -5,7 +5,7 @@ import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:refreezer/main.dart';
+import 'package:deezer/main.dart';
 
 import '../api/download.dart';
 import '../translations.i18n.dart';

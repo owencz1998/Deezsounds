@@ -6,9 +6,9 @@ import 'package:fluttericon/octicons_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
-import 'package:refreezer/fonts/deezer_icons.dart';
-import 'package:refreezer/main.dart';
-import 'package:refreezer/utils/connectivity.dart';
+import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/main.dart';
+import 'package:deezer/utils/connectivity.dart';
 
 import '../api/cache.dart';
 import '../api/deezer.dart';

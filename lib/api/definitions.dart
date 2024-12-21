@@ -8,7 +8,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:refreezer/api/deezer.dart';
+import 'package:deezer/api/deezer.dart';
 
 import '../api/cache.dart';
 import '../translations.i18n.dart';

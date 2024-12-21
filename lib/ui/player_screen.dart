@@ -5,8 +5,8 @@ import 'dart:ui';
 import 'package:async/async.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:refreezer/fonts/deezer_icons.dart';
-import 'package:refreezer/utils/navigator_keys.dart';
+import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/utils/navigator_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -1213,15 +1213,18 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
 
   @override
   void initState() {
-    super.initState();
     _scrollController = ScrollController();
-    _queueStateSub = audioHandler.queueStateStream.listen((queueState) {
-      setState(() {});
-      if (queueState.queueIndex != _previousMediaItemIndex) {
-        _previousMediaItemIndex = queueState.queueIndex;
-        _scrollToCurrentItem();
-      }
-    });
+    super.initState();
+    final currentIndex = audioHandler.queueState.queueIndex ?? 0;
+    if (currentIndex > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          (currentIndex - 1) * 72.0, // Estimated TrackTile height
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      });
+    }
   }
 
   @override
@@ -1229,19 +1232,6 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
     _queueStateSub.cancel();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _scrollToCurrentItem() {
-    final currentIndex = audioHandler.queueState.queueIndex ?? 0;
-    if (currentIndex > 0) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollController.animateTo(
-          currentIndex * 72.0, // Estimated TrackTile height
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
-      });
-    }
   }
 
   @override
@@ -1327,7 +1317,6 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
                   track,
                   onTap: () async {
                     await audioHandler.skipToQueueItem(index);
-                    if (context.mounted) Navigator.of(context).pop();
                   },
                   key: Key(mediaItem.id + index.toString()),
                   trailing: IconButton(

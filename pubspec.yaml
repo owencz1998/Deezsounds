@@ -1,4 +1,4 @@
-name: refreezer
+name: deezer
 description: Deezer
 
 # The following line prevents the package from being accidentally published to
@@ -160,6 +160,8 @@ flutter:
     - assets/token.png
     - assets/animations/logo_closing.json
     - assets/animations/welcome_waves.json
+    - assets/animations/playing_wave.json
+    - assets/animations/pausing_wave.json
 
   fonts:
     #    - family: Montserrat

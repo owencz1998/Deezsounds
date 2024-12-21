@@ -1,4 +1,4 @@
-package r.r.refreezer.models;
+package definitely.not.deezer.models;
 
 import java.util.ArrayList;
 import java.util.List;

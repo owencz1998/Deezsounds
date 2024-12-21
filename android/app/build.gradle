@@ -29,7 +29,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace 'r.r.refreezer'
+    namespace 'definitely.not.deezer'
     compileSdk 34
     //ndkVersion flutter.ndkVersion
     ndkVersion "26.1.10909125"
@@ -50,7 +50,7 @@ android {
     defaultConfig {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        applicationId "r.r.refreezer"
+        applicationId "definitely.not.deezer"
         minSdk 21
         targetSdk 34
         versionCode flutterVersionCode.toInteger()
