@@ -1209,7 +1209,6 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
   AudioPlayerHandler audioHandler = GetIt.I<AudioPlayerHandler>();
   late StreamSubscription _queueStateSub;
   late ScrollController _scrollController;
-  int? _previousMediaItemIndex;
 
   @override
   void initState() {
@@ -1219,7 +1218,7 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
     if (currentIndex > 0) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _scrollController.animateTo(
-          (currentIndex - 1) * 72.0, // Estimated TrackTile height
+          currentIndex * 62.0, // Estimated TrackTile height
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
         );
@@ -1266,8 +1265,8 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
                 DeezerIcons.trash,
                 semanticLabel: 'Clear all'.i18n,
               ),
-              onPressed: () async {
-                await audioHandler.clearQueue();
+              onPressed: () {
+                audioHandler.clearQueue();
                 mainNavigatorKey.currentState!
                     .popUntil((route) => route.isFirst);
               },

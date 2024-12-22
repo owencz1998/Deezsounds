@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:deezer/api/cache.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:deezer/api/download.dart';
@@ -149,6 +150,12 @@ class DeezerAPI {
         userName = data['results']['USER']['BLOG_NAME'];
         favoritesPlaylistId = data['results']['USER']['LOVEDTRACKS_ID'];
         licenseToken = data['results']['USER']['OPTIONS']['license_token'];
+
+        //Store favoritesPlaylistId
+        cache.favoritesPlaylistId =
+            favoritesPlaylistId ?? cache.favoritesPlaylistId;
+        cache.save();
+
         return true;
       }
     } catch (e) {

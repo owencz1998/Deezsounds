@@ -1862,6 +1862,18 @@ class _CreditsScreenState extends State<CreditsScreen> {
           ),
           const FreezerDivider(),
           ListTile(
+            title: Text('PetitPrince'.i18n),
+            subtitle: Text(
+                'Definitely Not Deezer developer, tester, maintainer, ...'
+                    .i18n),
+            leading:
+                Image.asset('assets/PetitPrince.png', width: 36, height: 36),
+            onTap: () {
+              launchUrlString('https://github.com/PetitPrinc3');
+            },
+          ),
+          const FreezerDivider(),
+          ListTile(
             title: Text('DJDoubleD'.i18n),
             subtitle: Text(
                 'Original ReFreezer developer, tester and maintainer, ...'
@@ -1869,17 +1881,6 @@ class _CreditsScreenState extends State<CreditsScreen> {
             leading: Image.asset('assets/DJDoubleD.jpg', width: 36, height: 36),
             onTap: () {
               launchUrlString('https://github.com/DJDoubleD');
-            },
-          ),
-          const FreezerDivider(),
-          ListTile(
-            title: Text('PetitPrince'.i18n),
-            subtitle: Text(
-                'Developer, Deezer® UIX MOD, tester, maintainer, ...'.i18n),
-            leading:
-                Image.asset('assets/PetitPrince.png', width: 36, height: 36),
-            onTap: () {
-              launchUrlString('https://github.com/PetitPrinc3');
             },
           ),
           const FreezerDivider(),

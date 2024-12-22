@@ -15,6 +15,9 @@ late Cache cache;
 //Cache for miscellaneous things
 @JsonSerializable()
 class Cache {
+  @JsonKey(defaultValue: '')
+  String favoritesPlaylistId = '';
+
   //ID's of tracks that are in library
   List<String>? libraryTracks = [];
 

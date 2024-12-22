@@ -70,7 +70,7 @@ class FavoriteScreen extends StatelessWidget {
   const FavoriteScreen({super.key});
 
   Playlist get favoritesPlaylist => Playlist(
-      id: deezerAPI.favoritesPlaylistId,
+      id: cache.favoritesPlaylistId,
       title: 'Favorites'.i18n,
       user: User(name: deezerAPI.userName),
       image: ImageDetails(thumbUrl: 'assets/favorites_thumb.jpg'),
@@ -214,8 +214,8 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
     }
 
     //if favorite Playlist is offline
-    Playlist? p = await downloadManager
-        .getOfflinePlaylist(deezerAPI.favoritesPlaylistId ?? '');
+    Playlist? p =
+        await downloadManager.getOfflinePlaylist(cache.favoritesPlaylistId);
     if (p?.tracks?.isNotEmpty ?? false) {
       setState(() {
         tracks = p?.tracks ?? [];
@@ -229,8 +229,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
       //Load tracks as a playlist
       Playlist? favPlaylist;
       try {
-        favPlaylist =
-            await deezerAPI.playlist(deezerAPI.favoritesPlaylistId ?? '');
+        favPlaylist = await deezerAPI.playlist(cache.favoritesPlaylistId);
       } catch (e) {
         if (kDebugMode) {
           print(e);
@@ -389,16 +388,15 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
   }
 
   Future _loadFavorite() async {
-    Playlist? favPlaylist = await downloadManager
-        .getOfflinePlaylist(deezerAPI.favoritesPlaylistId ?? '');
+    Playlist? favPlaylist =
+        await downloadManager.getOfflinePlaylist(cache.favoritesPlaylistId);
     if (favPlaylist != null) {
       setState(() {
         favoritesPlaylist = favPlaylist;
       });
     }
 
-    favPlaylist =
-        await deezerAPI.fullPlaylist(deezerAPI.favoritesPlaylistId ?? '');
+    favPlaylist = await deezerAPI.fullPlaylist(cache.favoritesPlaylistId);
 
     if (favPlaylist.tracks?.isNotEmpty ?? false) {
       if (mounted) {

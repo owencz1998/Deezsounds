@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logging/logging.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:deezer/fonts/deezer_icons.dart';
 
@@ -42,7 +43,7 @@ class _PlayerBarState extends State<PlayerBar> {
 
     if (mounted) {
       setState(() {
-        _bgColor = palette.dominantColor?.color.withOpacity(1);
+        _bgColor = palette.dominantColor?.color;
       });
     }
   }
@@ -106,14 +107,19 @@ class _PlayerBarState extends State<PlayerBar> {
               .push(SlideBottomRoute(widget: const PlayerScreen()));
         } else if ((details.primaryVelocity ?? 0) > 100) {
           // Swiped down => close
-          await audioHandler.clearQueue();
+          await audioHandler.stop();
         }
         updateColor();
       },
       child: StreamBuilder(
           stream: Stream.periodic(const Duration(milliseconds: 250)),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (GetIt.I<AudioPlayerHandler>().mediaItem.value == null) {
+            if (GetIt.I<AudioPlayerHandler>().mediaItem.value == null ||
+                GetIt.I<AudioPlayerHandler>()
+                        .playbackState
+                        .value
+                        .processingState ==
+                    AudioProcessingState.idle) {
               return const SizedBox(
                 width: 0,
                 height: 0,
@@ -124,12 +130,12 @@ class _PlayerBarState extends State<PlayerBar> {
               decoration: BoxDecoration(
                   color: Theme.of(context).scaffoldBackgroundColor,
                   border: Border.all(
-                      color: _bgColor?.withOpacity(0.7) ??
+                      color: _bgColor?.withAlpha(180) ??
                           Theme.of(context).scaffoldBackgroundColor),
                   borderRadius: BorderRadius.circular(17)),
               child: Container(
                   decoration: BoxDecoration(
-                    color: _bgColor?.withOpacity(0.7) ??
+                    color: _bgColor?.withAlpha(180) ??
                         Theme.of(context).scaffoldBackgroundColor,
                   ),
                   child: Column(
@@ -204,7 +210,7 @@ class _PlayerBarState extends State<PlayerBar> {
                         child: LinearProgressIndicator(
                           backgroundColor:
                               (_bgColor ?? Theme.of(context).primaryColor)
-                                  .withOpacity(0.1),
+                                  .withAlpha(25),
                           color: _bgColor ?? Theme.of(context).primaryColor,
                           value: _progress,
                         ),

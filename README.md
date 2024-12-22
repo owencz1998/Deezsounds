@@ -45,12 +45,8 @@ This repository originates from [ReFreezer](https://github.com/DJDoubleD/ReFreez
 ## :star2: Features & changes
 
 #### :lady_beetle: Bugs
-- If queue is cleared and player bar is dismissed, it will not be brought back up if the user clicks back on the formerly playing track.
 - Lyrics are re-fetched from api each time the player is brought back. This is because the API does not include informations regarding the lyrics in the track model.
-- Player bar does not always update its color on track tile tap or various other scenarios.
-- Favorite tracks playlist id is not always properly saved (no/minor UX consequences).
 - Queue screen is laggy. This seems to be because of how the images are loaded.
-- Tracks removed from playlist/favorites will not disappear immediately from the detailed screen.
 
 #### :building_construction: Upcoming features
 - Caching information to avoid reloading every time (eg. favorites screen)

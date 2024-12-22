@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:custom_navigator/custom_navigator.dart';
 import 'package:lottie/lottie.dart';
 import 'package:deezer/fonts/deezer_icons.dart';
@@ -313,9 +314,10 @@ class _MainScreenState extends State<MainScreen>
     //Restore saved queue
     _loadSavedQueue();
 
-    GetIt.I<AudioPlayerHandler>().mediaItem.listen((event) {
+    GetIt.I<AudioPlayerHandler>().playbackState.listen((event) {
       playerBarState.setPlayerBarState(
-          GetIt.I<AudioPlayerHandler>().mediaItem.hasValue &&
+          GetIt.I<AudioPlayerHandler>().playbackState.value.processingState !=
+                  AudioProcessingState.idle &&
               GetIt.I<AudioPlayerHandler>().mediaItem.value != null);
     });
   }

@@ -256,7 +256,7 @@ class MenuSheet {
       onTap: () async {
         await deezerAPI.addFavoriteTrack(t.id!);
         //Make track offline, if favorites are offline
-        Playlist p = Playlist(id: deezerAPI.favoritesPlaylistId);
+        Playlist p = Playlist(id: cache.favoritesPlaylistId);
         if (await downloadManager.checkOffline(playlist: p)) {
           downloadManager.addOfflinePlaylist(p);
         }
@@ -321,22 +321,24 @@ class MenuSheet {
                       );
                     });
               });
-          //if (context.mounted) _close(context);
+          if (context.mounted) _close(context);
         },
       );
 
-  Widget removeFromPlaylist(Track t, Playlist p, BuildContext context) =>
+  Widget removeFromPlaylist(
+          Track t, Playlist p, BuildContext context, Function? onRemove) =>
       ListTile(
         title: Text('Remove from playlist'.i18n),
         leading: const Icon(DeezerIcons.trash),
         onTap: () async {
           await deezerAPI.removeFromPlaylist(t.id!, p.id!);
+          if (onRemove != null) onRemove();
           Fluttertoast.showToast(
             msg: 'Track removed from'.i18n + ' ${p.title}',
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
           );
-          //if (context.mounted) _close(context);
+          if (context.mounted) _close(context);
         },
       );
 
@@ -350,7 +352,7 @@ class MenuSheet {
         onTap: () async {
           await deezerAPI.removeFavorite(t.id!);
           //Check if favorites playlist is offline, update it
-          Playlist p = Playlist(id: deezerAPI.favoritesPlaylistId);
+          Playlist p = Playlist(id: cache.favoritesPlaylistId);
           if (await downloadManager.checkOffline(playlist: p)) {
             await downloadManager.addOfflinePlaylist(p);
           }

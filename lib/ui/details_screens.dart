@@ -140,8 +140,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                           horizontalTitleGap: 8.0,
                                           leading: IconButton(
                                               onPressed: () async {
-                                                await customNavigatorKey
-                                                    .currentState!
+                                                await Navigator.of(context)
                                                     .maybePop();
                                               },
                                               icon: Icon(Icons.arrow_back)),
@@ -824,8 +823,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                           children: [
                                             IconButton(
                                                 onPressed: () async {
-                                                  await customNavigatorKey
-                                                      .currentState!
+                                                  await Navigator.of(context)
                                                       .maybePop();
                                                 },
                                                 icon: Icon(Icons.arrow_back)),
@@ -1195,8 +1193,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                           horizontalTitleGap: 8.0,
                                           leading: IconButton(
                                               onPressed: () async {
-                                                await customNavigatorKey
-                                                    .currentState!
+                                                await Navigator.of(context)
                                                     .maybePop();
                                               },
                                               icon: Icon(Icons.arrow_back)),
@@ -1732,8 +1729,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                       children: [
                                         IconButton(
                                             onPressed: () async {
-                                              await customNavigatorKey
-                                                  .currentState!
+                                              await Navigator.of(context)
                                                   .maybePop();
                                             },
                                             icon: Icon(Icons.arrow_back)),
@@ -2464,7 +2460,8 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
 
     _scrollController.addListener(() {
       double off = _scrollController.position.maxScrollExtent * 0.90;
-      if (_scrollController.position.pixels > off) {
+      if (_scrollController.position.pixels > off &&
+          widget.playlist.tracks?.length != widget.playlist.trackCount) {
         _loadTracks();
       }
     });
@@ -2519,8 +2516,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                         horizontalTitleGap: 8.0,
                                         leading: IconButton(
                                             onPressed: () async {
-                                              await customNavigatorKey
-                                                  .currentState!
+                                              await Navigator.of(context)
                                                   .maybePop();
                                             },
                                             icon: Icon(Icons.arrow_back)),
@@ -2945,20 +2941,42 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                     id: playlist.id,
                                                     tracks: playlist.tracks),
                                                 t.id ?? '');
-                                  }, onHold: () {
+                                  }, onHold: () async {
                                     MenuSheet m = MenuSheet();
                                     m.defaultTrackMenu(t,
                                         context: context,
                                         options: [
                                           (playlist.user?.id ==
-                                                  deezerAPI.userId)
+                                                      deezerAPI.userId &&
+                                                  playlist.id !=
+                                                      cache.favoritesPlaylistId)
                                               ? m.removeFromPlaylist(
-                                                  t, playlist, context)
+                                                  t, playlist, context, () {
+                                                  setState(() {
+                                                    playlist.tracks = playlist
+                                                        .tracks
+                                                        ?.where((track) =>
+                                                            track.id != t.id)
+                                                        .toList();
+                                                  });
+                                                })
                                               : const SizedBox(
                                                   width: 0,
                                                   height: 0,
                                                 )
-                                        ]);
+                                        ],
+                                        onRemove: playlist.id ==
+                                                cache.favoritesPlaylistId
+                                            ? () {
+                                                setState(() {
+                                                  playlist.tracks = playlist
+                                                      .tracks
+                                                      ?.where((track) =>
+                                                          track.id != t.id)
+                                                      .toList();
+                                                });
+                                              }
+                                            : null);
                                   });
                                 }),
                                 if (_isLoadingTracks)
@@ -3432,14 +3450,37 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                         t.id ?? '');
                           }, onHold: () {
                             MenuSheet m = MenuSheet();
-                            m.defaultTrackMenu(t, context: context, options: [
-                              (playlist.user?.id == deezerAPI.userId)
-                                  ? m.removeFromPlaylist(t, playlist, context)
-                                  : const SizedBox(
-                                      width: 0,
-                                      height: 0,
-                                    )
-                            ]);
+                            m.defaultTrackMenu(t,
+                                context: context,
+                                options: [
+                                  (playlist.user?.id == deezerAPI.userId &&
+                                          playlist.id !=
+                                              cache.favoritesPlaylistId)
+                                      ? m.removeFromPlaylist(
+                                          t, playlist, context, () {
+                                          setState(() {
+                                            playlist.tracks = playlist.tracks
+                                                ?.where(
+                                                    (track) => track.id != t.id)
+                                                .toList();
+                                          });
+                                        })
+                                      : const SizedBox(
+                                          width: 0,
+                                          height: 0,
+                                        )
+                                ],
+                                onRemove: playlist.id ==
+                                        cache.favoritesPlaylistId
+                                    ? () {
+                                        setState(() {
+                                          playlist.tracks = playlist.tracks
+                                              ?.where(
+                                                  (track) => track.id != t.id)
+                                              .toList();
+                                        });
+                                      }
+                                    : null);
                           });
                         }),
                         if (_isLoadingTracks)

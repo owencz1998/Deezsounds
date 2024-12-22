@@ -9,6 +9,7 @@ import 'package:equalizer_flutter/equalizer_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
@@ -310,9 +311,7 @@ class AudioPlayerHandler extends BaseAudioHandler
     if (newQueue.isNotEmpty) {
       await _playlist.addAll(await _itemsToSources(newQueue));
     } else {
-      if (mediaItem.hasValue) {
-        mediaItem.add(null);
-      }
+      GetIt.I<AudioHandler>().stop();
     }
   }
 

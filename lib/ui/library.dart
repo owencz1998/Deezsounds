@@ -344,8 +344,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
         //Load tracks as a playlist
         Playlist? favPlaylist;
         try {
-          favPlaylist =
-              await deezerAPI.playlist(deezerAPI.favoritesPlaylistId ?? '');
+          favPlaylist = await deezerAPI.playlist(cache.favoritesPlaylistId);
         } catch (e) {
           if (kDebugMode) {
             print(e);
@@ -374,8 +373,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
 
       List<Track>? t;
       try {
-        t = await deezerAPI.playlistTracksPage(
-            deezerAPI.favoritesPlaylistId ?? '', pos);
+        t = await deezerAPI.playlistTracksPage(cache.favoritesPlaylistId, pos);
       } catch (e) {
         if (kDebugMode) {
           print(e);
@@ -418,7 +416,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
     if (tracks.isEmpty || tracks.length < (trackCount ?? 0)) {
       late Playlist p;
       try {
-        p = await deezerAPI.fullPlaylist(deezerAPI.favoritesPlaylistId ?? '');
+        p = await deezerAPI.fullPlaylist(cache.favoritesPlaylistId);
       } catch (e) {
         if (kDebugMode) {
           print(e);
@@ -570,7 +568,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
                                   : tracks,
                               t.id!,
                               QueueSource(
-                                  id: deezerAPI.favoritesPlaylistId,
+                                  id: cache.favoritesPlaylistId,
                                   text: 'Favorites'.i18n,
                                   source: 'playlist'));
                         },
@@ -1136,7 +1134,7 @@ class _LibraryPlaylistsState extends State<LibraryPlaylists> {
   }
 
   Playlist get favoritesPlaylist => Playlist(
-      id: deezerAPI.favoritesPlaylistId,
+      id: cache.favoritesPlaylistId,
       title: 'Favorites'.i18n,
       user: User(name: deezerAPI.userName),
       image: ImageDetails(thumbUrl: 'assets/favorites_thumb.jpg'),

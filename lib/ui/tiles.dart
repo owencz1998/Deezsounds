@@ -70,8 +70,8 @@ class _TrackTileState extends State<TrackTile> {
           });
         }
       } else {
-        setState(() async {
-          await _stateSub?.cancel();
+        setState(() {
+          _stateSub?.cancel();
           nowPlaying = PlayingState.NONE;
         });
       }
