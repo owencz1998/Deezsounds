@@ -18,6 +18,12 @@ class Cache {
   @JsonKey(defaultValue: '')
   String favoritesPlaylistId = '';
 
+  @JsonKey(defaultValue: [])
+  List<Track> favoriteTracks = [];
+
+  @JsonKey(defaultValue: [])
+  List<Playlist> favoritePlaylists = [];
+
   //ID's of tracks that are in library
   List<String>? libraryTracks = [];
 

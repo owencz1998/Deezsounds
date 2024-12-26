@@ -49,7 +49,6 @@ This repository originates from [ReFreezer](https://github.com/DJDoubleD/ReFreez
 - Queue screen is laggy. This seems to be because of how the images are loaded.
 
 #### :building_construction: Upcoming features
-- Caching information to avoid reloading every time (eg. favorites screen)
 - Turn the mod into a skin for the official refreezer app
 
 #### :rocket: Definitely Not Deezer Features :

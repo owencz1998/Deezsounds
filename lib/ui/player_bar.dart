@@ -108,6 +108,9 @@ class _PlayerBarState extends State<PlayerBar> {
         } else if ((details.primaryVelocity ?? 0) > 100) {
           // Swiped down => close
           await audioHandler.stop();
+          setState(() {
+            audioHandler.mediaItem.value = null;
+          });
         }
         updateColor();
       },

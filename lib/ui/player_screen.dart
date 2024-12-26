@@ -78,22 +78,22 @@ class _PlayerScreenState extends State<PlayerScreen> {
     //Update notification
     if (settings.blurPlayerBackground) {
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-          statusBarColor: palette.dominantColor!.color.withOpacity(0.25),
+          statusBarColor: palette.dominantColor!.color.withAlpha(65),
           systemNavigationBarColor: Color.alphaBlend(
-              palette.dominantColor!.color.withOpacity(0.25),
+              palette.dominantColor!.color.withAlpha(65),
               scaffoldBackgroundColor)));
     }
 
     //Color gradient
     if (!settings.blurPlayerBackground) {
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: palette.dominantColor!.color.withOpacity(0.7),
+        statusBarColor: palette.dominantColor!.color.withAlpha(180),
       ));
       setState(() => _bgGradient = LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                palette.dominantColor!.color.withOpacity(0.7),
+                palette.dominantColor!.color.withAlpha(180),
                 scaffoldBackgroundColor
               ],
               stops: const [
@@ -769,7 +769,7 @@ class _ActionControls extends State<ActionControls> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                  color: Settings.secondaryText.withOpacity(0.9), width: 0.5),
+                  color: Settings.secondaryText.withAlpha(230), width: 0.5),
             ),
             alignment: Alignment.center,
             child: IconButton(
@@ -1275,61 +1275,57 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
         ],
       ),
       body: shuffleModeEnabled // No manual re-ordring in shuffle mode
-          ? ListView.builder(
+          ? ListView(
               controller: _scrollController,
-              itemCount: queueState.queue.length,
-              itemBuilder: (context, index) {
-                final mediaItem = queueState.queue[index];
-                final track = Track.fromMediaItem(mediaItem);
-                return TrackTile(
-                  track,
-                  onTap: () async {
-                    await audioHandler.skipToQueueItem(index);
-                    if (context.mounted) Navigator.of(context).pop();
-                  },
-                  key: Key(mediaItem.id + index.toString()),
-                  trailing: IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      semanticLabel: 'Close'.i18n,
-                    ),
-                    onPressed: () async {
-                      await audioHandler.removeQueueItem(mediaItem);
-                    },
-                  ),
-                );
-              },
+              children: List.generate(
+                  queueState.queue.length,
+                  (int index) => TrackTile(
+                        Track.fromMediaItem(queueState.queue[index]),
+                        onTap: () async {
+                          await audioHandler.skipToQueueItem(index);
+                          if (context.mounted) Navigator.of(context).pop();
+                        },
+                        key: Key(queueState.queue[index].id + index.toString()),
+                        trailing: IconButton(
+                          icon: Icon(
+                            Icons.close,
+                            semanticLabel: 'Close'.i18n,
+                          ),
+                          onPressed: () async {
+                            await audioHandler
+                                .removeQueueItem(queueState.queue[index]);
+                          },
+                        ),
+                      )),
             )
-          : ReorderableListView.builder(
+          : ReorderableListView(
               scrollController: _scrollController,
-              itemCount: queueState.queue.length,
               onReorder: (int oldIndex, int newIndex) {
-                // Circumvent bug in ReorderableListView that won't be fixed: https://github.com/flutter/flutter/pull/93146#issuecomment-1032082749
-                if (newIndex > oldIndex) newIndex -= 1;
                 if (oldIndex == newIndex) return;
+                setState(() {
+                  if (newIndex > oldIndex) newIndex -= 1;
+                });
                 audioHandler.moveQueueItem(oldIndex, newIndex);
               },
-              itemBuilder: (context, index) {
-                final mediaItem = queueState.queue[index];
-                final track = Track.fromMediaItem(mediaItem);
-                return TrackTile(
-                  track,
-                  onTap: () async {
-                    await audioHandler.skipToQueueItem(index);
-                  },
-                  key: Key(mediaItem.id + index.toString()),
-                  trailing: IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      semanticLabel: 'Close'.i18n,
-                    ),
-                    onPressed: () async {
-                      await audioHandler.removeQueueItem(mediaItem);
-                    },
-                  ),
-                );
-              },
-            ),
+              children: List.generate(
+                  queueState.queue.length,
+                  (int index) => TrackTile(
+                        Track.fromMediaItem(queueState.queue[index]),
+                        onTap: () async {
+                          await audioHandler.skipToQueueItem(index);
+                        },
+                        key: Key(queueState.queue[index].id + index.toString()),
+                        trailing: IconButton(
+                          icon: Icon(
+                            Icons.close,
+                            semanticLabel: 'Close'.i18n,
+                          ),
+                          onPressed: () async {
+                            await audioHandler
+                                .removeQueueItem(queueState.queue[index]);
+                          },
+                        ),
+                      ))),
     );
   }
 }

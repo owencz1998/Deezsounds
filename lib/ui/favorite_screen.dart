@@ -190,7 +190,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
 
     setState(() {
       randomTracks = List.from(tcopy);
-      _loading = false;
+      cache.favoriteTracks = List.from(tcopy);
     });
   }
 
@@ -198,19 +198,9 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
   Future _load() async {
     if (mounted) setState(() => _loading = true);
 
-    //Already loaded
-    if (trackCount != null && (tracks.length >= (trackCount ?? 0))) {
-      //Update favorite tracks cache when fully loaded
-      if (cache.libraryTracks?.length != trackCount) {
-        if (mounted) {
-          setState(() {
-            cache.libraryTracks = tracks.map((t) => t.id!).toList();
-          });
-          await cache.save();
-        }
-      }
-      selectRandom3(tracks);
-      return;
+    //Cached favorite tracks
+    if (cache.favoriteTracks.isNotEmpty) {
+      selectRandom3(cache.favoriteTracks);
     }
 
     //if favorite Playlist is offline
@@ -249,7 +239,6 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
           favoritePlaylist = favPlaylist;
         });
         selectRandom3(tracks);
-        return;
       }
     } else {
       if (randomTracks.isEmpty) {
@@ -264,6 +253,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
         }
       }
     }
+    if (mounted) setState(() => _loading = false);
   }
 
   void _makeFavorite() {
@@ -275,13 +265,13 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
   @override
   void initState() {
     _load();
-
     super.initState();
+    cache.save();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
+    if (randomTracks.isEmpty) {
       return Column(children: [
         SizedBox(
           height: 224,
@@ -319,18 +309,24 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
               'Favorite tracks'.i18n,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text((trackCount ?? 0).toString(),
-                    style: TextStyle(color: Settings.secondaryText)),
-                Icon(
-                  Icons.chevron_right,
-                )
-              ],
-            ),
+            trailing: _loading
+                ? Transform.scale(
+                    scale: 0.5, // Adjust the scale to 75% of the original size
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).primaryColor,
+                    ))
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text((trackCount ?? 0).toString(),
+                          style: TextStyle(color: Settings.secondaryText)),
+                      Icon(
+                        Icons.chevron_right,
+                      )
+                    ],
+                  ),
             onTap: () => (favoritePlaylist != null)
                 ? Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) =>
@@ -356,67 +352,71 @@ class FavoritePlaylists extends StatefulWidget {
 
 class _FavoritePlaylistsState extends State<FavoritePlaylists> {
   List<Playlist>? _playlists;
+  List<Playlist>? _tmpPlaylists;
   Playlist? favoritesPlaylist;
   bool _loading = false;
 
   Future _load() async {
     setState(() => _loading = true);
 
-    //load offline playlists
-    List<Playlist> playlists = await downloadManager.getOfflinePlaylists();
-    if (mounted) {
+    //load cached playlist
+    if (cache.favoritePlaylists.isNotEmpty &&
+        cache.favoritePlaylists[0].id != null) {
       setState(() {
-        _playlists = playlists;
-        _loading = false;
+        _playlists = cache.favoritePlaylists;
+      });
+    }
+
+    //load offline playlists
+    Playlist? favPlaylist =
+        await downloadManager.getOfflinePlaylist(cache.favoritesPlaylistId);
+    if (favPlaylist != null) {
+      setState(() {
+        _tmpPlaylists = [favPlaylist!];
+      });
+    }
+    List<Playlist> playlists = await downloadManager.getOfflinePlaylists();
+    if (mounted && playlists.length > (_playlists?.length ?? 0)) {
+      setState(() {
+        _tmpPlaylists?.addAll(playlists);
+        _playlists = _tmpPlaylists;
       });
     }
 
     //update if online
     if (await isConnected()) {
       try {
+        favPlaylist = await deezerAPI.fullPlaylist(cache.favoritesPlaylistId);
+        if (mounted && favPlaylist.id != null) {
+          setState(() {
+            _tmpPlaylists = [favPlaylist!];
+          });
+        }
         List<Playlist> playlists = await deezerAPI.getPlaylists();
-        if (mounted) setState(() => _playlists = playlists);
+        if (mounted) setState(() => _tmpPlaylists?.addAll(playlists));
       } catch (e) {
         Logger.root.severe('Error loading playlists: $e');
       }
     }
     if (mounted) {
       setState(() {
+        _playlists = _tmpPlaylists;
         _loading = false;
+        cache.favoritePlaylists = _tmpPlaylists ?? [];
       });
-    }
-  }
-
-  Future _loadFavorite() async {
-    Playlist? favPlaylist =
-        await downloadManager.getOfflinePlaylist(cache.favoritesPlaylistId);
-    if (favPlaylist != null) {
-      setState(() {
-        favoritesPlaylist = favPlaylist;
-      });
-    }
-
-    favPlaylist = await deezerAPI.fullPlaylist(cache.favoritesPlaylistId);
-
-    if (favPlaylist.tracks?.isNotEmpty ?? false) {
-      if (mounted) {
-        setState(() {
-          favoritesPlaylist = favPlaylist;
-        });
-      }
     }
   }
 
   @override
   void initState() {
     _load();
-    _loadFavorite();
     super.initState();
+    cache.save();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
+    if (_playlists?.isEmpty ?? true) {
       return SizedBox(
         height: 300,
         child: ListTile(
@@ -453,18 +453,25 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
                   'Playlists'.i18n,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(_playlists!.length.toString(),
-                        style: TextStyle(color: Settings.secondaryText)),
-                    Icon(
-                      Icons.chevron_right,
-                    )
-                  ],
-                ),
+                trailing: _loading
+                    ? Transform.scale(
+                        scale:
+                            0.5, // Adjust the scale to 75% of the original size
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).primaryColor,
+                        ))
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text((_playlists!.length).toString(),
+                              style: TextStyle(color: Settings.secondaryText)),
+                          Icon(
+                            Icons.chevron_right,
+                          )
+                        ],
+                      ),
                 onTap: () => {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => const LibraryPlaylists()))
@@ -474,7 +481,7 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
                   scrollDirection: Axis.horizontal,
                   physics: ClampingScrollPhysics(),
                   child: Row(children: [
-                    if (favoritesPlaylist?.tracks?.isNotEmpty ?? false)
+                    /*if (favoritesPlaylist?.tracks?.isNotEmpty ?? false)
                       Container(
                           padding: EdgeInsets.symmetric(horizontal: 4),
                           child: Column(
@@ -528,10 +535,10 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
                                         fontSize: 8)),
                               )
                             ],
-                          )),
-                    for (int i = 0; i < _playlists!.length; i++)
-                      if (_playlists?[i] != null)
-                        LargePlaylistTile(_playlists![i])
+                          )),*/
+                    if (_playlists != null)
+                      ...List.generate(_playlists!.length,
+                          (int i) => LargePlaylistTile(_playlists![i]))
                   ]))
             ],
           ));
