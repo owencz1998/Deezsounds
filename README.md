@@ -46,7 +46,6 @@ This repository originates from [ReFreezer](https://github.com/DJDoubleD/ReFreez
 
 #### :lady_beetle: Bugs
 - Lyrics are re-fetched from api each time the player is brought back. This is because the API does not include informations regarding the lyrics in the track model.
-- Queue screen is laggy. This seems to be because of how the images are loaded.
 
 #### :building_construction: Upcoming features
 - Turn the mod into a skin for the official refreezer app
