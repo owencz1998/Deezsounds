@@ -309,7 +309,7 @@ class DeezerLatest {
   static Future<DeezerLatest> fetch() async {
     http.Response res = await http.get(
       Uri.parse(
-          'https://api.github.com/repos/PetitPrinc3/Deezer/releases/latest'),
+          'https://api.github.com/repos/PetitPrinc3/DefinitelyNotDeezer/releases/latest'),
       headers: {'Accept': 'application/vnd.github.v3+json'},
     );
 

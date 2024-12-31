@@ -177,157 +177,187 @@ class _LoginWidgetState extends State<LoginWidget> {
     if (settings.arl == null) {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: ListView(
-            children: <Widget>[
-              Stack(alignment: Alignment.bottomLeft, children: [
-                Container(
-                  margin: EdgeInsets.only(bottom: 4.0),
-                  decoration: BoxDecoration(color: settings.primaryColor),
-                  height: MediaQuery.of(context).size.height / 3,
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Stack(alignment: Alignment.bottomLeft, children: [
+              Container(
+                decoration: BoxDecoration(color: settings.primaryColor),
+                height: MediaQuery.of(context).size.height / 3,
+                width: MediaQuery.of(context).size.width,
+                alignment: Alignment.bottomCenter,
+              ),
+              Lottie.asset('assets/animations/welcome_waves.json',
+                  repeat: true,
+                  frameRate: FrameRate(25),
+                  fit: BoxFit.fitWidth,
                   width: MediaQuery.of(context).size.width,
-                  alignment: Alignment.bottomCenter,
-                ),
-                Lottie.asset('assets/animations/welcome_waves.json',
-                    repeat: true,
-                    frameRate: FrameRate(25),
-                    fit: BoxFit.fitWidth,
-                    width: MediaQuery.of(context).size.width,
-                    delegates: LottieDelegates(values: [
-                      ValueDelegate.color(const ['**'],
-                          value: Theme.of(context).scaffoldBackgroundColor)
-                    ])),
-              ]),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
-                child: Text(
-                  'WELCOME TO DEEZER'.i18n,
-                  style: TextStyle(
-                      fontFamily: 'Deezer',
-                      fontWeight: FontWeight.w900,
-                      fontSize: 64),
-                  textAlign: TextAlign.start,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-                child: Text(
-                  'Sign up for free or log in'.i18n,
-                  textAlign: TextAlign.start,
-                  style: const TextStyle(
-                      fontSize: 16.0, color: Settings.secondaryText),
-                ),
-              ),
-              //Email login dialog
-              Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 8.0),
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: settings.primaryColor,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10))),
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) => EmailLogin(_update));
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12.0),
-                        child: Text(
-                          'Continue with email'.i18n,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500, fontSize: 18.0),
-                        ),
-                      ))),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 4.0),
-                child: Text(
-                  'Or'.i18n,
-                  style: TextStyle(color: Settings.secondaryText),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                  delegates: LottieDelegates(values: [
+                    ValueDelegate.color(const ['**'],
+                        value: Theme.of(context).scaffoldBackgroundColor)
+                  ])),
+            ]),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Container(
-                      padding: EdgeInsets.all(2),
-                      margin:
-                          EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                            color: Settings.secondaryText.withOpacity(0.9),
-                            width: 0.5),
+                  Text(
+                    'WELCOME TO '.i18n,
+                    style: TextStyle(
+                        fontFamily: 'Deezer',
+                        fontWeight: FontWeight.w900,
+                        fontSize: 50),
+                    textAlign: TextAlign.start,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Definitely not'.i18n,
+                        style: TextStyle(
+                            fontFamily: 'MabryPro',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12),
+                        textAlign: TextAlign.start,
                       ),
-                      alignment: Alignment.center,
-                      child: IconButton(
-                        icon: Image.asset('assets/chrome.png'),
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => LoginBrowser(_update)));
-                        },
-                      )),
-                  Container(
-                      padding: EdgeInsets.all(2),
-                      margin:
-                          EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                            color: Settings.secondaryText.withOpacity(0.9),
-                            width: 0.5),
+                      Text(
+                        'DEEZER'.i18n,
+                        style: TextStyle(
+                            fontFamily: 'Deezer',
+                            fontWeight: FontWeight.w900,
+                            fontSize: 50),
+                        textAlign: TextAlign.start,
                       ),
-                      alignment: Alignment.center,
-                      child: IconButton(
-                          icon: Image.asset('assets/token.png'),
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  Future.delayed(
-                                      const Duration(seconds: 1),
-                                      () => {
-                                            focusNode.requestFocus()
-                                          }); // autofocus doesn't work - it's replacement
-                                  return AlertDialog(
-                                    title: Text('Enter ARL'.i18n),
-                                    content: TextField(
-                                      onChanged: (String s) => _arl = s,
-                                      decoration: InputDecoration(
-                                          labelText: 'Token (ARL)'.i18n),
-                                      focusNode: focusNode,
-                                      controller: controller,
-                                      onSubmitted: (String s) {
-                                        goARL(focusNode, controller);
-                                      },
-                                    ),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        child: Text('Save'.i18n),
-                                        onPressed: () =>
-                                            goARL(null, controller),
-                                      )
-                                    ],
-                                  );
-                                });
-                          }))
+                    ],
+                  )
                 ],
               ),
-              Padding(
-                  padding: EdgeInsets.symmetric(vertical: 32.0),
-                  child: Text(
-                    "By using this app, you don't agree with the Deezer ToS."
-                        .i18n,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16.0),
-                  ))
-            ],
-          ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+              child: Text(
+                'Sign up for free or log in'.i18n,
+                textAlign: TextAlign.start,
+                style: const TextStyle(
+                    fontSize: 16.0, color: Settings.secondaryText),
+              ),
+            ),
+            //Email login dialog
+            Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: settings.primaryColor,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10))),
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) => EmailLogin(_update));
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12.0),
+                      child: Text(
+                        'Continue with email'.i18n,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 18.0),
+                      ),
+                    ))),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 4.0),
+              child: Text(
+                'Or'.i18n,
+                style: TextStyle(color: Settings.secondaryText),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                    padding: EdgeInsets.all(2),
+                    margin:
+                        EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                          color: Settings.secondaryText.withAlpha(230),
+                          width: 0.5),
+                    ),
+                    alignment: Alignment.center,
+                    child: IconButton(
+                      icon: Image.asset('assets/chrome.png'),
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => LoginBrowser(_update)));
+                      },
+                    )),
+                Container(
+                    padding: EdgeInsets.all(2),
+                    margin:
+                        EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                          color: Settings.secondaryText.withAlpha(230),
+                          width: 0.5),
+                    ),
+                    alignment: Alignment.center,
+                    child: IconButton(
+                        icon: Image.asset('assets/token.png'),
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                Future.delayed(
+                                    const Duration(seconds: 1),
+                                    () => {
+                                          focusNode.requestFocus()
+                                        }); // autofocus doesn't work - it's replacement
+                                return AlertDialog(
+                                  title: Text('Enter ARL'.i18n),
+                                  content: TextField(
+                                    onChanged: (String s) => _arl = s,
+                                    decoration: InputDecoration(
+                                        labelText: 'Token (ARL)'.i18n),
+                                    focusNode: focusNode,
+                                    controller: controller,
+                                    onSubmitted: (String s) {
+                                      goARL(focusNode, controller);
+                                    },
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: Text('Save'.i18n),
+                                      onPressed: () => goARL(null, controller),
+                                    )
+                                  ],
+                                );
+                              });
+                        }))
+              ],
+            ),
+            Expanded(
+                child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 24.0, horizontal: 12.0),
+                child: Text(
+                  "By using this app, you don't abide by Deezer's ToS.".i18n,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16.0),
+                ),
+              ),
+            ))
+          ],
         ),
       );
     }

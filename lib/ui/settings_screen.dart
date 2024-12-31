@@ -1913,7 +1913,8 @@ class _CreditsScreenState extends State<CreditsScreen> {
             subtitle: Text('Source code, report issues there.'.i18n),
             leading: const Icon(Icons.code, color: Colors.green, size: 36.0),
             onTap: () {
-              launchUrlString('https://github.com/PetitPrinc3/Deezer');
+              launchUrlString(
+                  'https://github.com/PetitPrinc3/DefinitelyNotDeezer');
             },
           ),
           ListTile(

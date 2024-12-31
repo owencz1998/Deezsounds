@@ -311,7 +311,11 @@ class AudioPlayerHandler extends BaseAudioHandler
     if (newQueue.isNotEmpty) {
       await _playlist.addAll(await _itemsToSources(newQueue));
     } else {
-      GetIt.I<AudioHandler>().stop();
+      try {
+        GetIt.I<AudioHandler>().stop();
+      } catch (e) {
+        Logger.root.warning("Can't stop audioHandler.");
+      }
     }
   }
 
