@@ -1,8 +1,8 @@
-![Deezer](./assets/banner.png?raw=true)
+![Definitely not Deezer](./assets/banner.png?raw=true)
 
 [![Latest Version](https://img.shields.io/github/v/release/PetitPrinc3/Deezer?color=blue)](../../releases/latest)
 [![Release date](https://img.shields.io/github/release-date/PetitPrinc3/Deezer)](../../releases/latest)
-[![Downloads Definitely Not Deezer](https://img.shields.io/github/downloads/PetitPrinc3/Deezer/total?color=blue&label=Definitely%20Not%20Deezer%20downloads)](../../releases)  
+[![Downloads](https://img.shields.io/github/downloads/PetitPrinc3/Deezer/total?color=blue&label=downloads)](../../releases)  
 [![Flutter Version](https://shields.io/badge/Flutter-v3.27.1-darkgreen.svg)](https://docs.flutter.dev/tools/sdk)
 [![Dart Version](https://shields.io/badge/Dart-v3.6.0-darkgreen.svg)](https://dart.dev/get-dart)
 [![Crowdin](https://badges.crowdin.net/refreezer/localized.svg)](https://crowdin.com/project/refreezer)
@@ -15,15 +15,27 @@
 ---
 
 >[!CAUTION]
-> The Deezer name, brand and affiliated designs are the registered trademark of **Deezer SA**  
-> Providing an app using the Deezer branding theme and bypassing Deezer restrictions is illegal.  
-> Therefore, there will be no apk releases or steps to compile published in this repository.  
-> If you are a developper interested in taking on the project and providing the app, feel free to fork.  
+> The "Deezer" name, brand, and associated designs are registered trademarks of **Deezer SA**.  
+> Using the Deezer branding theme or bypassing its restrictions is illegal.  
+> Therefore, no APK releases or compilation steps will be published in this repository.  
+> Developers interested in continuing the project are welcome to fork it.  
 
-This is definitely not Deezer.  
-This is an app that uses both public and internal Deezer APIs to provide similar features.  
+#### :rocket: Definitely Not Deezer Features :
+- Log in with an official Deezer account ;
+- Explore the official Deezer catalog ;
+- Play any track and skip freely ;
+- Like, save and add your favorite tracks to your own playlists ;
+- Sing along to the songs you love with synchronized lyrics ;
+- Download tracks, playlists and albums for offline listening ;
+- Export downloaded tracks to local storage ;
+- Import your playlists from Spotify ;
+- Customize themes, accent colors and more.
 
-This repository originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD.  
+This app builds upon ReFreezer by leveraging Deezer's public and internal APIs.  
+For more details, see the [Legal](#balance_scale-disclaimer--legal) section. 
+
+This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD.  
+
 
 ## :camera_flash: Screenshots
 
@@ -42,24 +54,13 @@ This repository originates from [ReFreezer](https://github.com/DJDoubleD/ReFreez
     <img src="./assets/screenshots/landscape_playlist.png" height=150>
 </p>
 
-## :star2: Features & changes
-
-#### :lady_beetle: Bugs
-- Lyrics are re-fetched from api each time the player is brought back. This is because the API does not include informations regarding the lyrics in the track model.
+## :star2: Bugs & features
 
 #### :building_construction: Upcoming features
 - Turn the mod into a skin for the official refreezer app
 
-#### :rocket: Definitely Not Deezer Features :
-- Floating player bar with background color based on title artwork
-- Deezer original icons & font
-- Deezer original navigation menu (+ settings)
-- Deezer like player screen
-- Deezer like info menu
-- Deezer like favorite screen (Offline : offline playlists and random offline tracks)
-- Most Deezer like pages (artists, playlists, albums)
-- Downloads are stored within the app storage (Android/data/package) and can be exported to local storage under settings with full tags
-- Fixed lyrics support
+#### :lady_beetle: Bugs
+- [Tell me !](https://github.com/PetitPrinc3/Deezer/issues)
 
 ## :balance_scale: Disclaimer & Legal
 
@@ -72,4 +73,4 @@ The Deezer brand and name is the registered trademark of its respective owner.
 
 **Definitely not Deezer** has no partnership, sponsorship or endorsement with Deezer.
 
-By using **Definitely not Deezer** you do not abide by Deezer's [CGU](https://www.deezer.com/legal/cgu)
+By using **Definitely not Deezer** you do not abide by Deezer's [Terms of Service](https://www.deezer.com/legal/cgu)

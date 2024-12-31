@@ -13,6 +13,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:logging/logging.dart';
 import 'package:marquee/marquee.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:rxdart/rxdart.dart';
@@ -568,11 +569,13 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
 
   void _loadLyrics() async {
     if (!isEnabled) {
-      Lyrics newLyrics = await deezerAPI.lyrics(track.id!);
+      LyricsFull newLyrics = await deezerAPI.lyrics(track.id!) as LyricsFull;
       if (mounted && newLyrics.id != null) {
         setState(() {
           isEnabled = true;
           trackLyrics = newLyrics;
+          audioHandler.mediaItem.value?.extras
+              ?.addAll({'lyrics': jsonEncode(newLyrics.toJson())});
         });
       }
     }
@@ -586,14 +589,15 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
       isEnabled = (track.lyrics?.id ?? '0') != '0';
     });
 
+    Logger.root.info(track.lyrics?.id, isEnabled);
     _loadLyrics();
 
     audioHandler.mediaItem.listen((event) {
       if (mounted) {
         setState(() {
-          isEnabled = false;
           track = Track.fromMediaItem(
               GetIt.I<AudioPlayerHandler>().mediaItem.value!);
+          isEnabled = (track.lyrics?.id ?? '0') != '0';
         });
       }
       _loadLyrics();
