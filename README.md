@@ -57,6 +57,7 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 ## :star2: Bugs & features
 
 #### :building_construction: Upcoming features
+- Include the blind test functionality
 - Turn the mod into a skin for the official refreezer app
 
 #### :lady_beetle: Bugs

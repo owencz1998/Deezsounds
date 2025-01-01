@@ -155,6 +155,7 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     //If arl is null, show loading
     if (settings.arl != null) {
       return const Scaffold(
