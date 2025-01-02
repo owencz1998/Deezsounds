@@ -27,6 +27,7 @@
 - Like, save and add your favorite tracks to your own playlists ;
 - Sing along to the songs you love with synchronized lyrics ;
 - Download tracks, playlists and albums for offline listening ;
+- Challenge yourself with playlist-based blind tests ;
 - Export downloaded tracks to local storage ;
 - Import your playlists from Spotify ;
 - Customize themes, accent colors and more.
@@ -40,14 +41,16 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 ## :camera_flash: Screenshots
 
 <p align="center">
-    <img src="./assets/screenshots/Mod_login.png" width=100>
-    <img src="./assets/screenshots/Mod_home.png" width=100>
-    <img src="./assets/screenshots/Mod_player.png" width=100>
-    <img src="./assets/screenshots/Mod_search.png" width=100>
-    <img src="./assets/screenshots/Mod_favorites.png" width=100>
-    <img src="./assets/screenshots/Mod_playlists.png" width=100>
-    <img src="./assets/screenshots/Mod_artists.png" width=100>
-    <img src="./assets/screenshots/Mod_menu.png" width=100>
+    <img src="./assets/screenshots/Mod_login.png" width=80>
+    <img src="./assets/screenshots/Mod_home.png" width=80>
+    <img src="./assets/screenshots/Mod_player.png" width=80>
+    <img src="./assets/screenshots/Mod_search.png" width=80>
+    <img src="./assets/screenshots/Mod_favorites.png" width=80>
+    <img src="./assets/screenshots/Mod_playlists.png" width=80>
+    <img src="./assets/screenshots/Mod_artists.png" width=80>
+    <img src="./assets/screenshots/Mod_menu.png" width=80>
+    <img src="./assets/screenshots/blindTest.png" width=80>
+    <img src="./assets/screenshots/blindResults.png" width=80>
 </p>
 <p align="center">
     <img src="./assets/screenshots/landscape_artist.png" height=150>
@@ -57,10 +60,11 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 ## :star2: Bugs & features
 
 #### :building_construction: Upcoming features
-- Include the blind test functionality
+- Include the blind test functionality (solo, multiplayer, title-based, artist-based)
 - Turn the mod into a skin for the official refreezer app
 
 #### :lady_beetle: Bugs
+- Game tiles (Home screen) are not implemented
 - [Tell me !](https://github.com/PetitPrinc3/Deezer/issues)
 
 ## :balance_scale: Disclaimer & Legal

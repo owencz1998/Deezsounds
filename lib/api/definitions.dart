@@ -998,6 +998,11 @@ class HomePageItem {
             type: HomePageItemType.ARTIST,
             value: Artist.fromPrivateJson(json['data']));
       case 'channel':
+        if (json['target'].toString().contains('games')) {
+          return HomePageItem(
+              type: HomePageItemType.GAME,
+              value: DeezerChannel.fromPrivateJson(json));
+        }
         return HomePageItem(
             type: HomePageItemType.CHANNEL,
             value: DeezerChannel.fromPrivateJson(json));
@@ -1127,14 +1132,15 @@ enum HomePageItemType {
   ARTIST,
   CHANNEL,
   ALBUM,
-  SHOW
+  SHOW,
+  GAME
 }
 
 enum HomePageSectionLayout { ROW, GRID }
 
 enum RepeatType { NONE, LIST, TRACK }
 
-enum DeezerLinkType { TRACK, ALBUM, ARTIST, PLAYLIST }
+enum DeezerLinkType { TRACK, ALBUM, ARTIST, PLAYLIST, GAME }
 
 class DeezerLinkResponse {
   DeezerLinkType? type;
@@ -1315,4 +1321,26 @@ class StreamQualityInfo {
     if (bitrate > 315 && bitrate < 325) return 320;
     return bitrate;
   }
+}
+
+@JsonSerializable()
+class BlindTest {
+  String? testToken;
+  List<Question> questions = [];
+  int points = 0;
+}
+
+@JsonSerializable()
+class Question {
+  String mediaToken;
+  int index;
+  Track? track;
+  List<Track> choices;
+
+  Question({
+    required this.mediaToken,
+    required this.index,
+    this.track,
+    List<Track>? choices,
+  }) : choices = choices ?? [];
 }

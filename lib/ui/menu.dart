@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:deezer/ui/blind_test.dart';
+import 'package:deezer/ui/router.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttericon/octicons_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -549,7 +551,8 @@ class MenuSheet {
       (playlist.library != null)
           ? removePlaylistLibrary(playlist, context, onRemove: onRemove)
           : addPlaylistLibrary(playlist, context),
-      addPlaylistOffline(playlist, context),
+      playBlindTest(playlist, context),
+      if (!(playlist.library ?? false)) addPlaylistOffline(playlist, context),
       shareTile('playlist', playlist.id!),
       if (playlist.user?.id == deezerAPI.userId)
         editPlaylist(playlist, context: context, onUpdate: onUpdate),
@@ -560,6 +563,17 @@ class MenuSheet {
   //===================
   // PLAYLIST OPTIONS
   //===================
+
+  Widget playBlindTest(Playlist p, BuildContext context,
+          {Function? onRemove}) =>
+      ListTile(
+        title: Text('Play blind test'.i18n),
+        leading: const Icon(DeezerIcons.question),
+        onTap: () async {
+          Navigator.of(context, rootNavigator: true)
+              .push(SlideBottomRoute(widget: BlindTestScreen(p)));
+        },
+      );
 
   Widget removePlaylistLibrary(Playlist p, BuildContext context,
           {Function? onRemove}) =>

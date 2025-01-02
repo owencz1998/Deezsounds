@@ -50,6 +50,8 @@ openScreenByURL(String url) async {
       mainNavigatorKey.currentState
           ?.push(MaterialPageRoute(builder: (context) => PlaylistDetails(p)));
       break;
+    case DeezerLinkType.GAME:
+      return;
   }
 }
 

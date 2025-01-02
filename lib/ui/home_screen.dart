@@ -1,3 +1,5 @@
+import 'package:deezer/ui/blind_test.dart';
+import 'package:deezer/ui/router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -402,6 +404,20 @@ class HomePageItemWidget extends StatelessWidget {
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => ShowScreen(item.value)));
+          },
+        );
+      case HomePageItemType.GAME:
+        return ChannelTile(
+          item.value,
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => Scaffold(
+                      appBar: FreezerAppBar(item.value.title.toString()),
+                      body: SingleChildScrollView(
+                          child: HomePageScreen(
+                        channel: item.value,
+                      )),
+                    )));
           },
         );
       default:

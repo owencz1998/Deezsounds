@@ -167,7 +167,8 @@ class _PlayerBarState extends State<PlayerBar> {
                                 GetIt.I<AudioPlayerHandler>()
                                     .mediaItem
                                     .value
-                                    ?.artUri,
+                                    ?.artUri
+                                    .toString(),
                           ),
                           title: Text(
                             GetIt.I<AudioPlayerHandler>()

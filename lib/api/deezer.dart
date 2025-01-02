@@ -49,6 +49,37 @@ class DeezerAPI {
         'Cookie': 'arl=$arl' + ((sid == null) ? '' : '; sid=$sid')
       };
 
+  Future<String> getMediaPreview(String trackToken) async {
+    //Generate URL
+    Uri uri = Uri.https('media.deezer.com', 'v1/get_url');
+    //Post
+    http.Response res = await http
+        .post(uri,
+            headers: headers,
+            body: jsonEncode({
+              'license_token': licenseToken,
+              'media': [
+                {
+                  'formats': [
+                    {'cipher': 'NONE', 'format': 'MP3_128'}
+                  ],
+                  'type': 'PREVIEW',
+                }
+              ],
+              'track_tokens': [trackToken]
+            }))
+        .catchError((e) {
+      return http.Response('', 200);
+    });
+    if (res.body == '') return '';
+    try {
+      return jsonDecode(res.body)['data'][0]['media'][0]['sources'][0]['url'];
+    } catch (e) {
+      Logger.root.info('API preview fetch failed.');
+      return '';
+    }
+  }
+
   //Call private GW-light API
   Future<Map<String, dynamic>> callGwApi(String method,
       {Map<String, dynamic>? params, String? gatewayInput}) async {
@@ -126,6 +157,10 @@ class DeezerAPI {
     http.Response res =
         await http.post(uri, headers: pipeApiHeaders, body: jsonEncode(params));
     dynamic body = jsonDecode(res.body);
+
+    if (body['data'] == null) {
+      Logger.root.info(body);
+    }
 
     return body;
   }

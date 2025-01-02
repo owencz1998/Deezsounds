@@ -264,6 +264,28 @@ class AudioPlayerHandler extends BaseAudioHandler
     }
   }
 
+  Future<void> playBlindTrack(String trackToken, String? artUri) async {
+    String previewURI = await deezerAPI.getMediaPreview(trackToken);
+
+    MediaItem blindTrack = MediaItem(
+        id: '0',
+        title: 'Blind test',
+        duration: Duration(seconds: 30),
+        artist: 'Definitely not Deezer',
+        artUri: Uri.parse(artUri ?? ''));
+
+    await pause();
+    await _playlist.clear();
+    if (previewURI.startsWith('http')) {
+      _playlist
+          .add(ProgressiveAudioSource(Uri.parse(previewURI), tag: blindTrack));
+    }
+    AudioSource.uri(Uri.parse(previewURI), tag: blindTrack);
+    await setShuffleMode(AudioServiceShuffleMode.none);
+    await skipToQueueItem(0);
+    await play();
+  }
+
   @override
   Future<void> pause() async {
     _player.pause();

@@ -183,4 +183,18 @@ class DeezerIcons {
       IconData(0xe915, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData release_notes =
       IconData(0xe916, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData question =
+      IconData(0xe944, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData question_small =
+      IconData(0xe945, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData question_small_withmargins =
+      IconData(0xe946, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData crown =
+      IconData(0xe96e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData crown_small =
+      IconData(0xe96f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData note_list =
+      IconData(0xe8e0, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData note_list_small =
+      IconData(0xe8e1, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }
