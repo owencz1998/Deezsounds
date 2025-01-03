@@ -386,6 +386,75 @@ class DeezerAPI {
     });
   }
 
+  //Get homepage/music library from deezer
+  Future<List<Playlist>> getUserGames() async {
+    List grid = [
+      'album',
+      'artist',
+      'artistLineUp',
+      'channel',
+      'livestream',
+      'flow',
+      'playlist',
+      'radio',
+      'show',
+      'smarttracklist',
+      'track',
+      'user',
+      'video-link',
+      'external-link'
+    ];
+    Map data = await callGwApi('page.get',
+        gatewayInput: jsonEncode({
+          'PAGE': 'channels/games',
+          'VERSION': '2.5',
+          'SUPPORT': {
+            /*
+        "deeplink-list": ["deeplink"],
+        "list": ["episode"],
+        "grid-preview-one": grid,
+        "grid-preview-two": grid,
+        "slideshow": grid,
+        "message": ["call_onboarding"],
+        */
+            'filterable-grid': ['flow'],
+            'grid': grid,
+            'horizontal-grid': grid,
+            'item-highlight': ['radio'],
+            'large-card': ['album', 'playlist', 'show', 'video-link'],
+            'ads': [] //Nope
+          },
+          'LANG': settings.deezerLanguage,
+          'OPTIONS': []
+        }));
+
+    List<dynamic> sections = data['results']['sections'];
+    List<Playlist> userQuizzes = [];
+
+    for (int i = 0; i < sections.length; i++) {
+      List<dynamic> items = sections[i]['items'];
+
+      for (int j = 0; j < items.length; j++) {
+        final regex = RegExp(r'^/game/blindtest/playlist/(\d+)');
+        final match = regex.firstMatch(items[j]['target']);
+
+        if (match != null) {
+          Playlist target = await playlist(match.group(1) ?? '', nb: 0);
+          userQuizzes.add(target);
+        }
+      }
+    }
+    return userQuizzes;
+  }
+
+  Future<List<Playlist>> getMusicQuizzes() async {
+    Map data = await callGwApi('deezer.pageProfile',
+        params: {'nb': 100, 'tab': 'playlists', 'user_id': '5207298602'});
+    return data['results']['TAB']['playlists']['data']
+        .map<Playlist>((json) => Playlist.fromPrivateJson(json, library: true))
+        .toList();
+  }
+
   //Get users playlists
   Future<List<Playlist>> getPlaylists() async {
     Map data = await callGwApi('deezer.pageProfile',

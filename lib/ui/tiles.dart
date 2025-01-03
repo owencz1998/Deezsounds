@@ -819,8 +819,9 @@ class ShowEpisodeTile extends StatelessWidget {
 
 class LargePlaylistTile extends StatelessWidget {
   final Playlist playlist;
+  final VoidCallback? onTap;
 
-  const LargePlaylistTile(this.playlist, {super.key});
+  const LargePlaylistTile(this.playlist, {this.onTap, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -831,8 +832,9 @@ class LargePlaylistTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => PlaylistDetails(playlist))),
+              onTap: onTap ??
+                  () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => PlaylistDetails(playlist))),
               onLongPress: () {
                 MenuSheet m = MenuSheet();
                 m.defaultPlaylistMenu(playlist, context: context);

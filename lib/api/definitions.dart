@@ -1323,14 +1323,12 @@ class StreamQualityInfo {
   }
 }
 
-@JsonSerializable()
 class BlindTest {
   String? testToken;
   List<Question> questions = [];
   int points = 0;
 }
 
-@JsonSerializable()
 class Question {
   String mediaToken;
   int index;

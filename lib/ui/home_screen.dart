@@ -1,10 +1,13 @@
+import 'dart:math';
+
 import 'package:deezer/ui/blind_test.dart';
-import 'package:deezer/ui/router.dart';
+import 'package:deezer/ui/cached_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:deezer/fonts/deezer_icons.dart';
 import 'package:deezer/main.dart';
+import 'package:logging/logging.dart';
 
 import '../api/deezer.dart';
 import '../api/definitions.dart';
@@ -118,6 +121,114 @@ class FreezerTitle extends StatelessWidget {
               )
             ],
           )
+        ],
+      ),
+    );
+  }
+}
+
+class GamePageScreen extends StatefulWidget {
+  final HomePage? homePage;
+  const GamePageScreen({this.homePage, super.key});
+
+  @override
+  _GamePageScreenState createState() => _GamePageScreenState();
+}
+
+class _GamePageScreenState extends State<GamePageScreen> {
+  List<Playlist> _games = [];
+  List<Playlist> _page = [];
+
+  Future<void> _userGames() async {
+    List<Playlist> gamePage = await deezerAPI.getUserGames();
+    setState(() {
+      _page = gamePage;
+    });
+  }
+
+  Future<void> _loadGames() async {
+    List<Playlist> games = await deezerAPI.getMusicQuizzes();
+    games.shuffle();
+    setState(() {
+      _games = games;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _userGames();
+    _loadGames();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: FreezerAppBar('Music Quizzes'.i18n),
+      body: ListView(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Text(
+              'Quizzes for you :',
+              style: TextStyle(
+                  fontFamily: 'Deezer',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            child: SizedBox(
+              height: 250,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: List.generate(
+                  min(10, _page.length),
+                  (int i) => LargePlaylistTile(
+                    _page[i],
+                    onTap: () =>
+                        Navigator.of(context, rootNavigator: true).push(
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              BlindTestChoiceScreen(_page[i])),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Text(
+              'Deezer quizzes :',
+              style: TextStyle(
+                  fontFamily: 'Deezer',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            child: SizedBox(
+              height: 250,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: List.generate(
+                  min(10, _games.length),
+                  (int i) => LargePlaylistTile(
+                    _games[i],
+                    onTap: () =>
+                        Navigator.of(context, rootNavigator: true).push(
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              BlindTestChoiceScreen(_games[i])),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -410,14 +521,8 @@ class HomePageItemWidget extends StatelessWidget {
         return ChannelTile(
           item.value,
           onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => Scaffold(
-                      appBar: FreezerAppBar(item.value.title.toString()),
-                      body: SingleChildScrollView(
-                          child: HomePageScreen(
-                        channel: item.value,
-                      )),
-                    )));
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => GamePageScreen()));
           },
         );
       default:

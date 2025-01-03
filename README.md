@@ -63,12 +63,11 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 ## :star2: Bugs & features
 
 #### :building_construction: Upcoming features
-- Include the blind test functionality (solo, multiplayer, title-based, artist-based)
 - Turn the mod into a skin for the official refreezer app
 
 #### :lady_beetle: Bugs
-- Game tiles (Home screen) are not implemented
 - [Tell me !](https://github.com/PetitPrinc3/Deezer/issues)
+- Some home tiles are not and will not be implemented (Concerts, Did you know, Original videos, ...)
 
 ## :balance_scale: Disclaimer & Legal
 

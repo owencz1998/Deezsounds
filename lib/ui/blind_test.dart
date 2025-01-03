@@ -13,7 +13,6 @@ import 'package:deezer/ui/tiles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
-import 'package:logging/logging.dart';
 
 class BlindTestChoiceScreen extends StatefulWidget {
   final Playlist playlist;
@@ -38,7 +37,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
 
     if (mounted) {
       setState(() {
-        bestScore = score['data']['me']['games']['blindTest']['bestScore'];
+        bestScore = score['data']['me']['games']['blindTest']['bestScore'] ?? 0;
       });
     }
   }
@@ -53,7 +52,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
 
     if (mounted) {
       setState(() {
-        rank = apiBoard['data']['blindTest']['userRank'];
+        rank = apiBoard['data']['blindTest']['userRank'] ?? 0;
       });
     }
   }
@@ -84,7 +83,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                     onPressed: () {
                       GetIt.I<AudioPlayerHandler>().stop();
                       GetIt.I<AudioPlayerHandler>().clearQueue();
-                      Navigator.of(context, rootNavigator: true).maybePop();
+                      Navigator.of(context).maybePop();
                     },
                     icon: Icon(DeezerIcons.cross),
                     iconSize: 20,
