@@ -1,13 +1,11 @@
 import 'dart:math';
 
 import 'package:deezer/ui/blind_test.dart';
-import 'package:deezer/ui/cached_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:deezer/fonts/deezer_icons.dart';
 import 'package:deezer/main.dart';
-import 'package:logging/logging.dart';
 
 import '../api/deezer.dart';
 import '../api/definitions.dart';
