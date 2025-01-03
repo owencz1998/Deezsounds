@@ -48,6 +48,8 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
     <img src="./assets/screenshots/Mod_playlists.png" width=100>
     <img src="./assets/screenshots/Mod_artists.png" width=100>
     <img src="./assets/screenshots/Mod_menu.png" width=100>
+</p>
+<p align="center">
     <img src="./assets/screenshots/chooseBlindTest.png" width=100>
     <img src="./assets/screenshots/blindTrackTest.png" width=100>
     <img src="./assets/screenshots/blindArtistTest.png" width=100>
