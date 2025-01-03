@@ -751,7 +751,9 @@ class AudioPlayerHandler extends BaseAudioHandler
       if (queueString == '') return;
       Map<String, dynamic> json = jsonDecode(queueString);
       List<MediaItem> savedQueue = (json['queue'] ?? [])
-          .map<MediaItem>((mi) => (MediaItemConverter.mediaItemFromMap(mi)))
+          .where(
+              (mi) => mi['id'] != '0') // Avoid errors loading blind test tracks
+          .map<MediaItem>((mi) => MediaItemConverter.mediaItemFromMap(mi))
           .toList();
       final int lastIndex = json['index'] ?? 0;
       final Duration lastPos = Duration(milliseconds: json['position'] ?? 0);

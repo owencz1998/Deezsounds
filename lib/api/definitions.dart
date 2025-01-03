@@ -1335,12 +1335,19 @@ class Question {
   String mediaToken;
   int index;
   Track? track;
-  List<Track> choices;
+  Artist? artist;
+  List<Track> trackChoices;
+  List<Artist> artistChoices;
 
   Question({
     required this.mediaToken,
     required this.index,
     this.track,
-    List<Track>? choices,
-  }) : choices = choices ?? [];
+    this.artist,
+    List<Track>? trackChoices,
+    List<Artist>? artistChoices,
+  })  : trackChoices = trackChoices ?? [],
+        artistChoices = artistChoices ?? [];
 }
+
+enum BlindTestType { TRACKS, ARTISTS }

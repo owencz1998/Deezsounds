@@ -111,7 +111,7 @@ class _LyricsScreenState extends State<LyricsScreen> {
                   (lyrics?.syncedLyrics?.first.offset?.inSeconds ?? 1),
               1)
         ];
-        if (progress == [1, 1]) timer.cancel();
+        if (progress == [1, 1] || progress[0] > progress[1]) timer.cancel();
       });
 
       //Update current lyric index

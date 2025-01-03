@@ -571,7 +571,7 @@ class MenuSheet {
         leading: const Icon(DeezerIcons.question),
         onTap: () async {
           Navigator.of(context, rootNavigator: true)
-              .push(SlideBottomRoute(widget: BlindTestScreen(p)));
+              .push(SlideBottomRoute(widget: BlindTestChoiceScreen(p)));
         },
       );
 

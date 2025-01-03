@@ -41,16 +41,18 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 ## :camera_flash: Screenshots
 
 <p align="center">
-    <img src="./assets/screenshots/Mod_login.png" width=80>
-    <img src="./assets/screenshots/Mod_home.png" width=80>
-    <img src="./assets/screenshots/Mod_player.png" width=80>
-    <img src="./assets/screenshots/Mod_search.png" width=80>
-    <img src="./assets/screenshots/Mod_favorites.png" width=80>
-    <img src="./assets/screenshots/Mod_playlists.png" width=80>
-    <img src="./assets/screenshots/Mod_artists.png" width=80>
-    <img src="./assets/screenshots/Mod_menu.png" width=80>
-    <img src="./assets/screenshots/blindTest.png" width=80>
-    <img src="./assets/screenshots/blindResults.png" width=80>
+    <img src="./assets/screenshots/Mod_login.png" width=100>
+    <img src="./assets/screenshots/Mod_home.png" width=100>
+    <img src="./assets/screenshots/Mod_player.png" width=100>
+    <img src="./assets/screenshots/Mod_search.png" width=100>
+    <img src="./assets/screenshots/Mod_favorites.png" width=100>
+    <img src="./assets/screenshots/Mod_playlists.png" width=100>
+    <img src="./assets/screenshots/Mod_artists.png" width=100>
+    <img src="./assets/screenshots/Mod_menu.png" width=100>
+    <img src="./assets/screenshots/chooseBlindTest.png" width=100>
+    <img src="./assets/screenshots/blindTrackTest.png" width=100>
+    <img src="./assets/screenshots/blindArtistTest.png" width=100>
+    <img src="./assets/screenshots/blindResults.png" width=100>
 </p>
 <p align="center">
     <img src="./assets/screenshots/landscape_artist.png" height=150>

@@ -6,23 +6,332 @@ import 'package:deezer/api/deezer.dart';
 import 'package:deezer/api/definitions.dart';
 import 'package:deezer/fonts/deezer_icons.dart';
 import 'package:deezer/service/audio_service.dart';
+import 'package:deezer/settings.dart';
 import 'package:deezer/translations.i18n.dart';
-import 'package:deezer/ui/home_screen.dart';
+import 'package:deezer/ui/cached_image.dart';
 import 'package:deezer/ui/tiles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
 
-class BlindTestScreen extends StatefulWidget {
+class BlindTestChoiceScreen extends StatefulWidget {
   final Playlist playlist;
-  const BlindTestScreen(this.playlist, {super.key});
+  const BlindTestChoiceScreen(this.playlist, {super.key});
+
+  @override
+  _BlindTestChoiceScreen createState() => _BlindTestChoiceScreen();
+}
+
+class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
+  int bestScore = 0;
+  int rank = 1;
+
+  Future<void> _score() async {
+    //Get best score
+    Map<String, dynamic> score = await deezerAPI.callPipeApi(params: {
+      'operationName': 'Score',
+      'query':
+          'query Score(\$id: String!) {\n  me {\n    games {\n      blindTest {\n        bestScore(id: \$id, type: PLAYLIST)\n        hasPlayed\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}',
+      'variables': {'id': widget.playlist.id}
+    });
+
+    if (mounted) {
+      setState(() {
+        bestScore = score['data']['me']['games']['blindTest']['bestScore'];
+      });
+    }
+  }
+
+  Future<void> _rank() async {
+    Map<String, dynamic> apiBoard = await deezerAPI.callPipeApi(params: {
+      'operationName': 'Leaderboard',
+      'query':
+          'query Leaderboard(\$blindtestId: String!) {\n  blindTest(id: \$blindtestId, type: PLAYLIST) {\n    ...UserScoreAndRank\n    leaderboard {\n      topRankedPlayers {\n        user {\n          name\n          id\n          picture {\n            ...Picture\n            __typename\n          }\n          __typename\n        }\n        rank\n        bestScore\n        __typename\n      }\n      playersCount\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment UserScoreAndRank on BlindTest {\n  id\n  userRank\n  userBestScore\n  __typename\n}\n\nfragment Picture on Picture {\n  ...PictureSmall\n  ...PictureMedium\n  ...PictureLarge\n  __typename\n}\n\nfragment PictureSmall on Picture {\n  id\n  small: urls(pictureRequest: {height: 100, width: 100})\n  __typename\n}\n\nfragment PictureMedium on Picture {\n  id\n  medium: urls(pictureRequest: {width: 264, height: 264})\n  __typename\n}\n\nfragment PictureLarge on Picture {\n  id\n  large: urls(pictureRequest: {width: 500, height: 500})\n  __typename\n}',
+      'variables': {'blindtestId': widget.playlist.id}
+    });
+
+    if (mounted) {
+      setState(() {
+        rank = apiBoard['data']['blindTest']['userRank'];
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    GetIt.I<AudioPlayerHandler>().stop();
+    super.initState();
+    _score();
+    _rank();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    return Scaffold(
+        body: SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Stack(
+                alignment: Alignment.topLeft,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      GetIt.I<AudioPlayerHandler>().stop();
+                      GetIt.I<AudioPlayerHandler>().clearQueue();
+                      Navigator.of(context, rootNavigator: true).maybePop();
+                    },
+                    icon: Icon(DeezerIcons.cross),
+                    iconSize: 20,
+                  ),
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Column(
+                        children: [
+                          Text(
+                            widget.playlist.title ?? '',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          Text(
+                            'Blind test'.i18n,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              )),
+          Column(
+            children: [
+              CachedImage(
+                url: widget.playlist.image?.full ?? '',
+                rounded: true,
+                width: MediaQuery.of(context).size.width * 3 / 5,
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 20),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Theme.of(context)
+                        .scaffoldBackgroundColor
+                        .withAlpha(100),
+                  ),
+                  child: Text('Your best score : '.i18n),
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Container(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 8, horizontal: 18),
+                        decoration: BoxDecoration(
+                            color: Color(0xFFE07DF7),
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Text(
+                          bestScore.toString(),
+                          style: TextStyle(
+                              color: Settings.deezerBg,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Deezer',
+                              fontSize: 18),
+                          textHeightBehavior: TextHeightBehavior(
+                            applyHeightToFirstAscent:
+                                false, // Disable height for ascent
+                            applyHeightToLastDescent:
+                                false, // Apply height for descent
+                          ),
+                        )),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Text(
+                      '#' + rank.toString(),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Deezer',
+                          fontSize: 18),
+                      textHeightBehavior: TextHeightBehavior(
+                        applyHeightToFirstAscent:
+                            false, // Disable height for ascent
+                        applyHeightToLastDescent:
+                            false, // Apply height for descent
+                      ),
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Padding(
+                padding: EdgeInsets.all(0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(
+                        'assets/blind_test_wave.png',
+                      ),
+                      repeat: ImageRepeat.repeat,
+                      alignment: Alignment.topLeft,
+                    ),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(15),
+                        topRight: Radius.circular(15)),
+                    color: Color(0xFF6849FF),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 24),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Choose your game'.i18n,
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Deezer',
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 34),
+                        child: Container(
+                          decoration: BoxDecoration(boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              spreadRadius: 0, // Spread value
+                              blurRadius: 8, // Blur value
+                              offset: Offset(0, 8),
+                            ),
+                          ]),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pushReplacement(MaterialPageRoute(
+                                      builder: (context) => BlindTestScreen(
+                                            BlindTestType.TRACKS,
+                                            widget.playlist,
+                                          )));
+                            },
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10))),
+                            child: ListTile(
+                              visualDensity: VisualDensity.compact,
+                              leading: CachedImage(
+                                url: 'assets/guess_track_icon.png',
+                                height: 35,
+                              ),
+                              title: Text(
+                                'Titles'.i18n,
+                                style: TextStyle(
+                                    fontFamily: 'Deezer',
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.black,
+                                    fontSize: 20),
+                              ),
+                              subtitle: Text(
+                                'Guess track titles',
+                                style: TextStyle(
+                                    color: Settings.secondaryText,
+                                    fontSize: 14),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 12, bottom: 12),
+                        child: Container(
+                          decoration: BoxDecoration(boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              spreadRadius: 0, // Spread value
+                              blurRadius: 8, // Blur value
+                              offset: Offset(0, 8),
+                            ),
+                          ]),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pushReplacement(MaterialPageRoute(
+                                      builder: (context) => BlindTestScreen(
+                                            BlindTestType.ARTISTS,
+                                            widget.playlist,
+                                          )));
+                            },
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10))),
+                            child: ListTile(
+                              visualDensity: VisualDensity.compact,
+                              leading: CachedImage(
+                                url: 'assets/guess_artist_icon.png',
+                                height: 35,
+                              ),
+                              title: Text(
+                                'Artists'.i18n,
+                                style: TextStyle(
+                                    fontFamily: 'Deezer',
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.black,
+                                    fontSize: 20),
+                              ),
+                              subtitle: Text(
+                                'Guess track artists',
+                                style: TextStyle(
+                                    color: Settings.secondaryText,
+                                    fontSize: 14),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ));
+  }
+}
+
+class BlindTestScreen extends StatefulWidget {
+  final BlindTestType blindTestType;
+  final Playlist playlist;
+  const BlindTestScreen(this.blindTestType, this.playlist, {super.key});
 
   @override
   _BlindTestScreenState createState() => _BlindTestScreenState();
 }
 
-class _BlindTestScreenState extends State<BlindTestScreen> {
+class _BlindTestScreenState extends State<BlindTestScreen>
+    with WidgetsBindingObserver {
   AudioPlayerHandler audioHandler = GetIt.I<AudioPlayerHandler>();
   StreamSubscription? _mediaItemSub;
   List<double> trackProgress = [0, 0];
@@ -36,13 +345,18 @@ class _BlindTestScreenState extends State<BlindTestScreen> {
   String _badAnswer = '';
 
   void _startSyncTimer() {
-    Timer.periodic(const Duration(milliseconds: 250), (timer) {
+    Timer.periodic(const Duration(milliseconds: 350), (timer) {
       _timer = timer;
 
       setState(() {
-        trackProgress = [trackProgress[1], _progress];
         remaining = _remaining;
-        if (trackProgress == [1, 1]) timer.cancel();
+        if (_remaining == 0) {
+          trackProgress = [0, 0];
+          timer.cancel();
+          _submitAnswer('');
+        } else {
+          trackProgress = [trackProgress[1], _progress];
+        }
       });
     });
   }
@@ -55,7 +369,8 @@ class _BlindTestScreenState extends State<BlindTestScreen> {
       'variables': {
         'additionalPlayers': 0,
         'id': widget.playlist.id,
-        'questionType': 'TRACKS'
+        'questionType':
+            widget.blindTestType == BlindTestType.TRACKS ? 'TRACKS' : 'ARTISTS'
       }
     });
 
@@ -79,12 +394,21 @@ class _BlindTestScreenState extends State<BlindTestScreen> {
 
       for (int i = 0; i < _testLegnth; i++) {
         Map<String, dynamic>? question = blindTestSession['questions'][i];
-        List<Track> choices = [];
+        List<Track> trackChoices = [];
+        List<Artist> artistChoices = [];
         for (int j = 0; j < question?['choices'].length; j++) {
+          Map<String, dynamic> artistDetails =
+              question?['choices'][j]['contributors']['edges'][0]['node'];
           if (question?['choices'][j]['id'] != null) {
-            choices.add(Track(
+            trackChoices.add(Track(
                 id: question?['choices'][j]['id'],
                 title: question?['choices'][j]['title']));
+            artistChoices.add(Artist(
+                id: artistDetails['id'],
+                name: artistDetails['name'],
+                picture: ImageDetails(
+                    fullUrl: artistDetails['picture']['large'][0],
+                    thumbUrl: artistDetails['picture']['small'][0])));
           }
         }
 
@@ -92,7 +416,8 @@ class _BlindTestScreenState extends State<BlindTestScreen> {
           _blindTest.questions.add(Question(
               mediaToken: question?['mediaToken']['payload'],
               index: i,
-              choices: choices));
+              trackChoices: trackChoices,
+              artistChoices: artistChoices));
         });
       }
     }
@@ -104,7 +429,8 @@ class _BlindTestScreenState extends State<BlindTestScreen> {
     if (index >= _blindTest.questions.length) {
       GetIt.I<AudioPlayerHandler>().stop();
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => ResultsScreen(widget.playlist, _blindTest)));
+          builder: (context) => ResultsScreen(
+              widget.playlist, widget.blindTestType, _blindTest)));
     }
 
     Question question = _blindTest.questions[index];
@@ -117,12 +443,14 @@ class _BlindTestScreenState extends State<BlindTestScreen> {
       _badAnswer = '';
       _currentQuestion = question;
     });
+
+    _startSyncTimer();
   }
 
   void _submitAnswer(String id) async {
     if (_goodAnswer != '') return;
 
-    int questionScore = ((_remaining * 99) / 30).toInt();
+    int questionScore = max(0, ((_remaining * 99) / 30)).toInt();
     Map<String, dynamic> res = await deezerAPI.callPipeApi(params: {
       'operationName': 'MakeBlindtestGuess',
       'query':
@@ -169,16 +497,28 @@ class _BlindTestScreenState extends State<BlindTestScreen> {
   @override
   void initState() {
     GetIt.I<AudioPlayerHandler>().stop();
-    _startSyncTimer();
     super.initState();
     _loadBlindTest();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _mediaItemSub?.cancel();
     _timer?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      GetIt.I<AudioPlayerHandler>().pause();
+    } else {
+      GetIt.I<AudioPlayerHandler>().play();
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   double get _progress {
@@ -238,6 +578,7 @@ class _BlindTestScreenState extends State<BlindTestScreen> {
                         IconButton(
                           onPressed: () {
                             GetIt.I<AudioPlayerHandler>().stop();
+                            GetIt.I<AudioPlayerHandler>().clearQueue();
                             Navigator.of(context, rootNavigator: true)
                                 .maybePop();
                           },
@@ -252,7 +593,7 @@ class _BlindTestScreenState extends State<BlindTestScreen> {
                                   fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                             Text(
-                              'Blind test',
+                              'Blind test'.i18n,
                               style: TextStyle(
                                   fontWeight: FontWeight.w400, fontSize: 10),
                             ),
@@ -295,208 +636,480 @@ class _BlindTestScreenState extends State<BlindTestScreen> {
                   Expanded(
                       child: Align(
                     alignment: Alignment.center,
-                    child: Text('Oops, something went wrong...'),
+                    child: Text('Oops, something went wrong...'.i18n),
                   ))
                 ],
               ),
             ))
-        : Scaffold(
-            backgroundColor: Color(0xFF6849FF),
-            body: SafeArea(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          GetIt.I<AudioPlayerHandler>().stop();
-                          Navigator.of(context, rootNavigator: true).maybePop();
-                        },
-                        icon: Icon(DeezerIcons.cross),
-                        iconSize: 20,
-                      ),
-                      Column(
-                        children: [
-                          Text(
-                            widget.playlist.title ?? '',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14),
+        : PopScope(
+            canPop: true,
+            onPopInvokedWithResult: (bool didPop, dynamic) {
+              GetIt.I<AudioPlayerHandler>().stop();
+              GetIt.I<AudioPlayerHandler>().clearQueue();
+              Navigator.of(context, rootNavigator: true).maybePop();
+            },
+            child: Scaffold(
+                backgroundColor: Color(0xFF6849FF),
+                body: SafeArea(
+                    child: Container(
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                          image: AssetImage(
+                            'assets/blind_test_wave.png',
                           ),
-                          Text(
-                            'Blind test',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400, fontSize: 10),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            (1 + (_currentQuestion?.index ?? 0)).toString() +
-                                '/' +
-                                _testLegnth.toString(),
-                            style: TextStyle(
-                                fontFamily: 'Deezer',
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor)),
-                            child: SizedBox(
-                              width: 35,
-                              height: 10,
-                              child: LinearProgressIndicator(
-                                value: (_currentQuestion?.index ?? 0) /
-                                    (_testLegnth != 0 ? _testLegnth : 1),
-                                color: Color(0xFF96F9F3),
-                                backgroundColor: Colors.transparent,
+                          repeat: ImageRepeat.repeat,
+                          alignment: Alignment.topLeft,
+                        )),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 12),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      GetIt.I<AudioPlayerHandler>().stop();
+                                      GetIt.I<AudioPlayerHandler>()
+                                          .clearQueue();
+                                      Navigator.of(context, rootNavigator: true)
+                                          .maybePop();
+                                    },
+                                    icon: Icon(DeezerIcons.cross),
+                                    iconSize: 20,
+                                  ),
+                                  Column(
+                                    children: [
+                                      Text(
+                                        widget.playlist.title ?? '',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14),
+                                      ),
+                                      Text(
+                                        'Blind test'.i18n,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 10),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        (1 + (_currentQuestion?.index ?? 0))
+                                                .toString() +
+                                            '/' +
+                                            _testLegnth.toString(),
+                                        style: TextStyle(
+                                            fontFamily: 'Deezer',
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Theme.of(context)
+                                                    .scaffoldBackgroundColor)),
+                                        child: SizedBox(
+                                          width: 35,
+                                          height: 10,
+                                          child: LinearProgressIndicator(
+                                            value:
+                                                (_currentQuestion?.index ?? 0) /
+                                                    (_testLegnth != 0
+                                                        ? _testLegnth
+                                                        : 1),
+                                            color: Color(0xFF96F9F3),
+                                            backgroundColor: Colors.transparent,
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ],
                               ),
                             ),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Text(
-                      remaining.toString(),
-                      style: TextStyle(
-                          fontFamily: 'Deezer',
-                          fontWeight: FontWeight.w900,
-                          fontSize: 50),
-                      textHeightBehavior: TextHeightBehavior(
-                        applyHeightToFirstAscent:
-                            true, // Disable height for ascent
-                        applyHeightToLastDescent:
-                            false, // Apply height for descent
-                      ),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 2,
-                      height: MediaQuery.of(context).size.width / 2,
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(
-                            begin: trackProgress[0], end: trackProgress[1]),
-                        duration: Duration(milliseconds: 350),
-                        builder: (context, value, _) =>
-                            CircularProgressIndicator(
-                          value: value,
-                          strokeWidth: 10,
-                          color: Theme.of(context).textTheme.bodyMedium?.color,
-                          backgroundColor:
-                              Theme.of(context).scaffoldBackgroundColor,
-                          strokeCap: StrokeCap.round,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 2,
-                      height: MediaQuery.of(context).size.width / 2 + 30,
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Color(0xFFE07DF7),
-                              border: Border.all(
-                                  width: 2,
-                                  color: Theme.of(context)
-                                      .scaffoldBackgroundColor)),
-                          child: SizedBox(
-                            width: 75,
-                            height: 32,
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Text(_blindTest.points.toString() + ' pt',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 16,
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor)),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: List.generate(
-                      _currentQuestion?.choices.length ?? 0,
-                      (int index) => Padding(
-                        padding: EdgeInsets.only(top: 12),
-                        child: Container(
-                          decoration: BoxDecoration(boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              spreadRadius: 0, // Spread value
-                              blurRadius: 8, // Blur value
-                              offset: Offset(0, 8),
-                            ),
-                          ]),
-                          child: ElevatedButton(
-                              onPressed: () {
-                                _submitAnswer(
-                                    _currentQuestion?.choices[index].id ?? '');
-                              },
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: _currentQuestion
-                                              ?.choices[index].id ==
-                                          _goodAnswer
-                                      ? Colors.green.shade400
-                                      : _currentQuestion?.choices[index].id ==
-                                              _badAnswer
-                                          ? Colors.red.shade400
-                                          : Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10))),
-                              child: SizedBox(
-                                width: MediaQuery.of(context).size.width - 48,
-                                height: 50,
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    _currentQuestion?.choices[index].title ??
-                                        '',
-                                    style: TextStyle(
-                                        fontFamily: 'Deezer',
-                                        fontWeight: FontWeight.w900,
-                                        color: Colors.black,
-                                        fontSize: 20),
+                            widget.blindTestType == BlindTestType.TRACKS
+                                ? Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Text(
+                                        remaining.toString(),
+                                        style: TextStyle(
+                                            fontFamily: 'Deezer',
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 50),
+                                        textHeightBehavior: TextHeightBehavior(
+                                          applyHeightToFirstAscent:
+                                              true, // Disable height for ascent
+                                          applyHeightToLastDescent:
+                                              false, // Apply height for descent
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                2,
+                                        height:
+                                            MediaQuery.of(context).size.width /
+                                                2,
+                                        child: TweenAnimationBuilder<double>(
+                                            tween: Tween(
+                                                begin: trackProgress[0],
+                                                end: trackProgress[1]),
+                                            duration:
+                                                Duration(milliseconds: 350),
+                                            builder: (context, value, _) =>
+                                                CircularProgressIndicator(
+                                                  value: value,
+                                                  strokeWidth: 10,
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.color,
+                                                  backgroundColor: Theme.of(
+                                                          context)
+                                                      .scaffoldBackgroundColor,
+                                                  strokeCap: StrokeCap.round,
+                                                )),
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                2,
+                                        height:
+                                            MediaQuery.of(context).size.width /
+                                                    2 +
+                                                30,
+                                        child: Align(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                color: Color(0xFFE07DF7),
+                                                border: Border.all(
+                                                    width: 2,
+                                                    color: Theme.of(context)
+                                                        .scaffoldBackgroundColor)),
+                                            child: SizedBox(
+                                              width: 75,
+                                              height: 32,
+                                              child: Align(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                    _blindTest.points
+                                                            .toString() +
+                                                        ' pt',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w900,
+                                                        fontSize: 16,
+                                                        color: Theme.of(context)
+                                                            .scaffoldBackgroundColor)),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                5,
+                                        child: Center(
+                                          child: Text(
+                                            remaining.toString() + "'",
+                                            style: TextStyle(
+                                                fontFamily: 'Deezer',
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: 50),
+                                            textHeightBehavior:
+                                                TextHeightBehavior(
+                                              applyHeightToFirstAscent:
+                                                  true, // Disable height for ascent
+                                              applyHeightToLastDescent:
+                                                  false, // Apply height for descent
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                3 /
+                                                5,
+                                        height: 10,
+                                        child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 12),
+                                            child:
+                                                TweenAnimationBuilder<double>(
+                                              tween: Tween(
+                                                  begin: trackProgress[0],
+                                                  end: trackProgress[1]),
+                                              duration:
+                                                  Duration(milliseconds: 350),
+                                              builder: (context, value, _) =>
+                                                  LinearProgressIndicator(
+                                                value: value,
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.color,
+                                                backgroundColor: Theme.of(
+                                                        context)
+                                                    .scaffoldBackgroundColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                            )),
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                5,
+                                        child: Align(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                color: Color(0xFFE07DF7),
+                                                border: Border.all(
+                                                    width: 2,
+                                                    color: Theme.of(context)
+                                                        .scaffoldBackgroundColor)),
+                                            child: SizedBox(
+                                              width: 70,
+                                              height: 40,
+                                              child: Align(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                    _blindTest.points
+                                                            .toString() +
+                                                        ' pt',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w900,
+                                                        fontSize: 16,
+                                                        color: Theme.of(context)
+                                                            .scaffoldBackgroundColor)),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              )),
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            )));
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 24),
+                              child: widget.blindTestType ==
+                                      BlindTestType.TRACKS
+                                  ? Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: List.generate(
+                                        widget.blindTestType ==
+                                                BlindTestType.TRACKS
+                                            ? _currentQuestion
+                                                    ?.trackChoices.length ??
+                                                0
+                                            : _currentQuestion
+                                                    ?.artistChoices.length ??
+                                                0,
+                                        (int index) => Padding(
+                                          padding: EdgeInsets.only(top: 12),
+                                          child: Container(
+                                            decoration:
+                                                BoxDecoration(boxShadow: [
+                                              BoxShadow(
+                                                color: Theme.of(context)
+                                                    .scaffoldBackgroundColor,
+                                                spreadRadius: 0, // Spread value
+                                                blurRadius: 8, // Blur value
+                                                offset: Offset(0, 8),
+                                              ),
+                                            ]),
+                                            child: ElevatedButton(
+                                                onPressed: () {
+                                                  _submitAnswer(_currentQuestion
+                                                          ?.trackChoices[index]
+                                                          .id ??
+                                                      '');
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor: _currentQuestion
+                                                                ?.trackChoices[
+                                                                    index]
+                                                                .id ==
+                                                            _goodAnswer
+                                                        ? Colors.green.shade400
+                                                        : _currentQuestion
+                                                                    ?.trackChoices[
+                                                                        index]
+                                                                    .id ==
+                                                                _badAnswer
+                                                            ? Colors
+                                                                .red.shade400
+                                                            : Colors.white,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10))),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width -
+                                                      48,
+                                                  height: 50,
+                                                  child: Align(
+                                                    alignment: Alignment.center,
+                                                    child: Text(
+                                                      _currentQuestion
+                                                              ?.trackChoices[
+                                                                  index]
+                                                              .title ??
+                                                          '',
+                                                      style: TextStyle(
+                                                          fontFamily: 'Deezer',
+                                                          fontWeight:
+                                                              FontWeight.w900,
+                                                          color: Colors.black,
+                                                          fontSize: 20),
+                                                    ),
+                                                  ),
+                                                )),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : GridView.count(
+                                      crossAxisCount: 2,
+                                      shrinkWrap: true,
+                                      physics: NeverScrollableScrollPhysics(),
+                                      children: List.generate(
+                                        _currentQuestion
+                                                ?.artistChoices.length ??
+                                            0,
+                                        (int index) => Padding(
+                                          padding: EdgeInsets.all(12),
+                                          child: Container(
+                                            decoration:
+                                                BoxDecoration(boxShadow: [
+                                              BoxShadow(
+                                                color: Theme.of(context)
+                                                    .scaffoldBackgroundColor,
+                                                spreadRadius: 0, // Spread value
+                                                blurRadius: 8, // Blur value
+                                                offset: Offset(0, 8),
+                                              ),
+                                            ]),
+                                            child: ElevatedButton(
+                                                onPressed: () {
+                                                  _submitAnswer(_currentQuestion
+                                                          ?.trackChoices[index]
+                                                          .id ??
+                                                      '');
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor: _currentQuestion
+                                                                ?.trackChoices[
+                                                                    index]
+                                                                .id ==
+                                                            _goodAnswer
+                                                        ? Colors.green.shade400
+                                                        : _currentQuestion
+                                                                    ?.trackChoices[
+                                                                        index]
+                                                                    .id ==
+                                                                _badAnswer
+                                                            ? Colors
+                                                                .red.shade400
+                                                            : Colors.white,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10))),
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(8),
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      CachedImage(
+                                                        url: _currentQuestion
+                                                                ?.artistChoices[
+                                                                    index]
+                                                                .picture
+                                                                ?.full ??
+                                                            '',
+                                                        rounded: true,
+                                                      ),
+                                                      Center(
+                                                          child: Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                top: 8),
+                                                        child: Text(
+                                                          _currentQuestion
+                                                                  ?.artistChoices[
+                                                                      index]
+                                                                  .name ??
+                                                              '',
+                                                          maxLines: 1,
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'Deezer',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w900,
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: 18),
+                                                        ),
+                                                      ))
+                                                    ],
+                                                  ),
+                                                )),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                            )
+                          ],
+                        )))));
   }
 }
 
 class ResultsScreen extends StatefulWidget {
   final Playlist playlist;
+  final BlindTestType blindTestType;
   final BlindTest blindTest;
-  const ResultsScreen(this.playlist, this.blindTest, {super.key});
+  const ResultsScreen(this.playlist, this.blindTestType, this.blindTest,
+      {super.key});
 
   @override
   _ResultsScreenState createState() => _ResultsScreenState();
@@ -574,17 +1187,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
     }
   }
 
-  Future<Map<String, dynamic>> _me() async {
-    Map<String, dynamic> me = await deezerAPI.callPipeApi(params: {
-      'operationName': 'Me',
-      'query':
-          'query Me {\n  me {\n    mediaServiceLicenseToken {\n      token\n      expirationDate\n      __typename\n    }\n    recToken {\n      token\n      expirationDate\n      __typename\n    }\n    user {\n      id\n      name\n      picture {\n        ...Picture\n        __typename\n      }\n      __typename\n    }\n    onboarding(context: WELCOME) {\n      shouldBeOnboarded\n      __typename\n    }\n    __typename\n  }\n  permissions {\n    games {\n      blindTest {\n        canInitiateMultiplayerSession\n        hasRestrictedAccessToBlindTest\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment Picture on Picture {\n  ...PictureSmall\n  ...PictureMedium\n  ...PictureLarge\n  __typename\n}\n\nfragment PictureSmall on Picture {\n  id\n  small: urls(pictureRequest: {height: 100, width: 100})\n  __typename\n}\n\nfragment PictureMedium on Picture {\n  id\n  medium: urls(pictureRequest: {width: 264, height: 264})\n  __typename\n}\n\nfragment PictureLarge on Picture {\n  id\n  large: urls(pictureRequest: {width: 500, height: 500})\n  __typename\n}',
-      'variables': {}
-    });
-
-    return me;
-  }
-
   Future<void> _load() async {
     _score();
     _leaderBoard();
@@ -607,6 +1209,16 @@ class _ResultsScreenState extends State<ResultsScreen> {
     return Scaffold(
         backgroundColor: Color(0xFF6849FF),
         body: SafeArea(
+            child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                'assets/blind_test_wave.png',
+              ),
+              repeat: ImageRepeat.repeat,
+              alignment: Alignment.topLeft,
+            ),
+          ),
           child: Column(
             children: [
               Padding(
@@ -618,6 +1230,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                     IconButton(
                       onPressed: () {
                         GetIt.I<AudioPlayerHandler>().stop();
+                        GetIt.I<AudioPlayerHandler>().clearQueue();
                         Navigator.of(context, rootNavigator: true).maybePop();
                       },
                       icon: Icon(DeezerIcons.cross),
@@ -633,7 +1246,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                           ),
                         ),
                         Text(
-                          'Blind test',
+                          'Blind test'.i18n,
                           style: TextStyle(
                             fontWeight: FontWeight.w400,
                             fontSize: 10,
@@ -643,35 +1256,40 @@ class _ResultsScreenState extends State<ResultsScreen> {
                     ),
                     IconButton(
                       onPressed: () {
-                        _load();
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                            builder: (context) => BlindTestScreen(
+                                widget.blindTestType, widget.playlist)));
                       },
-                      icon: Icon(DeezerIcons.question),
-                      iconSize: 20,
+                      icon: Icon(Icons.refresh),
+                      iconSize: 25,
                     ),
                   ],
                 ),
               ),
-              Center(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xFFE07DF7),
-                    border: Border.all(
-                      width: 2,
-                      color: Theme.of(context).scaffoldBackgroundColor,
+              Padding(
+                padding: EdgeInsets.only(top: 12),
+                child: Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color(0xFFE07DF7),
+                      border: Border.all(
+                        width: 2,
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                      ),
                     ),
-                  ),
-                  child: SizedBox(
-                    width: 100,
-                    height: 45,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        '${widget.blindTest.points} pt',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 20,
-                          color: Theme.of(context).scaffoldBackgroundColor,
+                    child: SizedBox(
+                      width: 100,
+                      height: 45,
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          '${widget.blindTest.points} pt',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 20,
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                          ),
                         ),
                       ),
                     ),
@@ -688,75 +1306,68 @@ class _ResultsScreenState extends State<ResultsScreen> {
                         .scaffoldBackgroundColor
                         .withAlpha(100),
                   ),
-                  child: Text('Your best score : $bestScore'),
+                  child: Text('Your best score : '.i18n + bestScore.toString()),
                 ),
               ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 20),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+                  child: Column(
+                    children: [
+                      Row(
+                        textBaseline: TextBaseline.ideographic,
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Icon(
                               DeezerIcons.crown,
-                              size: 30,
+                              size: 34,
                             ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Center(
-                                child: Text(
-                                  'Leaderboard',
-                                  textHeightBehavior: TextHeightBehavior(
-                                    applyHeightToFirstAscent: false,
-                                    applyHeightToLastDescent: true,
-                                  ),
-                                  style: TextStyle(
-                                    fontSize: 34,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Deezer',
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: _leaderboard.length,
-                            itemBuilder: (context, i) {
-                              return ListTile(
-                                leading: Text(
-                                  '#${i + 1}',
-                                  style: TextStyle(
-                                    fontSize: 46,
-                                    fontWeight: FontWeight.w900,
-                                    fontFamily: 'Deezer',
-                                  ),
-                                ),
-                                title: Text(_leaderboard[i]['user']['name']),
-                                trailing: Text(
-                                    _leaderboard[i]['bestScore'].toString()),
-                              );
-                            },
                           ),
-                        ),
-                        Text('You are #' +
-                            rank.toString() +
-                            ' out of ' +
-                            playerCount.toString() +
-                            ' players')
-                      ],
-                    ),
+                          Text(
+                            'Leaderboard'.i18n,
+                            style: TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Deezer',
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: List.generate(
+                            _leaderboard.length,
+                            (int i) => ListTile(
+                                  leading: Text(
+                                    '#${i + 1}',
+                                    style: TextStyle(
+                                      fontSize: 46,
+                                      fontWeight: FontWeight.w900,
+                                      fontFamily: 'Deezer',
+                                    ),
+                                  ),
+                                  title: Text(_leaderboard[i]['user']['name']),
+                                  trailing: Text(
+                                      _leaderboard[i]['bestScore'].toString()),
+                                )),
+                      ),
+                      Text('You are #'.i18n +
+                          rank.toString() +
+                          ' out of '.i18n +
+                          playerCount.toString() +
+                          ' players'.i18n)
+                    ],
                   ),
                 ),
               ),
@@ -772,29 +1383,28 @@ class _ResultsScreenState extends State<ResultsScreen> {
                     child: Column(
                       children: [
                         Row(
+                          textBaseline: TextBaseline.ideographic,
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
                           children: [
-                            Icon(
-                              DeezerIcons.note_list,
-                              size: 30,
-                            ),
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Center(
-                                child: Text(
-                                  'Played tracks',
-                                  textHeightBehavior: TextHeightBehavior(
-                                    applyHeightToFirstAscent: false,
-                                    applyHeightToLastDescent: true,
-                                  ),
-                                  style: TextStyle(
-                                    fontSize: 34,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Deezer',
-                                  ),
-                                ),
+                              child: Icon(
+                                DeezerIcons.note_list,
+                                size: 34,
+                              ),
+                            ),
+                            Text(
+                              'Played tracks'.i18n,
+                              textHeightBehavior: TextHeightBehavior(
+                                applyHeightToFirstAscent: false,
+                                applyHeightToLastDescent: true,
+                              ),
+                              style: TextStyle(
+                                fontSize: 34,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Deezer',
                               ),
                             ),
                           ],
@@ -814,6 +1424,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
               ),
             ],
           ),
-        ));
+        )));
   }
 }
