@@ -41,7 +41,6 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 ## :camera_flash: Screenshots
 
 <p align="center">
-    <img src="./assets/screenshots/Mod_login.png" width=100>
     <img src="./assets/screenshots/Mod_home.png" width=100>
     <img src="./assets/screenshots/Mod_player.png" width=100>
     <img src="./assets/screenshots/Mod_search.png" width=100>
