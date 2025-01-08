@@ -336,10 +336,11 @@ class _BlindTestScreenState extends State<BlindTestScreen>
   List<double> trackProgress = [0, 0];
   Timer? _timer;
   int remaining = 30;
-  BlindTest _blindTest = BlindTest();
+  final BlindTest _blindTest = BlindTest();
   int _testLegnth = 0;
   Question? _currentQuestion;
   bool _error = false;
+  String? _errorMsg;
   String _goodAnswer = '';
   String _badAnswer = '';
 
@@ -349,7 +350,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
 
       setState(() {
         remaining = _remaining;
-        if (_remaining == 0) {
+        if (_remaining == 0 && trackProgress[0] != 0) {
           trackProgress = [0, 0];
           timer.cancel();
           _submitAnswer('');
@@ -435,7 +436,13 @@ class _BlindTestScreenState extends State<BlindTestScreen>
     Question question = _blindTest.questions[index];
 
     await GetIt.I<AudioPlayerHandler>()
-        .playBlindTrack(question.mediaToken, widget.playlist.image?.full);
+        .playBlindTrack(question.mediaToken, widget.playlist.image?.full)
+        .catchError((e) => {
+              setState(() {
+                _error = true;
+                _errorMsg = e.toString();
+              })
+            });
 
     setState(() {
       _goodAnswer = '';
@@ -633,9 +640,14 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                     ),
                   ),
                   Expanded(
-                      child: Align(
-                    alignment: Alignment.center,
-                    child: Text('Oops, something went wrong...'.i18n),
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Text('Oops, something went wrong...'.i18n),
+                      if (_errorMsg != null) Text(_errorMsg ?? '')
+                    ],
                   ))
                 ],
               ),
@@ -1118,7 +1130,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
   int bestScore = 0;
   int rank = 1;
   int playerCount = 1;
-  List<Track> _tracklist = [];
+  final List<Track> _tracklist = [];
   List<Map<String, dynamic>> _leaderboard = [];
 
   Future<void> _score() async {

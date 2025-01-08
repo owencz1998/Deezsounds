@@ -241,16 +241,14 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
         selectRandom3(tracks);
       }
     } else {
-      if (randomTracks.isEmpty) {
-        List<Track> tracks = await downloadManager.allOfflineTracks();
-        if (mounted) {
-          setState(() {
-            allTracks = tracks;
-            trackCount = tracks.length;
-            favoritePlaylist = null;
-            selectRandom3(allTracks);
-          });
-        }
+      List<Track> tracks = await downloadManager.allOfflineTracks();
+      if (mounted) {
+        setState(() {
+          allTracks = tracks;
+          trackCount = tracks.length;
+          favoritePlaylist = null;
+          selectRandom3(allTracks);
+        });
       }
     }
     if (mounted) setState(() => _loading = false);
@@ -352,7 +350,7 @@ class FavoritePlaylists extends StatefulWidget {
 
 class _FavoritePlaylistsState extends State<FavoritePlaylists> {
   List<Playlist>? _playlists;
-  List<Playlist>? _tmpPlaylists;
+  List<Playlist> _tmpPlaylists = [];
   Playlist? favoritesPlaylist;
   bool _loading = false;
 
@@ -378,7 +376,7 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
     List<Playlist> playlists = await downloadManager.getOfflinePlaylists();
     if (mounted && playlists.length > (_playlists?.length ?? 0)) {
       setState(() {
-        _tmpPlaylists?.addAll(playlists);
+        _tmpPlaylists.addAll(playlists);
         _playlists = _tmpPlaylists;
       });
     }
@@ -393,16 +391,18 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
           });
         }
         List<Playlist> playlists = await deezerAPI.getPlaylists();
-        if (mounted) setState(() => _tmpPlaylists?.addAll(playlists));
+        if (mounted) setState(() => _tmpPlaylists.addAll(playlists));
       } catch (e) {
         Logger.root.severe('Error loading playlists: $e');
       }
     }
+
     if (mounted) {
       setState(() {
         _playlists = _tmpPlaylists;
         _loading = false;
-        cache.favoritePlaylists = _tmpPlaylists ?? [];
+        cache.favoritePlaylists =
+            _tmpPlaylists == [] ? cache.favoritePlaylists : _tmpPlaylists;
       });
     }
   }

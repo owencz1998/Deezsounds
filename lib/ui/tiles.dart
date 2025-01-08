@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fluttericon/octicons_icons.dart';
 import 'package:get_it/get_it.dart';
-import 'package:logging/logging.dart';
 import 'package:deezer/settings.dart';
 import 'package:deezer/ui/details_screens.dart';
 import 'package:deezer/ui/favorite_screen.dart';
@@ -70,10 +69,12 @@ class _TrackTileState extends State<TrackTile> {
           });
         }
       } else {
-        setState(() {
-          _stateSub?.cancel();
-          nowPlaying = PlayingState.NONE;
-        });
+        if (mounted) {
+          setState(() {
+            _stateSub?.cancel();
+            nowPlaying = PlayingState.NONE;
+          });
+        }
       }
     });
     //Check if offline
@@ -87,7 +88,7 @@ class _TrackTileState extends State<TrackTile> {
     _downloadItemSub = downloadManager.serviceEvents.stream.listen((e) async {
       List<Download> downloads = await downloadManager.getDownloads();
 
-      if (e['action'] == 'onProgress') {
+      if (e['action'] == 'onProgress' && mounted) {
         setState(() {
           for (Map su in e['data']) {
             downloads
@@ -104,7 +105,6 @@ class _TrackTileState extends State<TrackTile> {
               setState(() {
                 nowDownloading = true;
                 downloadProgress = downloads[i].progress;
-                Logger.root.info(downloadProgress);
               });
             }
           } else {

@@ -75,7 +75,7 @@ class DeezerAPI {
     try {
       return jsonDecode(res.body)['data'][0]['media'][0]['sources'][0]['url'];
     } catch (e) {
-      Logger.root.info('API preview fetch failed.');
+      Logger.root.info('API preview fetch failed : $e');
       return '';
     }
   }

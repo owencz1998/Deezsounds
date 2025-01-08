@@ -267,6 +267,10 @@ class AudioPlayerHandler extends BaseAudioHandler
   Future<void> playBlindTrack(String trackToken, String? artUri) async {
     String previewURI = await deezerAPI.getMediaPreview(trackToken);
 
+    if (previewURI == '') {
+      throw Exception('Unable to load media preview from API.');
+    }
+
     MediaItem blindTrack = MediaItem(
         id: '0',
         title: 'Blind test',
