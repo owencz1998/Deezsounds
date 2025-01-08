@@ -2,7 +2,6 @@
 
 [![Latest Version](https://img.shields.io/github/v/release/PetitPrinc3/DefinitelyNotDeezer?color=blue)](../../releases/latest)
 [![Release date](https://img.shields.io/github/release-date/PetitPrinc3/DefinitelyNotDeezer)](../../releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/PetitPrinc3/DefinitelyNotDeezer/total?color=blue&label=downloads)](../../releases)  
 [![Flutter Version](https://shields.io/badge/Flutter-v3.27.1-darkgreen.svg)](https://docs.flutter.dev/tools/sdk)
 [![Dart Version](https://shields.io/badge/Dart-v3.6.0-darkgreen.svg)](https://dart.dev/get-dart)
 [![Crowdin](https://badges.crowdin.net/refreezer/localized.svg)](https://crowdin.com/project/refreezer)
