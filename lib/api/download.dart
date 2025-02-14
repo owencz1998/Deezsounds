@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:disk_space_plus/disk_space_plus.dart';
+//import 'package:disk_space_plus/disk_space_plus.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -735,7 +735,8 @@ class DownloadManager {
     int? playlistCount = Sqflite.firstIntValue(
         (await db!.rawQuery('SELECT COUNT(*) FROM Playlists')));
     //Free space
-    double diskSpace = await DiskSpacePlus.getFreeDiskSpace ?? 0;
+    //double diskSpace = await DiskSpacePlus.getFreeDiskSpace ?? 0;
+    double diskSpace = 0;
     //Used space
     List<FileSystemEntity> offlineStat =
         await Directory(offlinePath!).list().toList();

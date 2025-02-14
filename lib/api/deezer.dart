@@ -597,8 +597,11 @@ class DeezerAPI {
       'query': queryStringGraphQL
     };
     Map data = await callPipeApi(params: requestParams);
+
+    Logger.root.info(data);
+
     if (data['errors'] != null && data['errors'].length > 0) {
-      return Lyrics.error(data['errors']['message']);
+      return Lyrics.error('err');
     }
     return LyricsFull.fromPrivateJson(data['data']);
   }

@@ -8,7 +8,6 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
-import 'package:open_filex/open_filex.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -125,7 +124,6 @@ class _UpdaterScreenState extends State<UpdaterScreen> {
       await res.stream.pipe(fileSink);
       fileSink.close();
 
-      OpenFilex.open(path);
       setState(() {
         _buttonEnabled = true;
         _progress = 0.0;

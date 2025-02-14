@@ -65,8 +65,10 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 - Turn the mod into a skin for the official refreezer app
 
 #### :lady_beetle: Bugs
-- [Tell me !](https://github.com/PetitPrinc3/Deezer/issues)
+- Lyrics are not available
+- Blind tests are not available
 - Some home tiles are not and will not be implemented (Concerts, Did you know, Original videos, ...)
+- [Tell me !](https://github.com/PetitPrinc3/Deezer/issues)
 
 ## :balance_scale: Disclaimer & Legal
 

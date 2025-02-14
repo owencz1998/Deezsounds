@@ -29,8 +29,6 @@ class Settings {
   //Main
   @JsonKey(defaultValue: false)
   late bool ignoreInterruptions;
-  @JsonKey(defaultValue: false)
-  late bool enableEqualizer;
 
   //Account
   String? arl;
@@ -408,7 +406,6 @@ class Settings {
             unselectedWidgetColor: secondaryText,
             sliderTheme: _sliderTheme,
             scaffoldBackgroundColor: deezerBg,
-            dialogBackgroundColor: deezerBg,
             hintColor: Color(0xFF1B191F),
             inputDecorationTheme: const InputDecorationTheme(
               hintStyle: TextStyle(color: secondaryText),
@@ -471,7 +468,8 @@ class Settings {
             ),
             bottomAppBarTheme: const BottomAppBarTheme(color: deezerBg),
             progressIndicatorTheme:
-                ProgressIndicatorThemeData(color: primaryColor)),
+                ProgressIndicatorThemeData(color: primaryColor),
+            dialogTheme: DialogThemeData(backgroundColor: deezerBg)),
         Themes.Black: ThemeData(
             useMaterial3: false,
             brightness: Brightness.dark,
@@ -480,7 +478,6 @@ class Settings {
             primaryColor: primaryColor,
             scaffoldBackgroundColor: deezerBg,
             hintColor: Colors.grey.shade700,
-            dialogBackgroundColor: deezerBg,
             sliderTheme: _sliderTheme,
             bottomSheetTheme: const BottomSheetThemeData(
               backgroundColor: Colors.black,
@@ -537,7 +534,8 @@ class Settings {
                 return null;
               }),
             ),
-            bottomAppBarTheme: const BottomAppBarTheme(color: Colors.black))
+            bottomAppBarTheme: const BottomAppBarTheme(color: Colors.black),
+            dialogTheme: DialogThemeData(backgroundColor: deezerBg))
       };
 
   Future<String> getPath() async =>

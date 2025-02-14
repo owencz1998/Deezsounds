@@ -5,7 +5,6 @@ import 'package:clipboard/clipboard.dart';
 import 'package:country_currency_pickers/country.dart';
 import 'package:country_currency_pickers/country_picker_dialog.dart';
 import 'package:country_currency_pickers/utils/utils.dart';
-import 'package:disk_space_plus/disk_space_plus.dart';
 import 'package:external_path/external_path.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
@@ -1403,20 +1402,6 @@ class _GeneralSettingsState extends State<GeneralSettings> {
             },
           ),
           ListTile(
-            title: Text('Enable equalizer'.i18n),
-            subtitle: Text(
-                'Might enable some equalizer apps to work. Requires restart of Definitely Not Deezer'
-                    .i18n),
-            leading: const Icon(Icons.equalizer),
-            trailing: Switch(
-              value: settings.enableEqualizer,
-              onChanged: (v) async {
-                setState(() => settings.enableEqualizer = v);
-                settings.save();
-              },
-            ),
-          ),
-          ListTile(
             title: Text('LastFM'.i18n),
             subtitle: Text((settings.lastFMUsername != null)
                 ? 'Log out'.i18n
@@ -1595,12 +1580,11 @@ class _LastFMLoginState extends State<LastFMLogin> {
 class StorageInfo {
   final String rootDir;
   final String appFilesDir;
-  final int availableBytes;
 
-  StorageInfo(
-      {required this.rootDir,
-      required this.appFilesDir,
-      required this.availableBytes});
+  StorageInfo({
+    required this.rootDir,
+    required this.appFilesDir,
+  });
 }
 
 Future<List<StorageInfo>> getStorageInfo() async {
@@ -1611,16 +1595,10 @@ Future<List<StorageInfo>> getStorageInfo() async {
 
   if (externalDirectories.isNotEmpty) {
     for (var dir in externalDirectories) {
-      var availableMegaBytes =
-          (await DiskSpacePlus.getFreeDiskSpaceForPath(dir)) ?? 0.0;
-
       storageInfoList.add(
         StorageInfo(
           rootDir: dir,
           appFilesDir: dir,
-          availableBytes: availableMegaBytes > 0
-              ? (availableMegaBytes * 1000000).floor()
-              : 0,
         ),
       );
     }
@@ -1707,7 +1685,6 @@ class _DirectoryPickerState extends State<DirectoryPicker> {
                                   return ListTile(
                                     title: Text(si.rootDir),
                                     leading: const Icon(Icons.sd_card),
-                                    trailing: Text(filesize(si.availableBytes)),
                                     onTap: () {
                                       setState(() {
                                         _path = si.appFilesDir;

@@ -569,14 +569,18 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
 
   void _loadLyrics() async {
     if (!isEnabled) {
-      LyricsFull newLyrics = await deezerAPI.lyrics(track.id!) as LyricsFull;
-      if (mounted && newLyrics.id != null) {
-        setState(() {
-          isEnabled = true;
-          trackLyrics = newLyrics;
-          audioHandler.mediaItem.value?.extras
-              ?.addAll({'lyrics': jsonEncode(newLyrics.toJson())});
-        });
+      try {
+        LyricsFull newLyrics = await deezerAPI.lyrics(track.id!) as LyricsFull;
+        if (mounted && newLyrics.id != null) {
+          setState(() {
+            isEnabled = true;
+            trackLyrics = newLyrics;
+            audioHandler.mediaItem.value?.extras
+                ?.addAll({'lyrics': jsonEncode(newLyrics.toJson())});
+          });
+        }
+      } catch (e) {
+        //No lyrics available.
       }
     }
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 
 import '../languages/crowdin.dart';
-import '../languages/en_us.dart';
+import 'languages/en_us.dart';
 
 List<Language> languages = [
   Language('en', 'US', 'English'),
@@ -41,7 +41,7 @@ List<Language> languages = [
 List<Locale> get supportedLocales => languages.map((l) => l.getLocale).toList();
 
 extension Localization on String {
-  static final _t = Translations.byLocale('en_US') + language_en_us + crowdin;
+  static final _t = Translations.byLocale('en-US') + language_en_us + crowdin;
 
   String get i18n => localize(this, _t);
 }

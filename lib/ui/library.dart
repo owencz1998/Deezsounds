@@ -205,6 +205,7 @@ class LibraryScreen extends StatelessWidget {
             },
           ),
           ExpansionTile(
+            textColor: settings.primaryColor,
             title: Text('Statistics'.i18n),
             leading: const LeadingIcon(Icons.insert_chart, color: Colors.grey),
             children: <Widget>[
@@ -243,11 +244,6 @@ class LibraryScreen extends StatelessWidget {
                         title: Text('Offline size'.i18n),
                         leading: const Icon(Icons.sd_card),
                         trailing: Text(data[3]),
-                      ),
-                      ListTile(
-                        title: Text('Free space'.i18n),
-                        leading: const Icon(Icons.disc_full),
-                        trailing: Text(data[4]),
                       ),
                     ],
                   );

@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:equalizer_flutter/equalizer_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -182,31 +181,6 @@ class AudioPlayerHandler extends BaseAudioHandler
       if (state == ProcessingState.completed && _player.playing) {
         stop();
         _player.seek(Duration.zero, index: 0);
-      }
-    });
-
-    //Audio session
-    _player.androidAudioSessionIdStream.listen((session) {
-      if (!settings.enableEqualizer) return;
-
-      //Save
-      _prevAudioSession = _audioSession;
-      _audioSession = session;
-      if (_audioSession == null) return;
-
-      //Open EQ
-      if (!_equalizerOpen) {
-        EqualizerFlutter.open(session!);
-        _equalizerOpen = true;
-        return;
-      }
-
-      //Change session id
-      if (_prevAudioSession != _audioSession) {
-        if (_prevAudioSession != null) {
-          EqualizerFlutter.removeAudioSessionId(_prevAudioSession!);
-        }
-        EqualizerFlutter.setAudioSessionId(_audioSession!);
       }
     });
 

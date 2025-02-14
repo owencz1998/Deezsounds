@@ -12,7 +12,6 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
     )
       ..language = json['language'] as String?
       ..ignoreInterruptions = json['ignoreInterruptions'] as bool? ?? false
-      ..enableEqualizer = json['enableEqualizer'] as bool? ?? false
       ..wifiQuality =
           $enumDecodeNullable(_$AudioQualityEnumMap, json['wifiQuality']) ??
               AudioQuality.MP3_320
@@ -90,7 +89,6 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
 Map<String, dynamic> _$SettingsToJson(Settings instance) => <String, dynamic>{
       'language': instance.language,
       'ignoreInterruptions': instance.ignoreInterruptions,
-      'enableEqualizer': instance.enableEqualizer,
       'arl': instance.arl,
       'wifiQuality': _$AudioQualityEnumMap[instance.wifiQuality]!,
       'mobileQuality': _$AudioQualityEnumMap[instance.mobileQuality]!,
