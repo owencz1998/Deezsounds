@@ -114,7 +114,7 @@ class _PlayerBarState extends State<PlayerBar> {
         updateColor();
       },
       child: StreamBuilder(
-          stream: Stream.periodic(const Duration(milliseconds: 250)),
+          stream: Stream.periodic(const Duration(milliseconds: 150)),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (GetIt.I<AudioPlayerHandler>().mediaItem.value == null ||
                 GetIt.I<AudioPlayerHandler>()
@@ -210,6 +210,7 @@ class _PlayerBarState extends State<PlayerBar> {
                             ),
                           )),
                       SizedBox(
+                        height: 2,
                         child: LinearProgressIndicator(
                           backgroundColor:
                               (_bgColor ?? Theme.of(context).primaryColor)

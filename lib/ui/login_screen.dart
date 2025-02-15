@@ -201,44 +201,15 @@ class _LoginWidgetState extends State<LoginWidget> {
                   ])),
             ]),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'WELCOME TO '.i18n,
-                    style: TextStyle(
-                        fontFamily: 'Deezer',
-                        fontWeight: FontWeight.w900,
-                        fontSize: 50),
-                    textAlign: TextAlign.start,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Definitely not'.i18n,
-                        style: TextStyle(
-                            fontFamily: 'MabryPro',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12),
-                        textAlign: TextAlign.start,
-                      ),
-                      Text(
-                        'DEEZER'.i18n,
-                        style: TextStyle(
-                            fontFamily: 'Deezer',
-                            fontWeight: FontWeight.w900,
-                            fontSize: 50),
-                        textAlign: TextAlign.start,
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
+                child: Text(
+                  'WELCOME TO ALCHEMY'.i18n,
+                  style: TextStyle(
+                      fontFamily: 'MontSerrat',
+                      fontWeight: FontWeight.w900,
+                      fontSize: 50),
+                  textAlign: TextAlign.start,
+                )),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
               child: Text(
@@ -482,7 +453,7 @@ class _EmailLoginState extends State<EmailLogin> {
               'Email',
               textAlign: TextAlign.center,
               style: TextStyle(
-                  fontFamily: 'Deezer',
+                  fontFamily: 'MontSerrat',
                   fontSize: 56.0,
                   fontWeight: FontWeight.w700),
             ),

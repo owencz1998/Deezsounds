@@ -151,7 +151,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                           style: TextStyle(
                               color: Settings.deezerBg,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'Deezer',
+                              fontFamily: 'MontSerrat',
                               fontSize: 18),
                           textHeightBehavior: TextHeightBehavior(
                             applyHeightToFirstAscent:
@@ -167,7 +167,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                       '#' + rank.toString(),
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Deezer',
+                          fontFamily: 'MontSerrat',
                           fontSize: 18),
                       textHeightBehavior: TextHeightBehavior(
                         applyHeightToFirstAscent:
@@ -209,7 +209,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                         style: TextStyle(
                           fontSize: 34,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Deezer',
+                          fontFamily: 'MontSerrat',
                         ),
                       ),
                       Padding(
@@ -245,7 +245,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                               title: Text(
                                 'Titles'.i18n,
                                 style: TextStyle(
-                                    fontFamily: 'Deezer',
+                                    fontFamily: 'MontSerrat',
                                     fontWeight: FontWeight.w900,
                                     color: Colors.black,
                                     fontSize: 20),
@@ -293,7 +293,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                               title: Text(
                                 'Artists'.i18n,
                                 style: TextStyle(
-                                    fontFamily: 'Deezer',
+                                    fontFamily: 'MontSerrat',
                                     fontWeight: FontWeight.w900,
                                     color: Colors.black,
                                     fontSize: 20),
@@ -615,7 +615,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                   '/' +
                                   _testLegnth.toString(),
                               style: TextStyle(
-                                  fontFamily: 'Deezer',
+                                  fontFamily: 'MontSerrat',
                                   fontWeight: FontWeight.bold),
                             ),
                             Container(
@@ -721,7 +721,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                             '/' +
                                             _testLegnth.toString(),
                                         style: TextStyle(
-                                            fontFamily: 'Deezer',
+                                            fontFamily: 'MontSerrat',
                                             fontWeight: FontWeight.bold),
                                       ),
                                       Container(
@@ -755,7 +755,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                       Text(
                                         remaining.toString(),
                                         style: TextStyle(
-                                            fontFamily: 'Deezer',
+                                            fontFamily: 'MontSerrat',
                                             fontWeight: FontWeight.w900,
                                             fontSize: 50),
                                         textHeightBehavior: TextHeightBehavior(
@@ -846,7 +846,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                           child: Text(
                                             remaining.toString() + "'",
                                             style: TextStyle(
-                                                fontFamily: 'Deezer',
+                                                fontFamily: 'MontSerrat',
                                                 fontWeight: FontWeight.w900,
                                                 fontSize: 50),
                                             textHeightBehavior:
@@ -997,7 +997,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                                               .title ??
                                                           '',
                                                       style: TextStyle(
-                                                          fontFamily: 'Deezer',
+                                                          fontFamily: 'MontSerrat',
                                                           fontWeight:
                                                               FontWeight.w900,
                                                           color: Colors.black,
@@ -1348,7 +1348,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                             style: TextStyle(
                               fontSize: 34,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'Deezer',
+                              fontFamily: 'MontSerrat',
                             ),
                           ),
                         ],
@@ -1365,7 +1365,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                     style: TextStyle(
                                       fontSize: 46,
                                       fontWeight: FontWeight.w900,
-                                      fontFamily: 'Deezer',
+                                      fontFamily: 'MontSerrat',
                                     ),
                                   ),
                                   title: Text(_leaderboard[i]['user']['name']),
@@ -1415,7 +1415,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                               style: TextStyle(
                                 fontSize: 34,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'Deezer',
+                                fontFamily: 'MontSerrat',
                               ),
                             ),
                           ],

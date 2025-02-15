@@ -1841,9 +1841,7 @@ class _CreditsScreenState extends State<CreditsScreen> {
           const FreezerDivider(),
           ListTile(
             title: Text('PetitPrince'.i18n),
-            subtitle: Text(
-                'Definitely Not Deezer developer, tester, maintainer, ...'
-                    .i18n),
+            subtitle: Text('Alchemy developer, tester, maintainer, ...'.i18n),
             leading:
                 Image.asset('assets/PetitPrince.png', width: 36, height: 36),
             onTap: () {

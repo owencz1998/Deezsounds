@@ -31,7 +31,7 @@ class FavoriteAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return FreezerAppBar(
-      'Favorites'.i18n,
+      'Your library'.i18n,
       actions: <Widget>[
         Container(
           margin: EdgeInsets.only(right: 24),

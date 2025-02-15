@@ -78,10 +78,10 @@ class _SplashScreenState extends State<SplashScreen> {
             frameRate: FrameRate(25),
             fit: BoxFit.cover,
             width: MediaQuery.of(context).orientation == Orientation.portrait
-                ? MediaQuery.of(context).size.width * 0.5
+                ? MediaQuery.of(context).size.height * 0.1
                 : MediaQuery.of(context).size.height * 0.5,
             height: MediaQuery.of(context).orientation == Orientation.portrait
-                ? MediaQuery.of(context).size.width * 0.5
+                ? MediaQuery.of(context).size.height * 0.1
                 : MediaQuery.of(context).size.height * 0.5));
   }
 }

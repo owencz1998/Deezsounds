@@ -140,6 +140,7 @@ flutter:
   assets:
     - lib/.env
     - assets/cover.jpg
+    - assets/banner.png
     - assets/cover_thumb.jpg
     - assets/icon_legacy.png
     - assets/icon.png
@@ -181,6 +182,17 @@ flutter:
       fonts:
         - asset: assets/fonts/AlchemyIcons.ttf
     - family: Deezer
+      fonts:
+        - asset: assets/fonts/deezer_regular.ttf
+        - asset: assets/fonts/deezer_light.ttf
+          style: italic
+        - asset: assets/fonts/deezer_medium.ttf
+          weight: 500
+        - asset: assets/fonts/deezer_bold.ttf
+          weight: 700
+        - asset: assets/fonts/deezer_extrabold.ttf
+          weight: 900
+    - family: Montserrat
       fonts:
         - asset: assets/fonts/Montserrat-Regular.ttf
         - asset: assets/fonts/Montserrat-Light.ttf

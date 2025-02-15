@@ -97,28 +97,12 @@ class FreezerTitle extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Image.asset('assets/icon.png', width: 54, height: 54),
-          Container(width: 12.0),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Definitely not',
-                style: TextStyle(fontSize: 14),
-                textAlign: TextAlign.start,
-              ),
-              Text(
-                'Deezer',
-                style: TextStyle(
-                    fontSize: 64,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'Deezer'),
-                textAlign: TextAlign.start,
-              )
-            ],
-          )
+          Image.asset(
+            'assets/banner.png',
+            width: MediaQuery.of(context).orientation == Orientation.portrait
+                ? MediaQuery.of(context).size.width * 0.9
+                : MediaQuery.of(context).size.height * 0.2,
+          ),
         ],
       ),
     );
@@ -170,7 +154,7 @@ class _GamePageScreenState extends State<GamePageScreen> {
             child: Text(
               'Quizzes for you :',
               style: TextStyle(
-                  fontFamily: 'Deezer',
+                  fontFamily: 'MontSerrat',
                   fontWeight: FontWeight.bold,
                   fontSize: 24),
             ),
@@ -201,7 +185,7 @@ class _GamePageScreenState extends State<GamePageScreen> {
             child: Text(
               'Deezer quizzes :',
               style: TextStyle(
-                  fontFamily: 'Deezer',
+                  fontFamily: 'MontSerrat',
                   fontWeight: FontWeight.bold,
                   fontSize: 24),
             ),

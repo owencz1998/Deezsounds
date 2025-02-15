@@ -263,7 +263,7 @@ class Settings {
       ? null
       : GoogleFonts.getTextTheme(font,
           isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme);
-  String? get _fontFamily => (font == 'Deezer') ? 'MabryPro' : null;
+  String? get _fontFamily => (font == 'Deezer') ? 'Montserrat' : null;
 
   //Overrides for the non-deprecated buttons to look like the old ones
   OutlinedButtonThemeData get outlinedButtonTheme => OutlinedButtonThemeData(
@@ -346,6 +346,7 @@ class Settings {
             primaryColor: primaryColor,
             sliderTheme: _sliderTheme,
             outlinedButtonTheme: outlinedButtonTheme,
+            scaffoldBackgroundColor: Color(0xFF0F0D13),
             textButtonTheme: textButtonTheme,
             colorScheme: ColorScheme.fromSwatch()
                 .copyWith(secondary: primaryColor, brightness: Brightness.dark),
