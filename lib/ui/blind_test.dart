@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:audio_service/audio_service.dart';
 import 'package:deezer/api/deezer.dart';
 import 'package:deezer/api/definitions.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/alchemy_icons.dart';
 import 'package:deezer/service/audio_service.dart';
 import 'package:deezer/settings.dart';
 import 'package:deezer/translations.i18n.dart';
@@ -85,7 +85,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                       GetIt.I<AudioPlayerHandler>().clearQueue();
                       Navigator.of(context).maybePop();
                     },
-                    icon: Icon(DeezerIcons.cross),
+                    icon: Icon(AlchemyIcons.cross),
                     iconSize: 20,
                   ),
                   Center(
@@ -588,7 +588,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                             Navigator.of(context, rootNavigator: true)
                                 .maybePop();
                           },
-                          icon: Icon(DeezerIcons.cross),
+                          icon: Icon(AlchemyIcons.cross),
                           iconSize: 20,
                         ),
                         Column(
@@ -690,7 +690,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                       Navigator.of(context, rootNavigator: true)
                                           .maybePop();
                                     },
-                                    icon: Icon(DeezerIcons.cross),
+                                    icon: Icon(AlchemyIcons.cross),
                                     iconSize: 20,
                                   ),
                                   Column(
@@ -1244,7 +1244,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                         GetIt.I<AudioPlayerHandler>().clearQueue();
                         Navigator.of(context, rootNavigator: true).maybePop();
                       },
-                      icon: Icon(DeezerIcons.cross),
+                      icon: Icon(AlchemyIcons.cross),
                       iconSize: 20,
                     ),
                     Column(
@@ -1339,7 +1339,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 8),
                             child: Icon(
-                              DeezerIcons.crown,
+                              AlchemyIcons.crown,
                               size: 34,
                             ),
                           ),
@@ -1402,7 +1402,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 8),
                               child: Icon(
-                                DeezerIcons.note_list,
+                                AlchemyIcons.note_list,
                                 size: 34,
                               ),
                             ),

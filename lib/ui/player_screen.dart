@@ -5,7 +5,7 @@ import 'dart:ui';
 import 'package:async/async.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/alchemy_icons.dart';
 import 'package:deezer/utils/navigator_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -290,7 +290,7 @@ class _PlayerScreenHorizontalState extends State<PlayerScreenHorizontal> {
                         LyricsIconButton(12, afterOnPressed: updateColor),
                         IconButton(
                           icon: Icon(
-                            DeezerIcons.download,
+                            AlchemyIcons.download,
                             size: ScreenUtil().setWidth(12),
                             semanticLabel: 'Download'.i18n,
                           ),
@@ -439,7 +439,7 @@ class _PlayerScreenVerticalState extends State<PlayerScreenVertical> {
                 key: iconButtonKey,
                 icon: Icon(
                   //Icons.menu,
-                  DeezerIcons.queue,
+                  AlchemyIcons.queue,
                   semanticLabel: 'Queue'.i18n,
                 ),
                 iconSize: ScreenUtil().setSp(25) * 0.6,
@@ -617,7 +617,7 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
       child: IconButton(
         icon: Icon(
           //Icons.lyrics,
-          DeezerIcons.microphone,
+          AlchemyIcons.microphone,
           size: ScreenUtil().setWidth(widget.width),
           semanticLabel: 'Lyrics'.i18n,
         ),
@@ -695,19 +695,19 @@ class _RepeatButtonState extends State<RepeatButton> {
     switch (GetIt.I<AudioPlayerHandler>().getLoopMode()) {
       case LoopMode.off:
         return Icon(
-          DeezerIcons.repeat,
+          AlchemyIcons.repeat,
           size: widget.iconSize,
           semanticLabel: 'Repeat off'.i18n,
         );
       case LoopMode.all:
         return Icon(
-          DeezerIcons.repeat_active,
+          AlchemyIcons.repeat_active,
           size: widget.iconSize,
           semanticLabel: 'Repeat'.i18n,
         );
       case LoopMode.one:
         return Icon(
-          DeezerIcons.repeat_one,
+          AlchemyIcons.repeat_one,
           size: widget.iconSize,
           semanticLabel: 'Repeat one'.i18n,
         );
@@ -740,13 +740,13 @@ class _ActionControls extends State<ActionControls> {
     if (cache.checkTrackFavorite(
         Track.fromMediaItem(audioHandler.mediaItem.value!))) {
       return Icon(
-        DeezerIcons.heart_fill,
+        AlchemyIcons.heart_fill,
         size: widget.iconSize,
         semanticLabel: 'Unlove'.i18n,
       );
     }
     return Icon(
-      DeezerIcons.heart,
+      AlchemyIcons.heart,
       size: widget.iconSize,
       semanticLabel: 'Love'.i18n,
     );
@@ -767,7 +767,7 @@ class _ActionControls extends State<ActionControls> {
                 Share.share('https://deezer.com/track/$id');
               },
               icon: Icon(
-                DeezerIcons.share_android,
+                AlchemyIcons.share_android,
                 size: widget.iconSize,
                 semanticLabel: 'Share'.i18n,
               )),
@@ -782,7 +782,7 @@ class _ActionControls extends State<ActionControls> {
             alignment: Alignment.center,
             child: IconButton(
               icon: Icon(
-                DeezerIcons.more_vert,
+                AlchemyIcons.more_vert,
                 size: widget.iconSize * 1.25,
                 semanticLabel: 'Options'.i18n,
               ),
@@ -874,7 +874,7 @@ class _PlaybackControlsState extends State<PlaybackControls> {
                 children: [
                   /*IconButton(
               icon: Icon(
-                DeezerIcons.angry_face,
+                AlchemyIcons.angry_face,
                 size: widget.iconSize * 0.44,
                 semanticLabel: 'Dislike'.i18n,
               ),
@@ -899,8 +899,8 @@ class _PlaybackControlsState extends State<PlaybackControls> {
                 icon: Icon(
                   //cons.shuffle,
                   shuffleModeEnabled
-                      ? DeezerIcons.shuffle_active
-                      : DeezerIcons.shuffle,
+                      ? AlchemyIcons.shuffle_active
+                      : AlchemyIcons.shuffle,
                   semanticLabel: 'Shuffle'.i18n,
                   color: Colors.white,
                   size: widget.iconSize * 0.6,
@@ -1257,8 +1257,8 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
               icon: Icon(
                 //cons.shuffle,
                 shuffleModeEnabled
-                    ? DeezerIcons.shuffle_active
-                    : DeezerIcons.shuffle,
+                    ? AlchemyIcons.shuffle_active
+                    : AlchemyIcons.shuffle,
                 semanticLabel: 'Shuffle'.i18n,
               ),
               onPressed: () async {
@@ -1270,7 +1270,7 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
             padding: const EdgeInsets.fromLTRB(0, 4, 16, 0),
             child: IconButton(
               icon: Icon(
-                DeezerIcons.trash,
+                AlchemyIcons.trash,
                 semanticLabel: 'Clear all'.i18n,
               ),
               onPressed: () {

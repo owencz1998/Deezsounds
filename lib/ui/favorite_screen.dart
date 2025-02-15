@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/alchemy_icons.dart';
 import 'package:deezer/main.dart';
 import 'package:deezer/ui/details_screens.dart';
 import 'package:deezer/ui/error.dart';
@@ -44,7 +44,7 @@ class FavoriteAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           child: IconButton(
             icon: Icon(
-              DeezerIcons.shuffle,
+              AlchemyIcons.shuffle,
               color: Colors.white,
               semanticLabel: 'Shuffle'.i18n,
               size: 20.0,
@@ -91,7 +91,7 @@ class FavoriteScreen extends StatelessWidget {
         ListTile(
             title: Text('Albums'.i18n),
             leading:
-                const LeadingIcon(DeezerIcons.album, color: Color(0xff4b2e7e)),
+                const LeadingIcon(AlchemyIcons.album, color: Color(0xff4b2e7e)),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => const LibraryAlbums()));
@@ -128,7 +128,7 @@ class FavoriteScreen extends StatelessWidget {
               List<String> data = snapshot.data!;
               return ListTile(
                 title: Text('Downloaded tracks'.i18n),
-                leading: const LeadingIcon(DeezerIcons.download_fill,
+                leading: const LeadingIcon(AlchemyIcons.download_fill,
                     color: Color(0xffbe3266)),
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
@@ -275,7 +275,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
           height: 224,
           child: ListTile(
             leading: Icon(
-              DeezerIcons.heart_fill,
+              AlchemyIcons.alchemy_tilted,
               color: Theme.of(context).primaryColor,
             ),
             title: Text(
@@ -300,7 +300,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
         child: Column(children: [
           ListTile(
             leading: Icon(
-              DeezerIcons.heart_fill,
+              AlchemyIcons.alchemy_tilted,
               color: Theme.of(context).primaryColor,
             ),
             title: Text(
@@ -421,7 +421,7 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
         height: 300,
         child: ListTile(
           leading: Icon(
-            DeezerIcons.heart_fill,
+            AlchemyIcons.alchemy_tilted,
             color: Theme.of(context).primaryColor,
           ),
           title: Text(
@@ -446,7 +446,7 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
             children: [
               ListTile(
                 leading: Icon(
-                  DeezerIcons.heart_fill,
+                  AlchemyIcons.alchemy_tilted,
                   color: Theme.of(context).primaryColor,
                 ),
                 title: Text(
@@ -509,7 +509,7 @@ class _FavoritePlaylistsState extends State<FavoritePlaylists> {
                                     width: 180,
                                     child: Container(
                                       color: Colors.deepOrange.shade100,
-                                      child: Icon(DeezerIcons.heart_fill,
+                                      child: Icon(AlchemyIcons.alchemy_tilted,
                                           color: Colors.deepOrange.shade400,
                                           size: 100.0),
                                     ),
@@ -554,7 +554,7 @@ class PlayerMenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: Icon(
-        DeezerIcons.more_vert,
+        AlchemyIcons.more_vert,
         semanticLabel: 'Options'.i18n,
       ),
       onPressed: () {

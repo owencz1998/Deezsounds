@@ -12,7 +12,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/alchemy_icons.dart';
 import 'package:deezer/main.dart';
 import 'package:deezer/settings.dart';
 
@@ -182,7 +182,7 @@ class _UpdaterScreenState extends State<UpdaterScreen> {
               iconColor: Theme.of(context).textTheme.bodyMedium?.color,
               collapsedTextColor: Settings.secondaryText,
               collapsedIconColor: Settings.secondaryText,
-              leading: Icon(DeezerIcons.release_notes),
+              leading: Icon(AlchemyIcons.release_notes),
               title: Text('See changelog'),
               children: [
                 Markdown(

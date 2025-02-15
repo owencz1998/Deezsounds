@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/alchemy_icons.dart';
 
 import '../api/deezer.dart';
 import '../api/definitions.dart';
@@ -211,7 +211,7 @@ class _LyricsScreenState extends State<LyricsScreen> {
                         height: 84,
                         child: Align(
                           alignment: Alignment.center,
-                          child: Icon(DeezerIcons.microphone),
+                          child: Icon(AlchemyIcons.microphone),
                         ),
                       ),
                       SizedBox(
@@ -320,7 +320,7 @@ class _LyricsScreenState extends State<LyricsScreen> {
                                   ? Navigator.of(context).pop()
                                   : null;
                             },
-                            icon: Icon(DeezerIcons.cross)),
+                            icon: Icon(AlchemyIcons.cross)),
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -356,7 +356,7 @@ class _LyricsScreenState extends State<LyricsScreen> {
                         child: IconButton(
                             onPressed: () {},
                             icon: Icon(
-                              DeezerIcons.heart,
+                              AlchemyIcons.heart,
                               color: Colors.white.withOpacity(0),
                             )),
                       ),

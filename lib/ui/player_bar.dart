@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:palette_generator/palette_generator.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/alchemy_icons.dart';
 
 import '../service/audio_service.dart';
 import '../settings.dart';
@@ -244,7 +244,7 @@ class PrevNextButton extends StatelessWidget {
           if (!(queueState?.hasNext ?? false)) {
             return IconButton(
               icon: Icon(
-                DeezerIcons.skip_next_fill,
+                AlchemyIcons.skip_next_fill,
                 semanticLabel: 'Play next'.i18n,
               ),
               iconSize: size,
@@ -253,7 +253,7 @@ class PrevNextButton extends StatelessWidget {
           }
           return IconButton(
             icon: Icon(
-              DeezerIcons.skip_next_fill,
+              AlchemyIcons.skip_next_fill,
               semanticLabel: 'Play next'.i18n,
             ),
             iconSize: size,
@@ -270,7 +270,7 @@ class PrevNextButton extends StatelessWidget {
             }
             return IconButton(
               icon: Icon(
-                DeezerIcons.skip_back,
+                AlchemyIcons.skip_back,
                 semanticLabel: 'Play previous'.i18n,
               ),
               iconSize: size,
@@ -279,7 +279,7 @@ class PrevNextButton extends StatelessWidget {
           }
           return IconButton(
             icon: Icon(
-              DeezerIcons.skip_back,
+              AlchemyIcons.skip_back,
               semanticLabel: 'Play previous'.i18n,
             ),
             iconSize: size,
@@ -348,10 +348,10 @@ class _PlayPauseButtonState extends State<PlayPauseButton>
                         child: FadeTransition(opacity: anim, child: child),
                       ),
                   child: !playing
-                      ? Icon(DeezerIcons.play_fill_small,
+                      ? Icon(AlchemyIcons.play_fill_small,
                           key: const ValueKey('Play'))
                       : Icon(
-                          DeezerIcons.pause_fill_small,
+                          AlchemyIcons.pause_fill_small,
                           key: const ValueKey('Pause'),
                         )),
               iconSize: widget.size,

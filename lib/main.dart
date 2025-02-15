@@ -4,7 +4,7 @@ import 'package:app_links/app_links.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:custom_navigator/custom_navigator.dart';
 import 'package:lottie/lottie.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/alchemy_icons.dart';
 import 'package:deezer/ui/favorite_screen.dart';
 import 'package:deezer/ui/restartable.dart';
 import 'package:deezer/ui/settings_screen.dart';
@@ -544,30 +544,31 @@ class _MainScreenState extends State<MainScreen>
                                     items: <BottomNavigationBarItem>[
                                       BottomNavigationBarItem(
                                           activeIcon: const Icon(
-                                              DeezerIcons.house_fill),
-                                          icon: const Icon(DeezerIcons.house),
+                                              AlchemyIcons.house_fill),
+                                          icon: const Icon(AlchemyIcons.house),
                                           label: 'Home'.i18n),
                                       BottomNavigationBarItem(
                                           activeIcon: const Icon(
-                                              DeezerIcons.compass_fill),
-                                          icon: const Icon(DeezerIcons.compass),
+                                              AlchemyIcons.compass_fill),
+                                          icon:
+                                              const Icon(AlchemyIcons.compass),
                                           label: 'Explore'.i18n),
                                       BottomNavigationBarItem(
                                           activeIcon: const Icon(
-                                              DeezerIcons.heart_fill),
-                                          icon: const Icon(DeezerIcons.heart),
+                                              AlchemyIcons.heart_fill),
+                                          icon: const Icon(AlchemyIcons.heart),
                                           label: 'Favorites'.i18n),
                                       BottomNavigationBarItem(
-                                        activeIcon:
-                                            const Icon(DeezerIcons.search_fill),
-                                        icon: const Icon(DeezerIcons.search),
+                                        activeIcon: const Icon(
+                                            AlchemyIcons.search_fill),
+                                        icon: const Icon(AlchemyIcons.search),
                                         label: 'Search'.i18n,
                                       ),
                                       BottomNavigationBarItem(
                                           activeIcon:
-                                              const Icon(DeezerIcons.settings),
+                                              const Icon(AlchemyIcons.settings),
                                           icon:
-                                              const Icon(DeezerIcons.settings),
+                                              const Icon(AlchemyIcons.settings),
                                           label: 'Settings'.i18n)
                                     ],
                                   )))
@@ -586,34 +587,34 @@ class _MainScreenState extends State<MainScreen>
                                         destinations: [
                                           NavigationRailDestination(
                                               selectedIcon: const Icon(
-                                                  DeezerIcons.house_fill),
-                                              icon:
-                                                  const Icon(DeezerIcons.house),
+                                                  AlchemyIcons.house_fill),
+                                              icon: const Icon(
+                                                  AlchemyIcons.house),
                                               label: Text('Home'.i18n)),
                                           NavigationRailDestination(
                                               selectedIcon: const Icon(
-                                                  DeezerIcons.compass_fill),
+                                                  AlchemyIcons.compass_fill),
                                               icon: const Icon(
-                                                  DeezerIcons.compass),
+                                                  AlchemyIcons.compass),
                                               label: Text('Explore'.i18n)),
                                           NavigationRailDestination(
                                               selectedIcon: const Icon(
-                                                  DeezerIcons.heart_fill),
-                                              icon:
-                                                  const Icon(DeezerIcons.heart),
+                                                  AlchemyIcons.heart_fill),
+                                              icon: const Icon(
+                                                  AlchemyIcons.heart),
                                               label: Text('Favorites'.i18n)),
                                           NavigationRailDestination(
                                             selectedIcon: const Icon(
-                                                DeezerIcons.search_fill),
+                                                AlchemyIcons.search_fill),
                                             icon:
-                                                const Icon(DeezerIcons.search),
+                                                const Icon(AlchemyIcons.search),
                                             label: Text('Search'.i18n),
                                           ),
                                           NavigationRailDestination(
                                               selectedIcon: const Icon(
-                                                  DeezerIcons.settings),
+                                                  AlchemyIcons.settings),
                                               icon: const Icon(
-                                                  DeezerIcons.settings),
+                                                  AlchemyIcons.settings),
                                               label: Text('Settings'.i18n))
                                         ],
                                         selectedIndex: _selected,

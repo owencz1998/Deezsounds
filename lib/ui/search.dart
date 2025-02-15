@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:fluttericon/typicons_icons.dart';
 import 'package:get_it/get_it.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/alchemy_icons.dart';
 import 'package:deezer/main.dart';
 import 'package:deezer/settings.dart';
 
@@ -166,7 +166,7 @@ class _SearchScreenState extends State<SearchScreen> {
         actions: <Widget>[
           IconButton(
             icon: Icon(
-              DeezerIcons.download,
+              AlchemyIcons.download,
               semanticLabel: 'Download'.i18n,
             ),
             onPressed: () {
@@ -176,7 +176,7 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           IconButton(
             icon: Icon(
-              DeezerIcons.settings,
+              AlchemyIcons.settings,
               semanticLabel: 'Settings'.i18n,
             ),
             onPressed: () {
@@ -450,7 +450,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 _suggestions.length,
                 (i) => ListTile(
                       title: Text(_suggestions[i]),
-                      leading: const Icon(DeezerIcons.search),
+                      leading: const Icon(AlchemyIcons.search),
                       onTap: () {
                         setState(() => _query = _suggestions[i]);
                         _submit(context);

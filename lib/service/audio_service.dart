@@ -46,10 +46,6 @@ class AudioPlayerHandler extends BaseAudioHandler
     _init();
   }
 
-  int? _audioSession;
-  int? _prevAudioSession;
-  bool _equalizerOpen = false;
-
   final AndroidAuto _androidAuto =
       AndroidAuto(); // Create an instance of AndroidAuto
 

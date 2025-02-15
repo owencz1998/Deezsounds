@@ -177,19 +177,19 @@ flutter:
     - family: ReFreezerIcons
       fonts:
         - asset: assets/fonts/ReFreezerIcons.ttf
-    - family: DeezerIcons
+    - family: AlchemyIcons
       fonts:
-        - asset: assets/fonts/DeezerIcons.ttf
+        - asset: assets/fonts/AlchemyIcons.ttf
     - family: Deezer
       fonts:
-        - asset: assets/fonts/deezer_regular.ttf
-        - asset: assets/fonts/deezer_light.ttf
+        - asset: assets/fonts/Montserrat-Regular.ttf
+        - asset: assets/fonts/Montserrat-Light.ttf
           style: italic
-        - asset: assets/fonts/deezer_medium.ttf
+        - asset: assets/fonts/Montserrat-Medium.ttf
           weight: 500
-        - asset: assets/fonts/deezer_bold.ttf
+        - asset: assets/fonts/Montserrat-Bold.ttf
           weight: 700
-        - asset: assets/fonts/deezer_extrabold.ttf
+        - asset: assets/fonts/Montserrat-Extrabold.ttf
           weight: 900
 
   # An image asset can refer to one or more resolution-specific "variants", see

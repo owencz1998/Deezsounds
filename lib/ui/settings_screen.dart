@@ -6,7 +6,6 @@ import 'package:country_currency_pickers/country.dart';
 import 'package:country_currency_pickers/country_picker_dialog.dart';
 import 'package:country_currency_pickers/utils/utils.dart';
 import 'package:external_path/external_path.dart';
-import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:flutter_displaymode/flutter_displaymode.dart';
@@ -25,7 +24,7 @@ import 'package:deezer/api/download.dart';
 import 'package:deezer/ui/log_screen.dart';
 import 'package:scrobblenaut/scrobblenaut.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/alchemy_icons.dart';
 
 import '../api/cache.dart';
 import '../api/deezer.dart';
@@ -120,14 +119,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         body: ListView(children: <Widget>[
           ListTile(
             title: Text('General'.i18n),
-            leading: const LeadingIcon(DeezerIcons.settings,
+            leading: const LeadingIcon(AlchemyIcons.settings,
                 color: Color(0xffeca704)),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => const GeneralSettings())),
           ),
           ListTile(
             title: Text('Download Settings'.i18n),
-            leading: const LeadingIcon(DeezerIcons.download_fill,
+            leading: const LeadingIcon(AlchemyIcons.download_fill,
                 color: Color(0xffbe3266)),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => const DownloadsSettings())),
@@ -197,7 +196,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: Text('Export tracks'.i18n),
             leading: Transform.rotate(
               angle: -pi / 2,
-              child: LeadingIcon(DeezerIcons.import,
+              child: LeadingIcon(AlchemyIcons.import,
                   color: Color.fromARGB(255, 0, 207, 62)),
             ),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -402,6 +401,8 @@ class _AppearanceSettingsState extends State<AppearanceSettings> {
                           onMainColorChange: (ColorSwatch? color) {
                             setState(() {
                               settings.primaryColor = color!;
+                              Logger.root
+                                  .info((color.toARGB32().toRadixString(16)));
                             });
                             settings.save();
                             updateTheme();
@@ -978,7 +979,7 @@ class _ExportsSettingsState extends State<ExportsSettings> {
               leading: Transform.rotate(
                 angle: -pi / 2,
                 child: Icon(
-                  DeezerIcons.import,
+                  AlchemyIcons.import,
                 ),
               ),
               onTap: () async {

@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/alchemy_icons.dart';
 import 'package:deezer/main.dart';
 import 'package:deezer/settings.dart';
 import 'package:deezer/utils/connectivity.dart';
@@ -158,7 +158,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                 color: Settings.secondaryText),
                                           ),
                                           trailing: IconButton(
-                                            icon: Icon(DeezerIcons.more_vert),
+                                            icon: Icon(AlchemyIcons.more_vert),
                                             onPressed: () {
                                               MenuSheet m = MenuSheet();
                                               m.defaultAlbumMenu(album,
@@ -428,7 +428,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                               child: IconButton(
                                                 icon: isLibrary
                                                     ? Icon(
-                                                        DeezerIcons.heart_fill,
+                                                        AlchemyIcons.heart_fill,
                                                         size: 25,
                                                         color: Theme.of(context)
                                                             .primaryColor,
@@ -436,7 +436,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                             'Unlove'.i18n,
                                                       )
                                                     : Icon(
-                                                        DeezerIcons.heart,
+                                                        AlchemyIcons.heart,
                                                         size: 25,
                                                         semanticLabel:
                                                             'Love'.i18n,
@@ -481,7 +481,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                               (album.id ?? ''))
                                                     },
                                                 icon: Icon(
-                                                  DeezerIcons.share_android,
+                                                  AlchemyIcons.share_android,
                                                   size: 20.0,
                                                 )),
                                             Padding(
@@ -529,7 +529,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                                             .i18n));
                                                   },
                                                   icon: Icon(
-                                                    DeezerIcons.shuffle,
+                                                    AlchemyIcons.shuffle,
                                                     size: 18,
                                                   )),
                                             )
@@ -722,7 +722,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                               ListTile(
                                                 minVerticalPadding: 1,
                                                 leading: Icon(
-                                                  DeezerIcons.album,
+                                                  AlchemyIcons.album,
                                                   size: 25,
                                                 ),
                                                 title: Text(
@@ -743,7 +743,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                               ListTile(
                                                 minVerticalPadding: 1,
                                                 leading: Icon(
-                                                  DeezerIcons.clock,
+                                                  AlchemyIcons.clock,
                                                   size: 25,
                                                 ),
                                                 title: Text(
@@ -763,7 +763,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                               ListTile(
                                                 minVerticalPadding: 1,
                                                 leading: Icon(
-                                                  DeezerIcons.heart,
+                                                  AlchemyIcons.heart,
                                                   size: 25,
                                                 ),
                                                 title: Text(
@@ -784,7 +784,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                               ListTile(
                                                 minVerticalPadding: 1,
                                                 leading: Icon(
-                                                  DeezerIcons.calendar,
+                                                  AlchemyIcons.calendar,
                                                   size: 25,
                                                 ),
                                                 title: Text(
@@ -828,7 +828,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                 },
                                                 icon: Icon(Icons.arrow_back)),
                                             IconButton(
-                                              icon: Icon(DeezerIcons.more_vert),
+                                              icon:
+                                                  Icon(AlchemyIcons.more_vert),
                                               onPressed: () {
                                                 MenuSheet m = MenuSheet();
                                                 m.defaultAlbumMenu(album,
@@ -913,14 +914,14 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                       child: IconButton(
                                         icon: isLibrary
                                             ? Icon(
-                                                DeezerIcons.heart_fill,
+                                                AlchemyIcons.heart_fill,
                                                 size: 25,
                                                 color: Theme.of(context)
                                                     .primaryColor,
                                                 semanticLabel: 'Unlove'.i18n,
                                               )
                                             : Icon(
-                                                DeezerIcons.heart,
+                                                AlchemyIcons.heart,
                                                 size: 25,
                                                 semanticLabel: 'Love'.i18n,
                                               ),
@@ -957,7 +958,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                       (album.id ?? ''))
                                             },
                                         icon: Icon(
-                                          DeezerIcons.share_android,
+                                          AlchemyIcons.share_android,
                                           size: 20.0,
                                         )),
                                     Padding(
@@ -996,7 +997,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                                     .i18n));
                                           },
                                           icon: Icon(
-                                            DeezerIcons.shuffle,
+                                            AlchemyIcons.shuffle,
                                             size: 18,
                                           )),
                                     )
@@ -1076,12 +1077,12 @@ class _MakeAlbumOfflineState extends State<MakeAlbumOffline> {
     return IconButton(
         icon: _offline
             ? Icon(
-                DeezerIcons.download_fill,
+                AlchemyIcons.download_fill,
                 size: 25,
                 color: Theme.of(context).primaryColor,
               )
             : Icon(
-                DeezerIcons.download,
+                AlchemyIcons.download,
                 size: 25,
               ),
         onPressed: () async {
@@ -1204,7 +1205,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                 fontSize: 18.0),
                                           ),
                                           trailing: IconButton(
-                                            icon: Icon(DeezerIcons.more_vert),
+                                            icon: Icon(AlchemyIcons.more_vert),
                                             onPressed: () {
                                               MenuSheet m = MenuSheet();
                                               m.defaultArtistMenu(artist,
@@ -1243,7 +1244,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                               child: IconButton(
                                                 icon: isLibrary
                                                     ? Icon(
-                                                        DeezerIcons.heart_fill,
+                                                        AlchemyIcons.heart_fill,
                                                         size: 25,
                                                         color: Theme.of(context)
                                                             .primaryColor,
@@ -1251,7 +1252,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                             'Unlove'.i18n,
                                                       )
                                                     : Icon(
-                                                        DeezerIcons.heart,
+                                                        AlchemyIcons.heart,
                                                         size: 25,
                                                         semanticLabel:
                                                             'Love'.i18n,
@@ -1296,7 +1297,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                               (artist.id ?? ''))
                                                     },
                                                 icon: Icon(
-                                                  DeezerIcons.share_android,
+                                                  AlchemyIcons.share_android,
                                                   size: 20.0,
                                                 )),
                                           ],
@@ -1344,7 +1345,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                       }
                                                     },
                                                     icon: Icon(
-                                                      DeezerIcons.shuffle,
+                                                      AlchemyIcons.shuffle,
                                                       size: 18,
                                                     )),
                                               )
@@ -1734,7 +1735,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                             },
                                             icon: Icon(Icons.arrow_back)),
                                         IconButton(
-                                          icon: Icon(DeezerIcons.more_vert),
+                                          icon: Icon(AlchemyIcons.more_vert),
                                           onPressed: () {
                                             MenuSheet m = MenuSheet();
                                             m.defaultArtistMenu(artist,
@@ -1778,14 +1779,14 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                         child: IconButton(
                                           icon: isLibrary
                                               ? Icon(
-                                                  DeezerIcons.heart_fill,
+                                                  AlchemyIcons.heart_fill,
                                                   size: 25,
                                                   color: Theme.of(context)
                                                       .primaryColor,
                                                   semanticLabel: 'Unlove'.i18n,
                                                 )
                                               : Icon(
-                                                  DeezerIcons.heart,
+                                                  AlchemyIcons.heart,
                                                   size: 25,
                                                   semanticLabel: 'Love'.i18n,
                                                 ),
@@ -1806,7 +1807,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                         (artist.id ?? ''))
                                               },
                                           icon: Icon(
-                                            DeezerIcons.share_android,
+                                            AlchemyIcons.share_android,
                                             size: 20.0,
                                           )),
                                     ],
@@ -1847,7 +1848,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                 }
                                               },
                                               icon: Icon(
-                                                DeezerIcons.shuffle,
+                                                AlchemyIcons.shuffle,
                                                 size: 18,
                                               )),
                                         )
@@ -2533,7 +2534,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                               color: Settings.secondaryText),
                                         ),
                                         trailing: IconButton(
-                                          icon: Icon(DeezerIcons.more_vert),
+                                          icon: Icon(AlchemyIcons.more_vert),
                                           onPressed: () {
                                             MenuSheet m = MenuSheet();
                                             m.defaultPlaylistMenu(playlist,
@@ -2777,7 +2778,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                               child: IconButton(
                                                 icon: isLibrary
                                                     ? Icon(
-                                                        DeezerIcons.heart_fill,
+                                                        AlchemyIcons.heart_fill,
                                                         size: 25,
                                                         color: Theme.of(context)
                                                             .primaryColor,
@@ -2785,7 +2786,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                             'Unlove'.i18n,
                                                       )
                                                     : Icon(
-                                                        DeezerIcons.heart,
+                                                        AlchemyIcons.heart,
                                                         size: 25,
                                                         semanticLabel:
                                                             'Love'.i18n,
@@ -2830,7 +2831,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                             (playlist.id ?? ''))
                                                   },
                                               icon: Icon(
-                                                DeezerIcons.share_android,
+                                                AlchemyIcons.share_android,
                                                 size: 20.0,
                                               )),
                                           Padding(
@@ -2900,7 +2901,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                                           .i18n));
                                                 },
                                                 icon: Icon(
-                                                  DeezerIcons.shuffle,
+                                                  AlchemyIcons.shuffle,
                                                   size: 18,
                                                 )),
                                           )
@@ -3138,7 +3139,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                             ListTile(
                                               minVerticalPadding: 1,
                                               leading: Icon(
-                                                DeezerIcons.album,
+                                                AlchemyIcons.album,
                                                 size: 25,
                                               ),
                                               title: Text(
@@ -3161,7 +3162,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                             ListTile(
                                               minVerticalPadding: 1,
                                               leading: Icon(
-                                                DeezerIcons.clock,
+                                                AlchemyIcons.clock,
                                                 size: 25,
                                               ),
                                               title: Text(
@@ -3180,7 +3181,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                             ListTile(
                                               minVerticalPadding: 1,
                                               leading: Icon(
-                                                DeezerIcons.heart,
+                                                AlchemyIcons.heart,
                                                 size: 25,
                                               ),
                                               title: Text(
@@ -3226,7 +3227,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                               },
                                               icon: Icon(Icons.arrow_back)),
                                           IconButton(
-                                            icon: Icon(DeezerIcons.more_vert),
+                                            icon: Icon(AlchemyIcons.more_vert),
                                             onPressed: () {
                                               MenuSheet m = MenuSheet();
                                               m.defaultPlaylistMenu(playlist,
@@ -3311,14 +3312,14 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                       child: IconButton(
                                         icon: isLibrary
                                             ? Icon(
-                                                DeezerIcons.heart_fill,
+                                                AlchemyIcons.heart_fill,
                                                 size: 25,
                                                 color: Theme.of(context)
                                                     .primaryColor,
                                                 semanticLabel: 'Unlove'.i18n,
                                               )
                                             : Icon(
-                                                DeezerIcons.heart,
+                                                AlchemyIcons.heart,
                                                 size: 25,
                                                 semanticLabel: 'Love'.i18n,
                                               ),
@@ -3356,7 +3357,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                     (playlist.id ?? ''))
                                           },
                                       icon: Icon(
-                                        DeezerIcons.share_android,
+                                        AlchemyIcons.share_android,
                                         size: 20.0,
                                       )),
                                   Padding(
@@ -3415,7 +3416,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                               ' shuffle'.i18n));
                                         },
                                         icon: Icon(
-                                          DeezerIcons.shuffle,
+                                          AlchemyIcons.shuffle,
                                           size: 18,
                                         )),
                                   )
@@ -3562,12 +3563,12 @@ class _MakePlaylistOfflineState extends State<MakePlaylistOffline> {
         },
         icon: _offline
             ? Icon(
-                DeezerIcons.download_fill,
+                AlchemyIcons.download_fill,
                 size: 25,
                 color: Theme.of(context).primaryColor,
               )
             : Icon(
-                DeezerIcons.download,
+                AlchemyIcons.download,
                 size: 25,
               ));
   }

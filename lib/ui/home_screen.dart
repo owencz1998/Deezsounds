@@ -4,7 +4,7 @@ import 'package:deezer/ui/blind_test.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/alchemy_icons.dart';
 import 'package:deezer/main.dart';
 
 import '../api/deezer.dart';
@@ -62,7 +62,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: <Widget>[
         IconButton(
           icon: Icon(
-            DeezerIcons.download,
+            AlchemyIcons.download,
             semanticLabel: 'Download'.i18n,
           ),
           onPressed: () {
@@ -72,7 +72,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         IconButton(
           icon: Icon(
-            DeezerIcons.settings,
+            AlchemyIcons.settings,
             semanticLabel: 'Settings'.i18n,
           ),
           onPressed: () {

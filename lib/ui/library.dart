@@ -6,7 +6,7 @@ import 'package:fluttericon/octicons_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:deezer/fonts/alchemy_icons.dart';
 import 'package:deezer/main.dart';
 import 'package:deezer/utils/connectivity.dart';
 
@@ -40,7 +40,7 @@ class LibraryAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: <Widget>[
         IconButton(
           icon: Icon(
-            DeezerIcons.download,
+            AlchemyIcons.download,
             semanticLabel: 'Download'.i18n,
           ),
           onPressed: () {
@@ -50,7 +50,7 @@ class LibraryAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         IconButton(
           icon: Icon(
-            DeezerIcons.settings,
+            AlchemyIcons.settings,
             semanticLabel: 'Settings'.i18n,
           ),
           onPressed: () {
@@ -79,7 +79,7 @@ class LibraryScreen extends StatelessWidget {
             ListTile(
               title: Text('Downloads'.i18n),
               leading:
-                  const LeadingIcon(DeezerIcons.download, color: Colors.grey),
+                  const LeadingIcon(AlchemyIcons.download, color: Colors.grey),
               subtitle: Text(
                   'Downloading is currently stopped, click here to resume.'
                       .i18n),
@@ -91,7 +91,7 @@ class LibraryScreen extends StatelessWidget {
             ),
           ListTile(
             title: Text('Shuffle'.i18n),
-            leading: const LeadingIcon(DeezerIcons.shuffle,
+            leading: const LeadingIcon(AlchemyIcons.shuffle,
                 color: Color(0xffeca704)),
             onTap: () async {
               List<Track> tracks = (await isConnected())
@@ -119,7 +119,7 @@ class LibraryScreen extends StatelessWidget {
           ListTile(
             title: Text('Albums'.i18n),
             leading:
-                const LeadingIcon(DeezerIcons.album, color: Color(0xff4b2e7e)),
+                const LeadingIcon(AlchemyIcons.album, color: Color(0xff4b2e7e)),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => const LibraryAlbums()));
@@ -232,7 +232,7 @@ class LibraryScreen extends StatelessWidget {
                       ),
                       ListTile(
                         title: Text('Offline albums'.i18n),
-                        leading: const Icon(DeezerIcons.album),
+                        leading: const Icon(AlchemyIcons.album),
                         trailing: Text(data[1]),
                       ),
                       ListTile(
@@ -481,7 +481,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
                       MenuSheet().showDownloadStartedToast();
                     },
                     child: Icon(
-                      DeezerIcons.download,
+                      AlchemyIcons.download,
                       size: 25,
                     )),
               );
@@ -532,7 +532,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
                 ),
               ],
               child: Icon(
-                DeezerIcons.sort,
+                AlchemyIcons.sort,
                 size: 32.0,
                 semanticLabel: 'Sort'.i18n,
               ),
@@ -670,7 +670,7 @@ class _LibraryAlbumsState extends State<LibraryAlbums> {
             ),
             PopupMenuButton(
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: const Icon(DeezerIcons.sort, size: 32.0),
+              child: const Icon(AlchemyIcons.sort, size: 32.0),
               onSelected: (SortType s) async {
                 setState(() => _sort.type = s);
                 //Save to cache
@@ -998,7 +998,7 @@ class _LibraryArtistsState extends State<LibraryArtists> {
                   child: Text('Popularity'.i18n, style: popupMenuTextStyle()),
                 ),
               ],
-              child: const Icon(DeezerIcons.sort, size: 32.0),
+              child: const Icon(AlchemyIcons.sort, size: 32.0),
             ),
             Container(width: 8.0),
           ],
@@ -1187,7 +1187,7 @@ class _LibraryPlaylistsState extends State<LibraryPlaylists> {
                   child: Text('Alphabetic'.i18n, style: popupMenuTextStyle()),
                 ),
               ],
-              child: const Icon(DeezerIcons.sort, size: 32.0),
+              child: const Icon(AlchemyIcons.sort, size: 32.0),
             ),
             Container(width: 8.0),
           ],

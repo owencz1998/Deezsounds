@@ -1,4 +1,4 @@
-![Definitely not Deezer](./assets/banner.png?raw=true)
+![Alchemy](./assets/banner.png?raw=true)
 
 [![Latest Version](https://img.shields.io/github/v/release/PetitPrinc3/DefinitelyNotDeezer?color=blue)](../../releases/latest)
 [![Release date](https://img.shields.io/github/release-date/PetitPrinc3/DefinitelyNotDeezer)](../../releases/latest)  
@@ -19,7 +19,7 @@
 > Therefore, no APK releases or compilation steps will be published in this repository.  
 > Developers interested in continuing the project are welcome to fork it.  
 
-#### :rocket: Definitely Not Deezer Features :
+#### :rocket: Alchemy Features :
 - Log in with an official Deezer account ;
 - Explore the official Deezer catalog ;
 - Play any track and skip freely ;
@@ -72,13 +72,13 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 
 ## :balance_scale: Disclaimer & Legal
 
-**Definitely not Deezer** was not developed for piracy, but educational and private use.
-You are responsible for how you use **Definitely not Deezer**.
+**Alchemy** was not developed for piracy, but educational and private use.
+You are responsible for how you use **Alchemy**.
 
-**Definitely not Deezer** uses both Deezer's public and internal API's, but is not endorsed, certified or otherwise approved in any way by Deezer.
+**Alchemy** uses both Deezer's public and internal API's, but is not endorsed, certified or otherwise approved in any way by Deezer.
 
 The Deezer brand and name is the registered trademark of its respective owner.
 
-**Definitely not Deezer** has no partnership, sponsorship or endorsement with Deezer.
+**Alchemy** has no partnership, sponsorship or endorsement with Deezer.
 
-By using **Definitely not Deezer** you do not abide by Deezer's [Terms of Service](https://www.deezer.com/legal/cgu)
+By using **Alchemy** you do not abide by Deezer's [Terms of Service](https://www.deezer.com/legal/cgu)
