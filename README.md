@@ -40,13 +40,13 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 ## :camera_flash: Screenshots
 
 <p align="center">
-    <img src="./assets/screenshots/Mod_home.png" width=100>
-    <img src="./assets/screenshots/Mod_player.png" width=100>
-    <img src="./assets/screenshots/Mod_search.png" width=100>
-    <img src="./assets/screenshots/Mod_favorites.png" width=100>
-    <img src="./assets/screenshots/Mod_playlists.png" width=100>
-    <img src="./assets/screenshots/Mod_artists.png" width=100>
-    <img src="./assets/screenshots/Mod_menu.png" width=100>
+    <img src="./assets/screenshots/home.png" width=100>
+    <img src="./assets/screenshots/player.png" width=100>
+    <img src="./assets/screenshots/search.png" width=100>
+    <img src="./assets/screenshots/favorites.png" width=100>
+    <img src="./assets/screenshots/playlists.png" width=100>
+    <img src="./assets/screenshots/artists.png" width=100>
+    <img src="./assets/screenshots/menu.png" width=100>
 </p>
 <p align="center">
     <img src="./assets/screenshots/chooseBlindTest.png" width=100>
@@ -55,8 +55,8 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
     <img src="./assets/screenshots/blindResults.png" width=100>
 </p>
 <p align="center">
-    <img src="./assets/screenshots/landscape_artist.png" height=150>
-    <img src="./assets/screenshots/landscape_playlist.png" height=150>
+    <img src="./assets/screenshots/artist_landscape.png" height=150>
+    <img src="./assets/screenshots/playlist_landscape.png" height=150>
 </p>
 
 ## :star2: Bugs & features

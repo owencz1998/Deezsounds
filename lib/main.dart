@@ -508,7 +508,9 @@ class _MainScreenState extends State<MainScreen>
                               child: Theme(
                                   data: Theme.of(context).copyWith(
                                       canvasColor: Theme.of(context)
-                                          .scaffoldBackgroundColor),
+                                          .scaffoldBackgroundColor,
+                                      splashColor: Colors.transparent,
+                                      highlightColor: Colors.transparent),
                                   child: BottomNavigationBar(
                                     type: BottomNavigationBarType.fixed,
                                     unselectedItemColor:

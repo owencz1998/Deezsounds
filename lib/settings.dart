@@ -115,7 +115,7 @@ class Settings {
 
   //Colors
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  Color primaryColor = Color(0xFFA238FF);
+  Color primaryColor = Colors.lightBlue;
   static const deezerBg = Color(0xFF0D0D28);
   static const secondaryText = Color(0xFFA9A6AA);
 

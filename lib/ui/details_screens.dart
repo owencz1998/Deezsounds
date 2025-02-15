@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:deezer/ui/blind_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -505,7 +506,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                 border: Border.all(
                                                     color: Theme.of(context)
                                                         .scaffoldBackgroundColor
-                                                        .withOpacity(0)),
+                                                        .withAlpha(0)),
                                                 borderRadius:
                                                     BorderRadius.circular(100),
                                               ),
@@ -977,7 +978,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                         border: Border.all(
                                             color: Theme.of(context)
                                                 .scaffoldBackgroundColor
-                                                .withOpacity(0)),
+                                                .withAlpha(0)),
                                         borderRadius:
                                             BorderRadius.circular(100),
                                       ),
@@ -1316,7 +1317,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                   border: Border.all(
                                                       color: Theme.of(context)
                                                           .scaffoldBackgroundColor
-                                                          .withOpacity(0)),
+                                                          .withAlpha(0)),
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           100),
@@ -1452,7 +1453,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                   border: Border.all(
                                                       color: Theme.of(context)
                                                           .scaffoldBackgroundColor
-                                                          .withOpacity(0)),
+                                                          .withAlpha(0)),
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                   color: Theme.of(context)
@@ -1679,7 +1680,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                   .withOpacity(.6),
                                               Theme.of(context)
                                                   .scaffoldBackgroundColor
-                                                  .withOpacity(0)
+                                                  .withAlpha(0)
                                             ],
                                             begin: Alignment.topCenter,
                                             end: Alignment.bottomCenter,
@@ -1699,7 +1700,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                     .withOpacity(.6),
                                                 Theme.of(context)
                                                     .scaffoldBackgroundColor
-                                                    .withOpacity(0)
+                                                    .withAlpha(0)
                                               ],
                                               begin: Alignment.bottomCenter,
                                               end: Alignment.topCenter,
@@ -1824,7 +1825,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                             border: Border.all(
                                                 color: Theme.of(context)
                                                     .scaffoldBackgroundColor
-                                                    .withOpacity(0)),
+                                                    .withAlpha(0)),
                                             borderRadius:
                                                 BorderRadius.circular(100),
                                           ),
@@ -1940,7 +1941,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                         border: Border.all(
                                             color: Theme.of(context)
                                                 .scaffoldBackgroundColor
-                                                .withOpacity(0)),
+                                                .withAlpha(0)),
                                         borderRadius: BorderRadius.circular(10),
                                         color: Theme.of(context).hintColor),
                                     child: InkWell(
@@ -2630,7 +2631,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                     border: Border.all(
                                                         color: Theme.of(context)
                                                             .scaffoldBackgroundColor
-                                                            .withOpacity(0)),
+                                                            .withAlpha(0)),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             5)),
@@ -2853,7 +2854,33 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                               border: Border.all(
                                                   color: Theme.of(context)
                                                       .scaffoldBackgroundColor
-                                                      .withOpacity(0)),
+                                                      .withAlpha(0)),
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                            ),
+                                            child: IconButton(
+                                                onPressed: () async {
+                                                  Navigator.of(context,
+                                                          rootNavigator: true)
+                                                      .push(MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              BlindTestChoiceScreen(
+                                                                  playlist)));
+                                                },
+                                                icon: Icon(
+                                                  AlchemyIcons.question,
+                                                  size: 18,
+                                                )),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.only(right: 6.0),
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              border: Border.all(
+                                                  color: Theme.of(context)
+                                                      .scaffoldBackgroundColor
+                                                      .withAlpha(0)),
                                               borderRadius:
                                                   BorderRadius.circular(100),
                                             ),
@@ -3065,7 +3092,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                                     .6),
                                                             Theme.of(context)
                                                                 .scaffoldBackgroundColor
-                                                                .withOpacity(0)
+                                                                .withAlpha(0)
                                                           ],
                                                           begin: Alignment
                                                               .topCenter,
@@ -3376,7 +3403,31 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                       border: Border.all(
                                           color: Theme.of(context)
                                               .scaffoldBackgroundColor
-                                              .withOpacity(0)),
+                                              .withAlpha(0)),
+                                      borderRadius: BorderRadius.circular(100),
+                                    ),
+                                    child: IconButton(
+                                        onPressed: () async {
+                                          Navigator.of(context,
+                                                  rootNavigator: true)
+                                              .push(MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      BlindTestChoiceScreen(
+                                                          playlist)));
+                                        },
+                                        icon: Icon(
+                                          AlchemyIcons.question,
+                                          size: 18,
+                                        )),
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(right: 6.0),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      border: Border.all(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor
+                                              .withAlpha(0)),
                                       borderRadius: BorderRadius.circular(100),
                                     ),
                                     child: IconButton(

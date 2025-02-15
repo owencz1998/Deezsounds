@@ -152,6 +152,7 @@ class _TrackTileState extends State<TrackTile> {
             CachedImage(
               url: widget.track.albumArt?.thumb ?? '',
               width: 48,
+              rounded: true,
             ),
             if (nowPlaying == PlayingState.PLAYING)
               Container(
