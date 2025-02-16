@@ -107,9 +107,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
         body: _error
             ? const ErrorScreen()
             : _isLoading
-                ? Center(
-                    child: CircularProgressIndicator(
-                        color: Theme.of(context).primaryColor))
+                ? SplashScreen()
                 : OrientationBuilder(
                     builder: (context, orientation) {
                       //Responsive
@@ -1162,9 +1160,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
         body: _error
             ? const ErrorScreen()
             : _isLoading
-                ? Center(
-                    child: CircularProgressIndicator(
-                        color: Theme.of(context).primaryColor))
+                ? SplashScreen()
                 : OrientationBuilder(builder: (context, orientation) {
                     //Responsive
                     ScreenUtil.init(context, minTextAdapt: true);
@@ -2486,9 +2482,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
         body: _error
             ? const ErrorScreen()
             : _isLoading
-                ? Center(
-                    child: CircularProgressIndicator(
-                        color: Theme.of(context).primaryColor))
+                ? SplashScreen()
                 : OrientationBuilder(builder: (context, orientation) {
                     //Responsive
                     ScreenUtil.init(context, minTextAdapt: true);
@@ -2869,7 +2863,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                 },
                                                 icon: Icon(
                                                   AlchemyIcons.question,
-                                                  size: 18,
+                                                  size: 20,
                                                 )),
                                           ),
                                           Container(
@@ -3417,7 +3411,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                         },
                                         icon: Icon(
                                           AlchemyIcons.question,
-                                          size: 18,
+                                          size: 20,
                                         )),
                                   ),
                                   Container(

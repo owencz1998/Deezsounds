@@ -51,23 +51,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    loadSplash();
-  }
-
-// Load the splash screen for some duration
-  Future<Timer> loadSplash() async {
-    return Timer(
-      const Duration(milliseconds: 800),
-      onDoneLoading,
-    );
-  }
-
-  onDoneLoading() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: ((context) => const LoginMainWrapper()),
-      ),
-    );
   }
 
   @override
@@ -76,15 +59,17 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: Color(0xFF0D0D28),
       body: Center(
           child: Lottie.asset('assets/animations/logo_closing.json',
-              repeat: false,
-              frameRate: FrameRate(25),
-              fit: BoxFit.cover,
+              repeat: true,
+              frameRate: FrameRate(60),
+              fit: MediaQuery.of(context).orientation == Orientation.portrait
+                  ? BoxFit.fitWidth
+                  : BoxFit.fitHeight,
               width: MediaQuery.of(context).orientation == Orientation.portrait
-                  ? MediaQuery.of(context).size.height * 0.1
-                  : MediaQuery.of(context).size.height * 0.5,
+                  ? MediaQuery.of(context).size.width * 0.2
+                  : MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).orientation == Orientation.portrait
-                  ? MediaQuery.of(context).size.height * 0.1
-                  : MediaQuery.of(context).size.height * 0.5)),
+                  ? MediaQuery.of(context).size.height
+                  : MediaQuery.of(context).size.height * 0.3)),
     );
   }
 }
@@ -191,7 +176,7 @@ class _ReFreezerAppState extends State<ReFreezerApp> {
         },
         child: I18n(
           initialLocale: _locale(),
-          child: const SplashScreen(),
+          child: const LoginMainWrapper(),
         ),
       ),
       navigatorKey: mainNavigatorKey,
@@ -699,13 +684,7 @@ class _MainScreenState extends State<MainScreen>
           );
         } else {
           // While audio_service is initializing
-          return Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          );
+          return SplashScreen();
         }
       },
     );

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:deezer/fonts/alchemy_icons.dart';
 import 'package:deezer/main.dart';
+import 'package:lottie/lottie.dart';
 
 import '../api/deezer.dart';
 import '../api/definitions.dart';

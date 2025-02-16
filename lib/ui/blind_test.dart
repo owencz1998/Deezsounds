@@ -13,6 +13,7 @@ import 'package:deezer/ui/tiles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
+import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 
 class BlindTestChoiceScreen extends StatefulWidget {
   final Playlist playlist;
@@ -61,8 +62,19 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
   void initState() {
     GetIt.I<AudioPlayerHandler>().stop();
     super.initState();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.lightBlue.withAlpha(70)));
     _score();
     _rank();
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([]);
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      systemNavigationBarColor: settings.themeData.bottomAppBarTheme.color,
+    ));
+    super.dispose();
   }
 
   @override
@@ -185,142 +197,153 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
             alignment: Alignment.bottomCenter,
             child: SizedBox(
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 3,
+              height: MediaQuery.of(context).size.height * 0.3,
               child: Padding(
                 padding: EdgeInsets.all(0),
                 child: Container(
                   decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(
-                        'assets/wave.png',
-                      ),
-                      fit: BoxFit.fitWidth,
-                      alignment: Alignment.bottomLeft,
-                    ),
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(15),
                         topRight: Radius.circular(15)),
                     color: Colors.lightBlue,
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 24),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Choose your game'.i18n,
-                        style: TextStyle(
-                          fontSize: 34,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'MontSerrat',
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 34),
-                        child: Container(
-                          decoration: BoxDecoration(boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              spreadRadius: 0, // Spread value
-                              blurRadius: 8, // Blur value
-                              offset: Offset(0, 8),
+                  clipBehavior: Clip.hardEdge,
+                  child: Stack(children: [
+                    LiquidLinearProgressIndicator(
+                      value: 0.05,
+                      valueColor: AlwaysStoppedAnimation(Theme.of(context)
+                          .scaffoldBackgroundColor
+                          .withAlpha(70)),
+                      backgroundColor: Colors.lightBlue,
+                      direction: Axis.vertical,
+                      waveLength: 1.7,
+                      waveHeight: 20,
+                      speed: 1.5,
+                    ),
+                    Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(top: 32),
+                          child: Text(
+                            'Choose your game'.i18n,
+                            style: TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'MontSerrat',
                             ),
-                          ]),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pushReplacement(MaterialPageRoute(
-                                      builder: (context) => BlindTestScreen(
-                                            BlindTestType.TRACKS,
-                                            widget.playlist,
-                                          )));
-                            },
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10))),
-                            child: ListTile(
-                              visualDensity: VisualDensity.compact,
-                              leading: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    AlchemyIcons.music,
-                                    color: settings.primaryColor,
-                                  )
-                                ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(8, 34, 8, 0),
+                          child: Container(
+                            decoration: BoxDecoration(boxShadow: [
+                              BoxShadow(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                spreadRadius: 0, // Spread value
+                                blurRadius: 8, // Blur value
+                                offset: Offset(0, 8),
                               ),
-                              title: Text(
-                                'Titles'.i18n,
-                                style: TextStyle(
-                                    fontFamily: 'MontSerrat',
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.black,
-                                    fontSize: 20),
-                              ),
-                              subtitle: Text(
-                                'Guess track titles',
-                                style: TextStyle(
-                                    color: Settings.secondaryText,
-                                    fontSize: 14),
+                            ]),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pushReplacement(MaterialPageRoute(
+                                        builder: (context) => BlindTestScreen(
+                                              BlindTestType.TRACKS,
+                                              widget.playlist,
+                                            )));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10))),
+                              child: ListTile(
+                                visualDensity: VisualDensity.compact,
+                                leading: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      AlchemyIcons.music,
+                                      color: settings.primaryColor,
+                                    )
+                                  ],
+                                ),
+                                title: Text(
+                                  'Titles'.i18n,
+                                  style: TextStyle(
+                                      fontFamily: 'MontSerrat',
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.black,
+                                      fontSize: 20),
+                                ),
+                                subtitle: Text(
+                                  'Guess track titles',
+                                  style: TextStyle(
+                                      color: Settings.secondaryText,
+                                      fontSize: 14),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 12, bottom: 12),
-                        child: Container(
-                          decoration: BoxDecoration(boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              spreadRadius: 0, // Spread value
-                              blurRadius: 8, // Blur value
-                              offset: Offset(0, 8),
-                            ),
-                          ]),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pushReplacement(MaterialPageRoute(
-                                      builder: (context) => BlindTestScreen(
-                                            BlindTestType.ARTISTS,
-                                            widget.playlist,
-                                          )));
-                            },
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10))),
-                            child: ListTile(
-                              visualDensity: VisualDensity.compact,
-                              leading: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    AlchemyIcons.user,
-                                    color: settings.primaryColor,
-                                  ),
-                                ],
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(8, 12, 8, 44),
+                          child: Container(
+                            decoration: BoxDecoration(boxShadow: [
+                              BoxShadow(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                spreadRadius: 0, // Spread value
+                                blurRadius: 8, // Blur value
+                                offset: Offset(0, 8),
                               ),
-                              title: Text(
-                                'Artists'.i18n,
-                                style: TextStyle(
-                                    fontFamily: 'MontSerrat',
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.black,
-                                    fontSize: 20),
-                              ),
-                              subtitle: Text(
-                                'Guess track artists',
-                                style: TextStyle(
-                                    color: Settings.secondaryText,
-                                    fontSize: 14),
+                            ]),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pushReplacement(MaterialPageRoute(
+                                        builder: (context) => BlindTestScreen(
+                                              BlindTestType.ARTISTS,
+                                              widget.playlist,
+                                            )));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10))),
+                              child: ListTile(
+                                visualDensity: VisualDensity.compact,
+                                leading: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      AlchemyIcons.user,
+                                      color: settings.primaryColor,
+                                    ),
+                                  ],
+                                ),
+                                title: Text(
+                                  'Artists'.i18n,
+                                  style: TextStyle(
+                                      fontFamily: 'MontSerrat',
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.black,
+                                      fontSize: 20),
+                                ),
+                                subtitle: Text(
+                                  'Guess track artists',
+                                  style: TextStyle(
+                                      color: Settings.secondaryText,
+                                      fontSize: 14),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    )
+                  ]),
                 ),
               ),
             ),
@@ -532,6 +555,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
       GetIt.I<AudioPlayerHandler>().pause();
+      SystemChrome.setPreferredOrientations([]);
     } else {
       GetIt.I<AudioPlayerHandler>().play();
     }

@@ -18,7 +18,9 @@ class _ErrorScreenState extends State<ErrorScreen> {
   @override
   void initState() {
     Connectivity().checkConnectivity().then((connectivity) {
-      if (connectivity.isNotEmpty && !connectivity.contains(ConnectivityResult.none) && counter > 3) {
+      if (connectivity.isNotEmpty &&
+          !connectivity.contains(ConnectivityResult.none) &&
+          counter > 3) {
         setState(() {
           checkArl = true;
         });
@@ -43,12 +45,15 @@ class _ErrorScreenState extends State<ErrorScreen> {
           Container(
             height: 4.0,
           ),
-          Text(widget.message ?? 'Please check your connection and try again later...'.i18n),
+          Text(widget.message ??
+              'Please check your connection and try again later...'.i18n),
           if (checkArl)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 32.0),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 32.0),
               child: Text(
-                'Your ARL might be expired, try logging out and logging back in using new ARL or browser.'.i18n,
+                'Your ARL might be expired, try logging out and logging back in using new ARL or browser.'
+                    .i18n,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 12.0,

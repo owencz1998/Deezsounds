@@ -120,7 +120,7 @@ class Settings {
   static const secondaryText = Color(0xFFA9A6AA);
 
   static _colorToJson(Color c) => c.value;
-  static _colorFromJson(int? v) => v == null ? Color(0xFFA238FF) : Color(v);
+  static _colorFromJson(int? v) => v == null ? Colors.lightBlue : Color(v);
 
   @JsonKey(defaultValue: false)
   bool useArtColor = false;

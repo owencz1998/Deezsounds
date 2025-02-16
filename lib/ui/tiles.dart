@@ -240,6 +240,7 @@ class SimpleTrackTile extends StatelessWidget {
       visualDensity: VisualDensity.compact,
       leading: CachedImage(
         url: track.albumArt?.full ?? '',
+        rounded: true,
         height: 40,
         width: 40,
       ),

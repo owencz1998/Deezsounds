@@ -16,3 +16,6 @@
 [submodule "scrobblenaut"]
 	path = scrobblenaut
 	url = https://github.com/DJDoubleD/Scrobblenaut.git
+[submodule "liquid_progress_indicator_v2"]
+	path = liquid_progress_indicator_v2
+	url = https://github.com/PetitPrinc3/liquid_progress_indicator_v2.git

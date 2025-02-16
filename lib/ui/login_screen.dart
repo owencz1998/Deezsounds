@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:logging/logging.dart';
 import 'package:lottie/lottie.dart';
 
@@ -183,23 +184,22 @@ class _LoginWidgetState extends State<LoginWidget> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            Stack(alignment: Alignment.bottomLeft, children: [
-              Container(
-                decoration: BoxDecoration(color: settings.primaryColor),
-                height: MediaQuery.of(context).size.height / 3,
-                width: MediaQuery.of(context).size.width,
-                alignment: Alignment.bottomCenter,
+            Container(
+              decoration: BoxDecoration(color: settings.primaryColor),
+              height: MediaQuery.of(context).size.height / 3,
+              width: MediaQuery.of(context).size.width,
+              alignment: Alignment.bottomCenter,
+              child: LiquidLinearProgressIndicator(
+                value: 0.1,
+                valueColor: AlwaysStoppedAnimation(
+                    Theme.of(context).scaffoldBackgroundColor),
+                backgroundColor: Colors.lightBlue,
+                direction: Axis.vertical,
+                waveHeight: MediaQuery.of(context).size.height / 8,
+                waveLength: 4.6,
+                speed: 1,
               ),
-              Lottie.asset('assets/animations/welcome_waves.json',
-                  repeat: true,
-                  frameRate: FrameRate(25),
-                  fit: BoxFit.fitWidth,
-                  width: MediaQuery.of(context).size.width,
-                  delegates: LottieDelegates(values: [
-                    ValueDelegate.color(const ['**'],
-                        value: Theme.of(context).scaffoldBackgroundColor)
-                  ])),
-            ]),
+            ),
             Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
                 child: Text(

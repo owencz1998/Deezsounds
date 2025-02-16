@@ -40,6 +40,7 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 ## :camera_flash: Screenshots
 
 <p align="center">
+    <img src="./assets/screenshots/login.png" width=100>
     <img src="./assets/screenshots/home.png" width=100>
     <img src="./assets/screenshots/player.png" width=100>
     <img src="./assets/screenshots/search.png" width=100>
