@@ -72,17 +72,20 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: Lottie.asset('assets/animations/logo_closing.json',
-            repeat: false,
-            frameRate: FrameRate(25),
-            fit: BoxFit.cover,
-            width: MediaQuery.of(context).orientation == Orientation.portrait
-                ? MediaQuery.of(context).size.height * 0.1
-                : MediaQuery.of(context).size.height * 0.5,
-            height: MediaQuery.of(context).orientation == Orientation.portrait
-                ? MediaQuery.of(context).size.height * 0.1
-                : MediaQuery.of(context).size.height * 0.5));
+    return Scaffold(
+      backgroundColor: Color(0xFF0D0D28),
+      body: Center(
+          child: Lottie.asset('assets/animations/logo_closing.json',
+              repeat: false,
+              frameRate: FrameRate(25),
+              fit: BoxFit.cover,
+              width: MediaQuery.of(context).orientation == Orientation.portrait
+                  ? MediaQuery.of(context).size.height * 0.1
+                  : MediaQuery.of(context).size.height * 0.5,
+              height: MediaQuery.of(context).orientation == Orientation.portrait
+                  ? MediaQuery.of(context).size.height * 0.1
+                  : MediaQuery.of(context).size.height * 0.5)),
+    );
   }
 }
 
@@ -159,7 +162,7 @@ class _ReFreezerAppState extends State<ReFreezerApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Deezer',
+      title: 'Alchemy',
       shortcuts: <ShortcutActivator, Intent>{
         ...WidgetsApp.defaultShortcuts,
         LogicalKeySet(LogicalKeyboardKey.select):

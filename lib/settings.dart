@@ -116,7 +116,7 @@ class Settings {
   //Colors
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
   Color primaryColor = Colors.lightBlue;
-  static const deezerBg = Color(0xFF0D0D28);
+  static const bgColor = Color(0xFF0D0D28);
   static const secondaryText = Color(0xFFA9A6AA);
 
   static _colorToJson(Color c) => c.value;
@@ -406,20 +406,20 @@ class Settings {
             primaryColor: primaryColor,
             unselectedWidgetColor: secondaryText,
             sliderTheme: _sliderTheme,
-            scaffoldBackgroundColor: deezerBg,
+            scaffoldBackgroundColor: bgColor,
             hintColor: Color(0xFF1B191F),
             inputDecorationTheme: const InputDecorationTheme(
               hintStyle: TextStyle(color: secondaryText),
               labelStyle: TextStyle(color: secondaryText),
             ),
             bottomSheetTheme:
-                const BottomSheetThemeData(backgroundColor: deezerBg),
-            cardColor: deezerBg,
+                const BottomSheetThemeData(backgroundColor: bgColor),
+            cardColor: bgColor,
             outlinedButtonTheme: outlinedButtonTheme,
             textButtonTheme: textButtonTheme,
             colorScheme: ColorScheme.fromSwatch().copyWith(
                 secondary: primaryColor,
-                surface: deezerBg,
+                surface: bgColor,
                 brightness: Brightness.dark),
             checkboxTheme: CheckboxThemeData(
               fillColor: WidgetStateProperty.resolveWith<Color?>(
@@ -467,17 +467,17 @@ class Settings {
                 return null;
               }),
             ),
-            bottomAppBarTheme: const BottomAppBarTheme(color: deezerBg),
+            bottomAppBarTheme: const BottomAppBarTheme(color: bgColor),
             progressIndicatorTheme:
                 ProgressIndicatorThemeData(color: primaryColor),
-            dialogTheme: DialogThemeData(backgroundColor: deezerBg)),
+            dialogTheme: DialogThemeData(backgroundColor: bgColor)),
         Themes.Black: ThemeData(
             useMaterial3: false,
             brightness: Brightness.dark,
             textTheme: textTheme,
             fontFamily: _fontFamily,
             primaryColor: primaryColor,
-            scaffoldBackgroundColor: deezerBg,
+            scaffoldBackgroundColor: bgColor,
             hintColor: Colors.grey.shade700,
             sliderTheme: _sliderTheme,
             bottomSheetTheme: const BottomSheetThemeData(
@@ -536,7 +536,7 @@ class Settings {
               }),
             ),
             bottomAppBarTheme: const BottomAppBarTheme(color: Colors.black),
-            dialogTheme: DialogThemeData(backgroundColor: deezerBg))
+            dialogTheme: DialogThemeData(backgroundColor: bgColor))
       };
 
   Future<String> getPath() async =>

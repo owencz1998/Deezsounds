@@ -209,4 +209,8 @@ class AlchemyIcons {
       IconData(0xe85a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData settings =
       IconData(0xe85b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData music =
+      IconData(0xe85c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData user =
+      IconData(0xe85d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

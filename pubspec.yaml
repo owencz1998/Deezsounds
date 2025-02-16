@@ -150,9 +150,8 @@ flutter:
     - assets/PetitPrince.png
     - assets/chrome.png
     - assets/token.png
-    - assets/guess_track_icon.png
-    - assets/guess_artist_icon.png
-    - assets/blind_test_wave.png
+    - assets/wave.png
+    - assets/animations/bubbles.json
     - assets/animations/logo_closing.json
     - assets/animations/welcome_waves.json
     - assets/animations/playing_wave.json

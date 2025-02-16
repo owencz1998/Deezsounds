@@ -144,12 +144,12 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                         padding:
                             EdgeInsets.symmetric(vertical: 8, horizontal: 18),
                         decoration: BoxDecoration(
-                            color: Color(0xFFE07DF7),
+                            color: settings.primaryColor,
                             borderRadius: BorderRadius.circular(5)),
                         child: Text(
                           bestScore.toString(),
                           style: TextStyle(
-                              color: Settings.deezerBg,
+                              color: Theme.of(context).scaffoldBackgroundColor,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'MontSerrat',
                               fontSize: 18),
@@ -185,21 +185,22 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
             alignment: Alignment.bottomCenter,
             child: SizedBox(
               width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height / 3,
               child: Padding(
                 padding: EdgeInsets.all(0),
                 child: Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage(
-                        'assets/blind_test_wave.png',
+                        'assets/wave.png',
                       ),
-                      repeat: ImageRepeat.repeat,
-                      alignment: Alignment.topLeft,
+                      fit: BoxFit.fitWidth,
+                      alignment: Alignment.bottomLeft,
                     ),
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(15),
                         topRight: Radius.circular(15)),
-                    color: Color(0xFF6849FF),
+                    color: Colors.lightBlue,
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 24),
                   child: Column(
@@ -238,9 +239,14 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                                     borderRadius: BorderRadius.circular(10))),
                             child: ListTile(
                               visualDensity: VisualDensity.compact,
-                              leading: CachedImage(
-                                url: 'assets/guess_track_icon.png',
-                                height: 35,
+                              leading: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    AlchemyIcons.music,
+                                    color: settings.primaryColor,
+                                  )
+                                ],
                               ),
                               title: Text(
                                 'Titles'.i18n,
@@ -286,9 +292,14 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                                     borderRadius: BorderRadius.circular(10))),
                             child: ListTile(
                               visualDensity: VisualDensity.compact,
-                              leading: CachedImage(
-                                url: 'assets/guess_artist_icon.png',
-                                height: 35,
+                              leading: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    AlchemyIcons.user,
+                                    color: settings.primaryColor,
+                                  ),
+                                ],
                               ),
                               title: Text(
                                 'Artists'.i18n,
@@ -660,16 +671,16 @@ class _BlindTestScreenState extends State<BlindTestScreen>
               Navigator.of(context, rootNavigator: true).maybePop();
             },
             child: Scaffold(
-                backgroundColor: Color(0xFF6849FF),
+                backgroundColor: Colors.lightBlue,
                 body: SafeArea(
                     child: Container(
                         decoration: BoxDecoration(
                             image: DecorationImage(
                           image: AssetImage(
-                            'assets/blind_test_wave.png',
+                            'assets/wave.png',
                           ),
-                          repeat: ImageRepeat.repeat,
-                          alignment: Alignment.topLeft,
+                          fit: BoxFit.fitWidth,
+                          alignment: Alignment.bottomLeft,
                         )),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -997,7 +1008,8 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                                               .title ??
                                                           '',
                                                       style: TextStyle(
-                                                          fontFamily: 'MontSerrat',
+                                                          fontFamily:
+                                                              'MontSerrat',
                                                           fontWeight:
                                                               FontWeight.w900,
                                                           color: Colors.black,
@@ -1218,16 +1230,16 @@ class _ResultsScreenState extends State<ResultsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color(0xFF6849FF),
+        backgroundColor: Colors.lightBlue,
         body: SafeArea(
             child: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage(
-                'assets/blind_test_wave.png',
+                'assets/wave.png',
               ),
-              repeat: ImageRepeat.repeat,
-              alignment: Alignment.topLeft,
+              fit: BoxFit.fitWidth,
+              alignment: Alignment.bottomLeft,
             ),
           ),
           child: Column(

@@ -62,7 +62,9 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 ## :star2: Bugs & features
 
 #### :building_construction: Upcoming features
-- Turn the mod into a skin for the official refreezer app
+- Find another source for lyrics
+- Implement homemade blindtest if deezer's are not working anymore
+- Redesign the Home page
 
 #### :lady_beetle: Bugs
 - Lyrics are not available
