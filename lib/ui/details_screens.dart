@@ -1456,8 +1456,8 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                           .withAlpha(0)),
                                                   borderRadius:
                                                       BorderRadius.circular(10),
-                                                  color: Theme.of(context)
-                                                      .hintColor),
+                                                  color: Colors.white
+                                                      .withAlpha(30)),
                                               child: InkWell(
                                                 radius: 10.0,
                                                 onTap: () {
@@ -1892,7 +1892,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                               vertical: 8.0, horizontal: 12.0),
                           decoration: BoxDecoration(
                             border: Border.all(
-                                color: Theme.of(context).hintColor, width: 1.5),
+                                color: Colors.white.withAlpha(30), width: 1.5),
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           child: InkWell(
@@ -1943,7 +1943,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                 .scaffoldBackgroundColor
                                                 .withAlpha(0)),
                                         borderRadius: BorderRadius.circular(10),
-                                        color: Theme.of(context).hintColor),
+                                        color: Colors.white.withAlpha(30)),
                                     child: InkWell(
                                       radius: 10.0,
                                       onTap: () {
