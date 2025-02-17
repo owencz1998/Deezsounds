@@ -70,6 +70,9 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 #### :lady_beetle: Bugs
 - Lyrics are not available
 - Blind tests are not available
+- Multiple bugs in artists discography :
+ - Extra empty tab on the right
+ - Count stuck at 15
 - Some home tiles are not and will not be implemented (Concerts, Did you know, Original videos, ...)
 - [Tell me !](https://github.com/PetitPrinc3/Deezer/issues)
 

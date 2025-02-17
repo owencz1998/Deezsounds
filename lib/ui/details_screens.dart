@@ -2433,10 +2433,12 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
           });
           return Playlist();
         });
-        setState(() {
-          playlist = onlinePlaylist;
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            playlist = onlinePlaylist;
+            _isLoading = false;
+          });
+        }
       }
     }
 

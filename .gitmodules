@@ -1,9 +1,6 @@
 [submodule "custom_navigator"]
 	path = custom_navigator
 	url = https://github.com/DJDoubleD/custom_navigator.git
-[submodule "equalizer_flutter"]
-	path = equalizer_flutter
-	url = https://github.com/DJDoubleD/equalizer_flutter.git
 [submodule "external_path"]
 	path = external_path
 	url = https://github.com/DJDoubleD/external_path.git

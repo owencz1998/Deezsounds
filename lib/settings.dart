@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:deezer/api/definitions.dart';
 import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -135,6 +136,8 @@ class Settings {
   late bool logListen;
   @JsonKey(defaultValue: null)
   String? proxyAddress;
+  @JsonKey(defaultValue: BlindTestType.DEEZER)
+  BlindTestType blindTestType = BlindTestType.DEEZER;
 
   //LastFM
   @JsonKey(defaultValue: null)

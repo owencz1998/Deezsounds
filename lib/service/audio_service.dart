@@ -234,10 +234,38 @@ class AudioPlayerHandler extends BaseAudioHandler
     }
   }
 
-  Future<void> playBlindTrack(String trackToken, String? artUri) async {
+  Future<void> playDeezerPreview(String trackToken, String? artUri) async {
     String previewURI = await deezerAPI.getMediaPreview(trackToken);
 
     if (previewURI == '') {
+      throw Exception(
+          'Unable to load media preview from API. Are you a premium user ?');
+    }
+
+    MediaItem blindTrack = MediaItem(
+        id: '0',
+        title: 'Blind test',
+        duration: Duration(seconds: 30),
+        artist: 'Definitely not Deezer',
+        artUri: Uri.parse(artUri ?? ''));
+
+    await pause();
+    await _playlist.clear();
+    if (previewURI.startsWith('http')) {
+      _playlist
+          .add(ProgressiveAudioSource(Uri.parse(previewURI), tag: blindTrack));
+    }
+    AudioSource.uri(Uri.parse(previewURI), tag: blindTrack);
+    await setShuffleMode(AudioServiceShuffleMode.none);
+    await skipToQueueItem(0);
+    await play();
+  }
+
+  Future<void> playBlindTrack(String trackId, String? artUri) async {
+    String previewURI = await deezerAPI.getTrackPreview(trackId);
+
+    if (previewURI == '') {
+      Logger.root.warning('Unable to fetch preview for $trackId');
       throw Exception('Unable to load media preview from API.');
     }
 

@@ -80,6 +80,30 @@ class DeezerAPI {
     }
   }
 
+  Future<String> getTrackPreview(String trackId) async {
+    //Generate URL
+    Uri uri = Uri.https('api.deezer.com', 'track/$trackId');
+    //Post
+    http.Response res = await http.get(uri).catchError((e) {
+      return http.Response('', 200);
+    });
+
+    if (res.body == '') return '';
+
+    try {
+      if (jsonDecode(res.body)['preview'] != '') {
+        return jsonDecode(res.body)['preview'];
+      }
+
+      String isrc = jsonDecode(res.body)['isrc'];
+      dynamic data = await deezerAPI.callPublicApi('track/isrc:$isrc');
+      return data['preview'];
+    } catch (e) {
+      Logger.root.info('API preview fetch failed : $e');
+      return '';
+    }
+  }
+
   //Call private GW-light API
   Future<Map<String, dynamic>> callGwApi(String method,
       {Map<String, dynamic>? params, String? gatewayInput}) async {
@@ -157,10 +181,6 @@ class DeezerAPI {
     http.Response res =
         await http.post(uri, headers: pipeApiHeaders, body: jsonEncode(params));
     dynamic body = jsonDecode(res.body);
-
-    if (body['data'] == null) {
-      Logger.root.info(body);
-    }
 
     return body;
   }
@@ -524,7 +544,8 @@ class DeezerAPI {
     }
 
     // No lyrics found, prefer to use pipe api error message
-    return lyricsFromPipeApi;
+    //return lyricsFromPipeApi;
+    return Lyrics();
   }
 
   //Get lyrics by track id from legacy GW api
@@ -597,8 +618,6 @@ class DeezerAPI {
       'query': queryStringGraphQL
     };
     Map data = await callPipeApi(params: requestParams);
-
-    Logger.root.info(data);
 
     if (data['errors'] != null && data['errors'].length > 0) {
       return Lyrics.error('err');

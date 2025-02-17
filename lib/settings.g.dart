@@ -77,6 +77,9 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
       ..deezerCountry = json['deezerCountry'] as String? ?? 'US'
       ..logListen = json['logListen'] as bool? ?? false
       ..proxyAddress = json['proxyAddress'] as String?
+      ..blindTestType =
+          $enumDecodeNullable(_$BlindTestTypeEnumMap, json['blindTestType']) ??
+              BlindTestType.DEEZER
       ..lastFMUsername = json['lastFMUsername'] as String?
       ..lastFMPassword = json['lastFMPassword'] as String?
       ..spotifyClientId = json['spotifyClientId'] as String?
@@ -123,6 +126,7 @@ Map<String, dynamic> _$SettingsToJson(Settings instance) => <String, dynamic>{
       'deezerCountry': instance.deezerCountry,
       'logListen': instance.logListen,
       'proxyAddress': instance.proxyAddress,
+      'blindTestType': _$BlindTestTypeEnumMap[instance.blindTestType]!,
       'lastFMUsername': instance.lastFMUsername,
       'lastFMPassword': instance.lastFMPassword,
       'spotifyClientId': instance.spotifyClientId,
@@ -142,6 +146,11 @@ const _$ThemesEnumMap = {
   Themes.Dark: 'Dark',
   Themes.Deezer: 'Deezer',
   Themes.Black: 'Black',
+};
+
+const _$BlindTestTypeEnumMap = {
+  BlindTestType.ALCHEMY: 'ALCHEMY',
+  BlindTestType.DEEZER: 'DEEZER',
 };
 
 SpotifyCredentialsSave _$SpotifyCredentialsSaveFromJson(

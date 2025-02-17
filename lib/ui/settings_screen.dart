@@ -125,20 +125,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 builder: (context) => const GeneralSettings())),
           ),
           ListTile(
-            title: Text('Download Settings'.i18n),
-            leading: const LeadingIcon(AlchemyIcons.download_fill,
+            title: Text('Alchemy'.i18n),
+            leading: const LeadingIcon(AlchemyIcons.alchemy,
                 color: Color(0xffbe3266)),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const DownloadsSettings())),
-          ),
-          ListTile(
-            title: Text('Appearance'.i18n),
-            leading:
-                const LeadingIcon(Icons.color_lens, color: Color(0xff4b2e7e)),
             onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => const AppearanceSettings())),
+          ),
+          ListTile(
+            title: Text('Download Settings'.i18n),
+            leading: const LeadingIcon(AlchemyIcons.download_fill,
+                color: Color(0xff4b2e7e)),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const DownloadsSettings())),
           ),
           ListTile(
             title: Text('Quality'.i18n),
@@ -401,8 +401,6 @@ class _AppearanceSettingsState extends State<AppearanceSettings> {
                           onMainColorChange: (ColorSwatch? color) {
                             setState(() {
                               settings.primaryColor = color!;
-                              Logger.root
-                                  .info((color.toARGB32().toRadixString(16)));
                             });
                             settings.save();
                             updateTheme();
@@ -443,6 +441,23 @@ class _AppearanceSettingsState extends State<AppearanceSettings> {
                                 )));
                   });
             },
+          ),
+          ListTile(
+            title: Text('Blind tests'.i18n),
+            subtitle: Text(
+                "Switch from Deezer official blind tests to Alchemy's.".i18n),
+            trailing: Switch(
+              value:
+                  settings.blindTestType == BlindTestType.DEEZER ? false : true,
+              onChanged: (bool v) {
+                setState(() => settings.blindTestType =
+                    v ? BlindTestType.ALCHEMY : BlindTestType.DEEZER);
+                settings.save();
+              },
+            ),
+            leading: settings.blindTestType == BlindTestType.DEEZER
+                ? Image.asset('assets/deezer.png', height: 30, width: 30)
+                : Image.asset('assets/icon.png', height: 30, width: 30),
           ),
           ListenableBuilder(
               listenable: playerBarState,
@@ -818,6 +833,7 @@ class _DeezerSettingsState extends State<DeezerSettings> {
             ),
             leading: const Icon(Icons.history_toggle_off),
           ),
+
           //TODO: Reimplement proxy
 //          ListTile(
 //            title: Text('Proxy'.i18n),

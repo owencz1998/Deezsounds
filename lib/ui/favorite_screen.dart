@@ -234,7 +234,7 @@ class _FavoriteTracksState extends State<FavoriteTracks> {
       if (mounted) {
         setState(() {
           trackCount = favPlaylist!.trackCount;
-          if (tracks.isEmpty) tracks = favPlaylist.tracks!;
+          if (tracks.isEmpty) tracks = favPlaylist.tracks ?? [];
           _makeFavorite();
           favoritePlaylist = favPlaylist;
         });

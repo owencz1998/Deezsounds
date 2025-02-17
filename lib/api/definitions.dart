@@ -1327,10 +1327,19 @@ class BlindTest {
   String? testToken;
   List<Question> questions = [];
   int points = 0;
+
+  dynamic toJson() {
+    return {
+      'testToken': testToken,
+      'questions':
+          List.generate(questions.length, (int i) => questions[i].toJson()),
+      'points': points,
+    };
+  }
 }
 
 class Question {
-  String mediaToken;
+  String? mediaToken;
   int index;
   Track? track;
   Artist? artist;
@@ -1338,7 +1347,7 @@ class Question {
   List<Artist> artistChoices;
 
   Question({
-    required this.mediaToken,
+    this.mediaToken,
     required this.index,
     this.track,
     this.artist,
@@ -1346,6 +1355,21 @@ class Question {
     List<Artist>? artistChoices,
   })  : trackChoices = trackChoices ?? [],
         artistChoices = artistChoices ?? [];
+
+  dynamic toJson() {
+    return {
+      'mediaToken': mediaToken,
+      'index': index,
+      'track': track?.toJson(),
+      'artist': artist?.toJson(),
+      'trackChoices': List.generate(
+          trackChoices.length, (int i) => trackChoices[i].toJson()),
+      'artistChoices': List.generate(
+          artistChoices.length, (int i) => artistChoices[i].toJson())
+    };
+  }
 }
 
-enum BlindTestType { TRACKS, ARTISTS }
+enum BlindTestType { ALCHEMY, DEEZER }
+
+enum BlindTestSubType { TRACKS, ARTISTS }
