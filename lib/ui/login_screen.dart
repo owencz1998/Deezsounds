@@ -5,7 +5,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:logging/logging.dart';
-import 'package:lottie/lottie.dart';
 
 import '../api/deezer.dart';
 import '../api/deezer_login.dart';

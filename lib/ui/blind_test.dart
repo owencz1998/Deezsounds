@@ -1737,8 +1737,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                         showDialog(
                                             context: context,
                                             builder: (context) {
-                                              BlindTestType blindTestType =
-                                                  settings.blindTestType;
                                               return StatefulBuilder(
                                                   builder: (context, setState) {
                                                 return AlertDialog(
