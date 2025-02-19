@@ -62,7 +62,7 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
                 'art'
               ]
       ..theme =
-          $enumDecodeNullable(_$ThemesEnumMap, json['theme']) ?? Themes.Deezer
+          $enumDecodeNullable(_$ThemesEnumMap, json['theme']) ?? Themes.Alchemy
       ..useSystemTheme = json['useSystemTheme'] as bool? ?? false
       ..colorGradientBackground =
           json['colorGradientBackground'] as bool? ?? true
@@ -143,7 +143,7 @@ const _$AudioQualityEnumMap = {
 
 const _$ThemesEnumMap = {
   Themes.Light: 'Light',
-  Themes.Dark: 'Dark',
+  Themes.Alchemy: 'Alchemy',
   Themes.Deezer: 'Deezer',
   Themes.Black: 'Black',
 };

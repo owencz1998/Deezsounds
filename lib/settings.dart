@@ -99,7 +99,7 @@ class Settings {
   late List<String> tags;
 
   //Appearance
-  @JsonKey(defaultValue: Themes.Deezer)
+  @JsonKey(defaultValue: Themes.Alchemy)
   late Themes theme;
   @JsonKey(defaultValue: false)
   late bool useSystemTheme;
@@ -161,7 +161,7 @@ class Settings {
       if (PlatformDispatcher.instance.platformBrightness == Brightness.light) {
         return _themeData[Themes.Light]!;
       } else {
-        if (theme == Themes.Light) return _themeData[Themes.Dark]!;
+        if (theme == Themes.Light) return _themeData[Themes.Deezer]!;
         return _themeData[theme]!;
       }
     }
@@ -199,12 +199,12 @@ class Settings {
 
   SliderThemeData get _sliderTheme => SliderThemeData(
       activeTrackColor: Colors.white,
-      inactiveTrackColor: Colors.white.withOpacity(0.2),
+      inactiveTrackColor: Colors.white.withAlpha(50),
       trackHeight: 0.5,
       thumbShape: RoundSliderThumbShape(enabledThumbRadius: 1),
       thumbColor: Colors.white,
       overlayShape: RoundSliderOverlayShape(overlayRadius: 4),
-      overlayColor: Colors.white.withOpacity(0.2));
+      overlayColor: Colors.white.withAlpha(50));
 
   //Load settings/init
   Future<Settings> loadSettings() async {
@@ -341,7 +341,7 @@ class Settings {
             ),
             bottomAppBarTheme:
                 const BottomAppBarTheme(color: Color(0xfff5f5f5))),
-        Themes.Dark: ThemeData(
+        Themes.Deezer: ThemeData(
             useMaterial3: false,
             brightness: Brightness.dark,
             textTheme: textTheme,
@@ -401,7 +401,7 @@ class Settings {
             ),
             bottomAppBarTheme:
                 const BottomAppBarTheme(color: Color(0xFF0F0D13))),
-        Themes.Deezer: ThemeData(
+        Themes.Alchemy: ThemeData(
             useMaterial3: false,
             brightness: Brightness.dark,
             textTheme: textTheme,
@@ -480,7 +480,7 @@ class Settings {
             textTheme: textTheme,
             fontFamily: _fontFamily,
             primaryColor: primaryColor,
-            scaffoldBackgroundColor: bgColor,
+            scaffoldBackgroundColor: Colors.black,
             hintColor: Colors.grey.shade700,
             sliderTheme: _sliderTheme,
             bottomSheetTheme: const BottomSheetThemeData(
@@ -553,7 +553,7 @@ class Settings {
 
 enum AudioQuality { MP3_128, MP3_320, FLAC, ASK }
 
-enum Themes { Light, Dark, Deezer, Black }
+enum Themes { Light, Alchemy, Deezer, Black }
 
 @JsonSerializable()
 class SpotifyCredentialsSave {
