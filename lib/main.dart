@@ -56,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF0D0D28),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
           child: Lottie.asset('assets/animations/logo_closing.json',
               repeat: true,
@@ -483,6 +483,11 @@ class _MainScreenState extends State<MainScreen>
           // When _initialization is done, render app
           return OrientationBuilder(
             builder: (context, orientation) {
+              SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+                systemNavigationBarColor: orientation == Orientation.portrait
+                    ? settings.themeData.bottomAppBarTheme.color
+                    : Colors.white.withAlpha(30),
+              ));
               return KeyboardListener(
                   focusNode: FocusNode(),
                   onKeyEvent: (event) => _handleKey(

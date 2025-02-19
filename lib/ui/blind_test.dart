@@ -1098,30 +1098,29 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                       child: Align(
                                         alignment: Alignment.bottomCenter,
                                         child: Container(
-                                          decoration: BoxDecoration(
-                                              color: Color(0xFFFF3386),
-                                              border: Border.all(
-                                                  width: 2,
-                                                  color: Theme.of(context)
-                                                      .scaffoldBackgroundColor)),
-                                          child: SizedBox(
-                                            width: 75,
-                                            height: 32,
-                                            child: Align(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                  _blindTest.points.toString() +
-                                                      ' pt',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w900,
-                                                      fontSize: 16,
-                                                      color: Theme.of(context)
-                                                          .scaffoldBackgroundColor)),
-                                            ),
-                                          ),
-                                        ),
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 8, horizontal: 18),
+                                            decoration: BoxDecoration(
+                                                color: Theme.of(context)
+                                                    .scaffoldBackgroundColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
+                                            child: Text(
+                                              _blindTest.points.toString() +
+                                                  ' pt',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'MontSerrat',
+                                                  fontSize: 18),
+                                              textHeightBehavior:
+                                                  TextHeightBehavior(
+                                                applyHeightToFirstAscent:
+                                                    false, // Disable height for ascent
+                                                applyHeightToLastDescent:
+                                                    false, // Apply height for descent
+                                              ),
+                                            )),
                                       ),
                                     ),
                                   ],
@@ -1185,30 +1184,29 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                       child: Align(
                                         alignment: Alignment.bottomCenter,
                                         child: Container(
-                                          decoration: BoxDecoration(
-                                              color: Color(0xFFFF3386),
-                                              border: Border.all(
-                                                  width: 2,
-                                                  color: Theme.of(context)
-                                                      .scaffoldBackgroundColor)),
-                                          child: SizedBox(
-                                            width: 70,
-                                            height: 40,
-                                            child: Align(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                  _blindTest.points.toString() +
-                                                      ' pt',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w900,
-                                                      fontSize: 16,
-                                                      color: Theme.of(context)
-                                                          .scaffoldBackgroundColor)),
-                                            ),
-                                          ),
-                                        ),
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 8, horizontal: 18),
+                                            decoration: BoxDecoration(
+                                                color: Theme.of(context)
+                                                    .scaffoldBackgroundColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
+                                            child: Text(
+                                              _blindTest.points.toString() +
+                                                  ' pt',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'MontSerrat',
+                                                  fontSize: 18),
+                                              textHeightBehavior:
+                                                  TextHeightBehavior(
+                                                applyHeightToFirstAscent:
+                                                    false, // Disable height for ascent
+                                                applyHeightToLastDescent:
+                                                    false, // Apply height for descent
+                                              ),
+                                            )),
                                       ),
                                     ),
                                   ],
@@ -1624,30 +1622,25 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   padding: EdgeInsets.only(top: 12),
                   child: Center(
                     child: Container(
-                      decoration: BoxDecoration(
-                        color: Color(0xFFFF3386),
-                        border: Border.all(
-                          width: 2,
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                        ),
-                      ),
-                      child: SizedBox(
-                        width: 100,
-                        height: 45,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            '${widget.blindTest.points} pt',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 20,
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                            ),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 8, horizontal: 18),
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Text(
+                          '${widget.blindTest.points} pt',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'MontSerrat',
+                              fontSize: 18),
+                          textHeightBehavior: TextHeightBehavior(
+                            applyHeightToFirstAscent:
+                                false, // Disable height for ascent
+                            applyHeightToLastDescent:
+                                false, // Apply height for descent
                           ),
-                        ),
-                      ),
-                    ),
+                        )),
                   ),
                 ),
                 Padding(

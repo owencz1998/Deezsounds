@@ -1583,25 +1583,9 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                         fontSize: 20.0),
                                                   ),
                                                 ),
-                                                Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                        artist.albums.length
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                            color: Settings
-                                                                .secondaryText)),
-                                                    Icon(
-                                                      Icons.chevron_right,
-                                                    )
-                                                  ],
-                                                ),
+                                                Icon(
+                                                  Icons.chevron_right,
+                                                )
                                               ],
                                             )),
                                       ),
@@ -2047,22 +2031,9 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                               fontSize: 20.0),
                                         ),
                                       ),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text(artist.albums.length.toString(),
-                                              style: TextStyle(
-                                                  color:
-                                                      Settings.secondaryText)),
-                                          Icon(
-                                            Icons.chevron_right,
-                                          )
-                                        ],
-                                      ),
+                                      Icon(
+                                        Icons.chevron_right,
+                                      )
                                     ],
                                   )),
                             ),
@@ -2278,15 +2249,6 @@ class _DiscographyScreenState extends State<DiscographyScreen> {
                     );
                   },
                 ),
-                ListenableBuilder(
-                    listenable: playerBarState,
-                    builder: (BuildContext context, Widget? child) {
-                      return AnimatedPadding(
-                        duration: Duration(milliseconds: 200),
-                        padding: EdgeInsets.only(
-                            bottom: playerBarState.state ? 80 : 0),
-                      );
-                    }),
               ],
             ),
           );
@@ -2433,12 +2395,10 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
           });
           return Playlist();
         });
-        if (mounted) {
-          setState(() {
-            playlist = onlinePlaylist;
-            _isLoading = false;
-          });
-        }
+        setState(() {
+          playlist = onlinePlaylist;
+          _isLoading = false;
+        });
       }
     }
 

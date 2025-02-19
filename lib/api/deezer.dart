@@ -394,6 +394,10 @@ class DeezerAPI {
         [trackId, 0]
       ]
     });
+    if (await downloadManager.checkOffline(
+        playlist: Playlist(id: playlistId))) {
+      downloadManager.updateOfflinePlaylist(Playlist(id: favoritesPlaylistId));
+    }
   }
 
   //Remove track from playlist
