@@ -251,6 +251,10 @@ class Settings {
     }
   }
 
+  ThemeData themeDataFor(Themes theme) {
+    return _themeData[theme] ?? ThemeData();
+  }
+
   //Check if is dark, can't use theme directly, because of system themes, and Theme.of(context).brightness broke
   bool get isDark {
     if (useSystemTheme) {
@@ -289,6 +293,7 @@ class Settings {
             textTheme: textTheme,
             fontFamily: _fontFamily,
             primaryColor: primaryColor,
+            highlightColor: Colors.transparent,
             sliderTheme: _sliderTheme,
             outlinedButtonTheme: outlinedButtonTheme,
             textButtonTheme: textButtonTheme,
@@ -348,6 +353,7 @@ class Settings {
             textTheme: textTheme,
             fontFamily: _fontFamily,
             primaryColor: primaryColor,
+            highlightColor: Color(0xFFA238FF),
             sliderTheme: _sliderTheme,
             outlinedButtonTheme: outlinedButtonTheme,
             scaffoldBackgroundColor: Color(0xFF0F0D13),
@@ -402,12 +408,74 @@ class Settings {
             ),
             bottomAppBarTheme:
                 const BottomAppBarTheme(color: Color(0xFF0F0D13))),
+        Themes.Spotify: ThemeData(
+            useMaterial3: false,
+            brightness: Brightness.dark,
+            textTheme: textTheme,
+            fontFamily: _fontFamily,
+            primaryColor: primaryColor,
+            highlightColor: Color(0xFF00FF7F),
+            sliderTheme: _sliderTheme,
+            outlinedButtonTheme: outlinedButtonTheme,
+            scaffoldBackgroundColor: Color(0xFF1B1B1E),
+            textButtonTheme: textButtonTheme,
+            colorScheme: ColorScheme.fromSwatch()
+                .copyWith(secondary: primaryColor, brightness: Brightness.dark),
+            checkboxTheme: CheckboxThemeData(
+              fillColor: WidgetStateProperty.resolveWith<Color?>(
+                  (Set<WidgetState> states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return null;
+                }
+                if (states.contains(WidgetState.selected)) {
+                  return primaryColor;
+                }
+                return null;
+              }),
+            ),
+            radioTheme: RadioThemeData(
+              fillColor: WidgetStateProperty.resolveWith<Color?>(
+                  (Set<WidgetState> states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return null;
+                }
+                if (states.contains(WidgetState.selected)) {
+                  return primaryColor;
+                }
+                return null;
+              }),
+            ),
+            switchTheme: SwitchThemeData(
+              thumbColor: WidgetStateProperty.resolveWith<Color?>(
+                  (Set<WidgetState> states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return null;
+                }
+                if (states.contains(WidgetState.selected)) {
+                  return primaryColor;
+                }
+                return null;
+              }),
+              trackColor: WidgetStateProperty.resolveWith<Color?>(
+                  (Set<WidgetState> states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return null;
+                }
+                if (states.contains(WidgetState.selected)) {
+                  return primaryColor;
+                }
+                return null;
+              }),
+            ),
+            bottomAppBarTheme:
+                const BottomAppBarTheme(color: Color(0xFF1B1B1E))),
         Themes.Alchemy: ThemeData(
             useMaterial3: false,
             brightness: Brightness.dark,
             textTheme: textTheme,
             fontFamily: _fontFamily,
             primaryColor: primaryColor,
+            highlightColor: Colors.transparent,
             unselectedWidgetColor: secondaryText,
             sliderTheme: _sliderTheme,
             scaffoldBackgroundColor: bgColor,
@@ -481,6 +549,7 @@ class Settings {
             textTheme: textTheme,
             fontFamily: _fontFamily,
             primaryColor: primaryColor,
+            highlightColor: Colors.transparent,
             scaffoldBackgroundColor: Colors.black,
             hintColor: Colors.grey.shade700,
             sliderTheme: _sliderTheme,
@@ -554,7 +623,7 @@ class Settings {
 
 enum AudioQuality { MP3_128, MP3_320, FLAC, ASK }
 
-enum Themes { Light, Alchemy, Deezer, Black }
+enum Themes { Alchemy, Deezer, Spotify, Light, Black }
 
 @JsonSerializable()
 class SpotifyCredentialsSave {

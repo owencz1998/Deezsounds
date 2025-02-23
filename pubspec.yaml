@@ -125,7 +125,6 @@ dev_dependencies:
   envied_generator: ^1.1.1
   figma_squircle:
     path: ./figma_squircle
-  flutter_custom_carousel: ^0.1.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -163,15 +162,6 @@ flutter:
     - assets/animations/pausing_wave.json
 
   fonts:
-    - family: MabryPro
-      fonts:
-        - asset: assets/fonts/MabryPro.otf
-        - asset: assets/fonts/MabryProItalic.otf
-          style: italic
-        - asset: assets/fonts/MabryProBold.otf
-          weight: 700
-        - asset: assets/fonts/MabryProBlack.otf
-          weight: 900
     - family: ReFreezerIcons
       fonts:
         - asset: assets/fonts/ReFreezerIcons.ttf

@@ -7,6 +7,7 @@ import 'package:country_currency_pickers/country_picker_dialog.dart';
 import 'package:country_currency_pickers/utils/utils.dart';
 import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
+import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:path/path.dart' as p;
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
@@ -259,78 +260,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ]),
             onTap: () {
               showDialog(
-                  context: context,
-                  builder: (context) {
-                    return SimpleDialog(
-                      title: Text('Select theme'.i18n),
-                      children: <Widget>[
-                        ListTile(
-                          leading: CircleColor(
-                            color: Colors.white,
-                            circleSize: 16,
+                context: context,
+                builder: (context) {
+                  double screenWidth = MediaQuery.of(context).size.width;
+                  double dialogWidth = screenWidth * 0.8;
+                  double tileWidth = screenWidth * 0.2;
+
+                  return AlertDialog(
+                    // Use AlertDialog for more width control
+                    contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 12),
+                    content: SizedBox(
+                      width: dialogWidth,
+                      child: Column(
+                        mainAxisSize: MainAxisSize
+                            .min, // Make column shrink to fit content
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(
+                                20.0), // Add padding to title
+                            child: Text('Select theme'.i18n,
+                                style: TextStyle(fontSize: 20)),
                           ),
-                          title: Text(
-                            'Light'.i18n,
-                            style: TextStyle(fontSize: 16),
+                          GridView.count(
+                            crossAxisCount: 3,
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            childAspectRatio:
+                                tileWidth / tileWidth, // Make tiles square
+                            mainAxisSpacing:
+                                10, // Adjust vertical spacing between rows
+                            crossAxisSpacing:
+                                10, // Adjust horizontal spacing between tiles
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0,
+                                vertical: 10.0), // Padding around the grid
+                            children: Themes.values.map((theme) {
+                              return ThemeTile(
+                                theme: theme,
+                                isSelected: settings.theme == theme,
+                                onTap: () {
+                                  setState(() => settings.theme = theme);
+                                  settings.save();
+                                  updateTheme();
+                                },
+                                tileSize:
+                                    tileWidth, // Pass tileWidth to ThemeTile
+                              );
+                            }).toList(),
                           ),
-                          onTap: () {
-                            setState(() => settings.theme = Themes.Light);
-                            settings.save();
-                            updateTheme();
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        ListTile(
-                          leading: CircleColor(
-                            color: Color(0xFF0D0D28),
-                            circleSize: 16,
-                          ),
-                          title: Text(
-                            'Alchemy'.i18n,
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          onTap: () {
-                            setState(() => settings.theme = Themes.Alchemy);
-                            settings.save();
-                            updateTheme();
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        ListTile(
-                          leading: CircleColor(
-                            color: Color(0xFF0F0D13),
-                            circleSize: 16,
-                          ),
-                          title: Text(
-                            'Deezer (dark)'.i18n,
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          onTap: () {
-                            setState(() => settings.theme = Themes.Deezer);
-                            settings.save();
-                            updateTheme();
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        ListTile(
-                          leading: CircleColor(
-                            color: Colors.black,
-                            circleSize: 16,
-                          ),
-                          title: Text(
-                            'Black (AMOLED)'.i18n,
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          onTap: () {
-                            setState(() => settings.theme = Themes.Black);
-                            settings.save();
-                            updateTheme();
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    );
-                  });
+                          SizedBox(
+                            height: 12,
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
             },
           ),
           ListTile(
@@ -2341,5 +2327,106 @@ class _CreditsScreenState extends State<CreditsScreen> {
         ],
       ),
     );
+  }
+}
+
+class ThemeTile extends StatelessWidget {
+  final Themes theme;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final double tileSize; // Add tileSize parameter
+
+  const ThemeTile({
+    super.key,
+    required this.theme,
+    required this.isSelected,
+    required this.onTap,
+    required this.tileSize, // Receive tileSize
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData themeData = settings.themeDataFor(theme);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isSelected
+            ? Theme.of(context).scaffoldBackgroundColor == Colors.white
+                ? Colors.black.withAlpha(70)
+                : Colors.white.withAlpha(70)
+            : Colors.transparent,
+        border: Border.all(
+          color: isSelected
+              ? Theme.of(context).scaffoldBackgroundColor == Colors.white
+                  ? Colors.black.withAlpha(150)
+                  : Colors.white.withAlpha(150)
+              : Colors.transparent,
+          width: 1.5,
+        ),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        onTap: onTap,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: tileSize * 0.35, // Circle radius relative to tile size
+              child: Container(
+                //clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: isSelected
+                      ? Border.all(
+                          color: themeData.primaryColor,
+                          width: 3.0,
+                        )
+                      : null,
+                ),
+                child: Container(
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: LiquidLinearProgressIndicator(
+                    value: 0.2, // You can adjust this value or make it dynamic
+                    backgroundColor: themeData.scaffoldBackgroundColor,
+                    valueColor: AlwaysStoppedAnimation(
+                        themeData.highlightColor.toARGB32().toRadixString(16) !=
+                                '0'
+                            ? themeData.highlightColor
+                            : settings.primaryColor),
+                    waveLength: 0.4,
+                    direction: Axis.vertical,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              _getThemeName(theme).i18n,
+              style: TextStyle(fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _getThemeName(Themes theme) {
+    switch (theme) {
+      case Themes.Light:
+        return 'Light';
+      case Themes.Alchemy:
+        return 'Alchemy';
+      case Themes.Deezer:
+        return 'Deezer';
+      case Themes.Black:
+        return 'Black (AMOLED)';
+      case Themes.Spotify:
+        return 'Spotify';
+    }
   }
 }

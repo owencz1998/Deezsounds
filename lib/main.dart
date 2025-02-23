@@ -7,7 +7,6 @@ import 'package:lottie/lottie.dart';
 import 'package:deezer/fonts/alchemy_icons.dart';
 import 'package:deezer/ui/favorite_screen.dart';
 import 'package:deezer/ui/restartable.dart';
-import 'package:deezer/ui/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
@@ -101,7 +100,7 @@ void main() async {
 
 Future<void> prepareRun() async {
   await initializeLogging();
-  Logger.root.info('Starting ReFreezer App...');
+  Logger.root.info('Starting Alchemy...');
   settings = await Settings().loadSettings();
   cache = await Cache.load();
 }
@@ -135,7 +134,9 @@ class _ReFreezerAppState extends State<ReFreezerApp> {
       systemNavigationBarColor: settings.themeData.bottomAppBarTheme.color,
       systemNavigationBarIconBrightness:
           settings.isDark ? Brightness.light : Brightness.dark,
+      statusBarColor: settings.themeData.scaffoldBackgroundColor,
     ));
+    settings.save();
   }
 
   Locale? _locale() {
@@ -474,18 +475,22 @@ class _MainScreenState extends State<MainScreen>
     FocusNode screenFocusNode = FocusNode(); // for CustomNavigator
     screenFocusNode.requestFocus();
 
+    Color scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Theme.of(context).scaffoldBackgroundColor,
+      systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor,
+    ));
+
     return FutureBuilder(
       future: _initialization,
       builder: (context, snapshot) {
         // Check _initialization status
         if (snapshot.connectionState == ConnectionState.done) {
           // When _initialization is done, render app
+
           return OrientationBuilder(
             builder: (context, orientation) {
-              SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-                systemNavigationBarColor:
-                    settings.themeData.bottomAppBarTheme.color,
-              ));
               return KeyboardListener(
                   focusNode: FocusNode(),
                   onKeyEvent: (event) => _handleKey(
@@ -521,14 +526,14 @@ class _MainScreenState extends State<MainScreen>
                                       setState(() {
                                         _selected = index;
                                       });
-                                      //Fix statusbar
+
                                       SystemChrome.setSystemUIOverlayStyle(
-                                          const SystemUiOverlayStyle(
-                                        statusBarColor: Colors.transparent,
+                                          SystemUiOverlayStyle(
+                                        statusBarColor: scaffoldBackgroundColor,
                                       ));
                                     },
                                     selectedItemColor:
-                                        settings.primaryColor.withOpacity(0.8),
+                                        settings.primaryColor.withAlpha(200),
                                     showUnselectedLabels: true,
                                     selectedLabelStyle:
                                         TextStyle(color: settings.primaryColor),
@@ -638,10 +643,11 @@ class _MainScreenState extends State<MainScreen>
                                           setState(() {
                                             _selected = index;
                                           });
-                                          //Fix statusbar
+
                                           SystemChrome.setSystemUIOverlayStyle(
-                                              const SystemUiOverlayStyle(
-                                            statusBarColor: Colors.transparent,
+                                              SystemUiOverlayStyle(
+                                            statusBarColor:
+                                                scaffoldBackgroundColor,
                                           ));
                                         },
                                         selectedIconTheme: IconThemeData(

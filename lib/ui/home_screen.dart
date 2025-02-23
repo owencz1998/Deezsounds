@@ -22,199 +22,146 @@ import '../ui/elements.dart';
 import '../ui/error.dart';
 import '../ui/menu.dart';
 import 'details_screens.dart';
-import 'downloads_screen.dart';
 import 'settings_screen.dart';
 import 'tiles.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          SafeArea(child: Container()),
-          Flexible(
-              child: ListenableBuilder(
-                  listenable: playerBarState,
-                  builder: (BuildContext context, Widget? child) {
-                    return AnimatedPadding(
-                      duration: Duration(milliseconds: 200),
-                      padding: EdgeInsets.only(
-                          bottom: playerBarState.state ? 80 : 0),
-                      child: HomePageScreen(),
-                    );
-                  }))
-        ],
-      ),
-    ));
-  }
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const HomeAppBar({super.key});
+class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scrollController = ScrollController();
+  final double _minScrollOffset = 0.0;
+  final double _maxScrollOffset = 250;
 
-  @override
-  Size get preferredSize => AppBar().preferredSize;
-
-  @override
-  Widget build(BuildContext context) {
-    return FreezerAppBar(
-      'Home'.i18n,
-      actions: <Widget>[
-        IconButton(
-          icon: Icon(
-            AlchemyIcons.download,
-            semanticLabel: 'Download'.i18n,
-          ),
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const DownloadsScreen()));
-          },
-        ),
-        IconButton(
-          icon: Icon(
-            AlchemyIcons.settings,
-            semanticLabel: 'Settings'.i18n,
-          ),
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const SettingsScreen()));
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class FreezerTitle extends StatelessWidget {
-  const FreezerTitle({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 24, 0, 8),
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Image.asset(
-            'assets/banner.png',
-            width: MediaQuery.of(context).orientation == Orientation.portrait
-                ? MediaQuery.of(context).size.width * 0.9
-                : MediaQuery.of(context).size.height * 0.2,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class GamePageScreen extends StatefulWidget {
-  final HomePage? homePage;
-  const GamePageScreen({this.homePage, super.key});
-
-  @override
-  _GamePageScreenState createState() => _GamePageScreenState();
-}
-
-class _GamePageScreenState extends State<GamePageScreen> {
-  List<Playlist> _games = [];
-  List<Playlist> _page = [];
-
-  Future<void> _userGames() async {
-    List<Playlist> gamePage = await deezerAPI.getUserGames();
-    setState(() {
-      _page = gamePage;
-    });
-  }
-
-  Future<void> _loadGames() async {
-    List<Playlist> games = await deezerAPI.getMusicQuizzes();
-    games.shuffle();
-    setState(() {
-      _games = games;
-    });
-  }
+  double _userPictureSize = 50.0;
+  double _subtitleOffset = 0.0;
+  bool _subtitleVisible = true;
 
   @override
   void initState() {
     super.initState();
-    _userGames();
-    _loadGames();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.hasClients) {
+      double offset = _scrollController.offset;
+      double size = 0.0;
+      double minSize = 35.0;
+      double maxSize = 60.0;
+
+      if (offset < _minScrollOffset) {
+        size = maxSize;
+      } else if (offset > _maxScrollOffset) {
+        size = minSize;
+      } else {
+        double shrinkFactor =
+            (maxSize - minSize) / (_maxScrollOffset - _minScrollOffset);
+        size = maxSize - offset * shrinkFactor;
+      }
+
+      double newSubtitleOffset = -offset * 2.0;
+
+      setState(() {
+        _subtitleVisible = offset < _maxScrollOffset;
+        _userPictureSize = size;
+        _subtitleOffset = newSubtitleOffset;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: FreezerAppBar('Music Quizzes'.i18n),
-      body: ListView(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            child: Text(
-              'Quizzes for you :',
-              style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            child: SizedBox(
-              height: 250,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: List.generate(
-                  min(10, _page.length),
-                  (int i) => LargePlaylistTile(
-                    _page[i],
-                    onTap: () =>
-                        Navigator.of(context, rootNavigator: true).push(
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              BlindTestChoiceScreen(_page[i])),
+      body: CustomScrollView(
+        controller: _scrollController,
+        scrollDirection: Axis.vertical,
+        slivers: [
+          SliverAppBar(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            collapsedHeight: 62,
+            pinned: true,
+            title: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 4),
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: ClipRRect(
+                  // Use ClipRRect for rounded corners
+                  borderRadius: BorderRadius.circular(
+                      _userPictureSize), // Apply rounded corners
+                  child: FittedBox(
+                    // Use FittedBox to control image fitting
+                    fit: BoxFit
+                        .contain, // Use BoxFit.contain to prevent cropping
+                    child: SizedBox(
+                      // Ensure CachedImage has specific size for FittedBox to work
+                      width: _userPictureSize,
+                      height: _userPictureSize,
+                      child: CachedImage(
+                        // Now CachedImage is inside FittedBox and ClipRRect
+                        url: deezerAPI.userPicture?.fullUrl ?? '',
+                      ),
                     ),
+                  ),
+                ),
+                title: Text(
+                  'Hi ${deezerAPI.displayName ?? ''}',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                subtitle: _subtitleVisible
+                    ? Container(
+                        clipBehavior: Clip.hardEdge,
+                        decoration: BoxDecoration(),
+                        child: Transform.translate(
+                          offset: Offset(_subtitleOffset, 0),
+                          child: Text(
+                            'Welcome back !',
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      )
+                    : null,
+                trailing: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => SettingsScreen()));
+                  },
+                  icon: Icon(
+                    AlchemyIcons.settings,
+                    color: Theme.of(context).textTheme.titleMedium?.color,
                   ),
                 ),
               ),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            child: Text(
-              'Deezer quizzes :',
-              style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            child: SizedBox(
-              height: 250,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: List.generate(
-                  min(10, _games.length),
-                  (int i) => LargePlaylistTile(
-                    _games[i],
-                    onTap: () =>
-                        Navigator.of(context, rootNavigator: true).push(
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              BlindTestChoiceScreen(_games[i])),
-                    ),
-                  ),
-                ),
-              ),
+          SliverToBoxAdapter(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Flexible(
+                    child: ListenableBuilder(
+                        listenable: playerBarState,
+                        builder: (BuildContext context, Widget? child) {
+                          return AnimatedPadding(
+                            duration: Duration(milliseconds: 200),
+                            padding: EdgeInsets.only(
+                                bottom: playerBarState.state ? 80 : 0),
+                            child: HomePageScreen(),
+                          );
+                        })),
+              ],
             ),
           ),
         ],
@@ -339,76 +286,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
     }
     if (_error) return const ErrorScreen();
     return Column(children: [
-      Padding(
-        padding: EdgeInsets.fromLTRB(8, 20, 8, 0),
-        child: ListTile(
-          leading: SizedBox(
-              width: MediaQuery.of(context).size.width / 8,
-              height: MediaQuery.of(context).size.width / 8,
-              child: CachedImage(
-                url: deezerAPI.userPicture?.fullUrl ?? '',
-                circular: true,
-              )),
-          title: Text(
-            'Hi '.i18n + (deezerAPI.displayName ?? ''),
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          subtitle: Text(
-            'Welcome back !'.i18n,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
-          trailing: IconButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => SettingsScreen()));
-              },
-              icon: Icon(AlchemyIcons.settings)),
-        ),
-      ),
-/*      Padding(
-        padding: EdgeInsets.fromLTRB(8, 4, 8, 0),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width * 0.45,
-              height: 62,
-              alignment: Alignment.center,
-              clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(
-                color: settings.primaryColor,
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Text(
-                'Music',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).scaffoldBackgroundColor),
-              ),
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width * 0.45,
-              height: 62,
-              alignment: Alignment.center,
-              clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(
-                color: Colors.white.withAlpha(10),
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Text(
-                'Soon...',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            )
-          ],
-        ),
-      ),*/
       if (_homePage?.flowSection != null)
         HomepageRowSection(_homePage!.flowSection!),
       if (_homePage?.mainSection != null)
@@ -712,5 +589,137 @@ class HomePageItemWidget extends StatelessWidget {
       default:
         return const SizedBox(height: 0, width: 0);
     }
+  }
+}
+
+class FreezerTitle extends StatelessWidget {
+  const FreezerTitle({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 24, 0, 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Image.asset(
+            'assets/banner.png',
+            width: MediaQuery.of(context).orientation == Orientation.portrait
+                ? MediaQuery.of(context).size.width * 0.9
+                : MediaQuery.of(context).size.height * 0.2,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GamePageScreen extends StatefulWidget {
+  final HomePage? homePage;
+  const GamePageScreen({this.homePage, super.key});
+
+  @override
+  _GamePageScreenState createState() => _GamePageScreenState();
+}
+
+class _GamePageScreenState extends State<GamePageScreen> {
+  List<Playlist> _games = [];
+  List<Playlist> _page = [];
+
+  Future<void> _userGames() async {
+    List<Playlist> gamePage = await deezerAPI.getUserGames();
+    setState(() {
+      _page = gamePage;
+    });
+  }
+
+  Future<void> _loadGames() async {
+    List<Playlist> games = await deezerAPI.getMusicQuizzes();
+    games.shuffle();
+    setState(() {
+      _games = games;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _userGames();
+    _loadGames();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: FreezerAppBar('Music Quizzes'.i18n),
+      body: ListView(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Text(
+              'Quizzes for you :',
+              style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            child: SizedBox(
+              height: 250,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: List.generate(
+                  min(10, _page.length),
+                  (int i) => LargePlaylistTile(
+                    _page[i],
+                    onTap: () =>
+                        Navigator.of(context, rootNavigator: true).push(
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              BlindTestChoiceScreen(_page[i])),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Text(
+              'Deezer quizzes :',
+              style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            child: SizedBox(
+              height: 250,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: List.generate(
+                  min(10, _games.length),
+                  (int i) => LargePlaylistTile(
+                    _games[i],
+                    onTap: () =>
+                        Navigator.of(context, rootNavigator: true).push(
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              BlindTestChoiceScreen(_games[i])),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
