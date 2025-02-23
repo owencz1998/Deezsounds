@@ -588,7 +588,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     title: Text(
                                       'Deezer'.i18n,
                                       style: TextStyle(
-                                        fontFamily: 'MontSerrat',
+                                        fontFamily: 'Poppins',
                                         fontWeight: FontWeight.w900,
                                         fontSize: 18,
                                       ),
@@ -643,7 +643,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     title: Text(
                                       'Alchemy'.i18n,
                                       style: TextStyle(
-                                        fontFamily: 'MontSerrat',
+                                        fontFamily: 'Poppins',
                                         fontWeight: FontWeight.w900,
                                         fontSize: 18,
                                       ),

@@ -267,7 +267,7 @@ class Settings {
       ? null
       : GoogleFonts.getTextTheme(font,
           isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme);
-  String? get _fontFamily => (font == 'Deezer') ? 'Montserrat' : null;
+  String? get _fontFamily => (font == 'Deezer') ? 'Poppins' : null;
 
   //Overrides for the non-deprecated buttons to look like the old ones
   OutlinedButtonThemeData get outlinedButtonTheme => OutlinedButtonThemeData(

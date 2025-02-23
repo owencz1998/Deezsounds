@@ -65,7 +65,7 @@ class FreezerAppBar extends StatelessWidget implements PreferredSizeWidget {
         title: Text(
           title,
           style: const TextStyle(
-            fontFamily: 'MontSerrat',
+            fontFamily: 'Poppins',
             fontWeight: FontWeight.w900,
             fontSize: 48,
           ),

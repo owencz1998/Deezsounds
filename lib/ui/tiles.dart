@@ -8,6 +8,7 @@ import 'package:deezer/ui/details_screens.dart';
 import 'package:deezer/ui/favorite_screen.dart';
 import 'package:deezer/ui/menu.dart';
 import 'package:lottie/lottie.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 
 import '../api/deezer.dart';
 import '../api/definitions.dart';
@@ -307,33 +308,41 @@ class ArtistTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        width: 150,
+        width: 140,
         child: InkWell(
+          borderRadius: BorderRadius.circular(25),
           onTap: onTap,
           onLongPress: onHold,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Container(
-                height: 4,
+              Padding(
+                padding: const EdgeInsets.all(4),
+                child: Container(
+                  clipBehavior: Clip.hardEdge,
+                  decoration: ShapeDecoration(
+                    shape: SmoothRectangleBorder(
+                      borderRadius: SmoothBorderRadius(
+                        cornerRadius: 25,
+                        cornerSmoothing: 0.6,
+                      ),
+                    ),
+                  ),
+                  child: CachedImage(
+                    url: artist.picture?.thumb ?? '',
+                    circular: true,
+                    width: 128,
+                  ),
+                ),
               ),
-              CachedImage(
-                url: artist.picture?.thumb ?? '',
-                circular: true,
-                width: 100,
-              ),
-              Container(
-                height: 8,
-              ),
-              Text(
-                artist.name ?? '',
-                maxLines: 1,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 14.0),
-              ),
-              Container(
-                height: 4,
+              Container(height: 2.0),
+              SizedBox(
+                child: Text(
+                  artist.name ?? '',
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 14.0),
+                ),
               ),
             ],
           ),
@@ -419,24 +428,35 @@ class PlaylistCardTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        height: 180.0,
+        width: 140,
         child: InkWell(
+          borderRadius: BorderRadius.circular(25),
           onTap: onTap,
           onLongPress: onHold,
           child: Column(
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.all(8),
-                child: CachedImage(
-                  url: playlist.image?.thumb ?? '',
-                  width: 128,
-                  height: 128,
-                  rounded: true,
+                padding: const EdgeInsets.all(4),
+                child: Container(
+                  clipBehavior: Clip.hardEdge,
+                  decoration: ShapeDecoration(
+                    shape: SmoothRectangleBorder(
+                      borderRadius: SmoothBorderRadius(
+                        cornerRadius: 25,
+                        cornerSmoothing: 0.6,
+                      ),
+                    ),
+                  ),
+                  child: CachedImage(
+                    url: playlist.image?.thumb ?? '',
+                    width: 130,
+                    height: 130,
+                    rounded: true,
+                  ),
                 ),
               ),
               Container(height: 2.0),
               SizedBox(
-                width: 144,
                 child: Text(
                   playlist.title ?? '',
                   maxLines: 1,
@@ -445,9 +465,6 @@ class PlaylistCardTile extends StatelessWidget {
                   style: const TextStyle(fontSize: 14.0),
                 ),
               ),
-              Container(
-                height: 4.0,
-              )
             ],
           ),
         ));
@@ -464,62 +481,69 @@ class SmartTrackListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 212.0,
-      child: InkWell(
-        onTap: onTap,
-        onLongPress: onHold,
-        child: Column(
-          children: <Widget>[
-            Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Stack(
-                  children: [
-                    CachedImage(
-                      width: 128,
-                      height: 128,
-                      url: smartTrackList.cover?.full ?? '',
-                      rounded: true,
-                    ),
-                    SizedBox(
-                      width: 128.0,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 6.0),
-                        child: Text(
-                          smartTrackList.title ?? '',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 18.0,
-                            shadows: [
-                              Shadow(
-                                  offset: Offset(1, 1),
-                                  blurRadius: 2,
-                                  color: Colors.black)
-                            ],
-                          ),
+        width: 140,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(25),
+          onTap: onTap,
+          onLongPress: onHold,
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(4),
+                child: Container(
+                    clipBehavior: Clip.hardEdge,
+                    decoration: ShapeDecoration(
+                      shape: SmoothRectangleBorder(
+                        borderRadius: SmoothBorderRadius(
+                          cornerRadius: 25,
+                          cornerSmoothing: 0.6,
                         ),
                       ),
-                    )
-                  ],
-                )),
-            SizedBox(
-              width: 144.0,
-              child: Text(
-                smartTrackList.subtitle ?? '',
-                maxLines: 3,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 14.0),
+                    ),
+                    child: Stack(
+                      children: [
+                        CachedImage(
+                          url: smartTrackList.cover?.full ?? '',
+                          width: 130,
+                          height: 130,
+                          rounded: true,
+                        ),
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 12, top: 8),
+                            child: Text(
+                              smartTrackList.title?.toUpperCase() ?? '',
+                              maxLines: 1,
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        )
+                      ],
+                    )),
               ),
-            ),
-            Container(
-              height: 8.0,
-            )
-          ],
-        ),
-      ),
-    );
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Text(smartTrackList.subtitle ?? '',
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontSize: 12.0,
+                        color:
+                            (Theme.of(context).brightness == Brightness.light)
+                                ? Colors.grey[800]
+                                : Colors.white70)),
+              )
+            ],
+          ),
+        ));
   }
 }
 
@@ -547,7 +571,7 @@ class FlowTrackListTile extends StatelessWidget {
               CachedImage(
                 url: deezerFlow.cover?.full ?? '',
                 circular: true,
-                width: 85,
+                width: 95,
               ),
               Container(
                 height: 8,
@@ -577,50 +601,62 @@ class AlbumCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      onLongPress: onHold,
-      child: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CachedImage(
-                width: 128.0,
-                height: 128.0,
-                url: album.art?.thumb ?? '',
-                rounded: true),
+    return SizedBox(
+        width: 140,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(25),
+          onTap: onTap,
+          onLongPress: onHold,
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(4),
+                child: Container(
+                  clipBehavior: Clip.hardEdge,
+                  decoration: ShapeDecoration(
+                    shape: SmoothRectangleBorder(
+                      borderRadius: SmoothBorderRadius(
+                        cornerRadius: 25,
+                        cornerSmoothing: 0.6,
+                      ),
+                    ),
+                  ),
+                  child: CachedImage(
+                    url: album.art?.thumb ?? '',
+                    width: 130,
+                    height: 130,
+                    rounded: true,
+                  ),
+                ),
+              ),
+              Container(height: 2.0),
+              SizedBox(
+                child: Text(
+                  album.title ?? '',
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 14.0),
+                ),
+              ),
+              Container(
+                height: 2.0,
+              ),
+              SizedBox(
+                child: Text(album.artistString ?? '',
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontSize: 12.0,
+                        color:
+                            (Theme.of(context).brightness == Brightness.light)
+                                ? Colors.grey[800]
+                                : Colors.white70)),
+              )
+            ],
           ),
-          SizedBox(
-            width: 144.0,
-            child: Text(
-              album.title ?? '',
-              maxLines: 1,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 14.0),
-            ),
-          ),
-          Container(height: 4.0),
-          SizedBox(
-            width: 144.0,
-            child: Text(
-              album.artistString ?? '',
-              maxLines: 1,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  fontSize: 12.0,
-                  color: (Theme.of(context).brightness == Brightness.light)
-                      ? Colors.grey[800]
-                      : Colors.white70),
-            ),
-          ),
-          Container(
-            height: 8.0,
-          )
-        ],
-      ),
-    );
+        ));
   }
 }
 
@@ -835,6 +871,7 @@ class LargePlaylistTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             InkWell(
+              borderRadius: BorderRadius.circular(30),
               onTap: onTap ??
                   () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => PlaylistDetails(playlist))),
@@ -844,9 +881,14 @@ class LargePlaylistTile extends StatelessWidget {
               },
               child: Container(
                 clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.transparent),
-                    borderRadius: BorderRadius.circular(10)),
+                decoration: ShapeDecoration(
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(
+                      cornerRadius: 30,
+                      cornerSmoothing: 0.8,
+                    ),
+                  ),
+                ),
                 child: CachedImage(
                   url: playlist.image?.fullUrl ?? '',
                   height: 180,
@@ -861,33 +903,11 @@ class LargePlaylistTile extends StatelessWidget {
                 child: Text(playlist.title ?? '',
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    textAlign: TextAlign.start,
+                    textAlign: TextAlign.center,
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
               ),
             ),
-            if (playlist.user?.name != null && playlist.user?.name != '')
-              SizedBox(
-                  width: 180,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4.0),
-                    child: Text('By '.i18n + (playlist.user?.name ?? ''),
-                        maxLines: 1,
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            color: Settings.secondaryText, fontSize: 8)),
-                  )),
-            if (playlist.user?.name == null || playlist.user?.name == '')
-              SizedBox(
-                  width: 180,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4.0),
-                    child: Text('By '.i18n + (deezerAPI.userName ?? ''),
-                        maxLines: 1,
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            color: Settings.secondaryText, fontSize: 8)),
-                  ))
           ],
         ));
   }
@@ -931,7 +951,7 @@ class LargeAlbumTile extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 6.0),
                   child: Text(album.title ?? '',
                       overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
+                      maxLines: 1,
                       textAlign: TextAlign.start,
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),

@@ -204,7 +204,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                 child: Text(
                   'WELCOME TO ALCHEMY'.i18n,
                   style: TextStyle(
-                      fontFamily: 'MontSerrat',
+                      fontFamily: 'Poppins',
                       fontWeight: FontWeight.w900,
                       fontSize: 50),
                   textAlign: TextAlign.start,
@@ -452,7 +452,7 @@ class _EmailLoginState extends State<EmailLogin> {
               'Email',
               textAlign: TextAlign.center,
               style: TextStyle(
-                  fontFamily: 'MontSerrat',
+                  fontFamily: 'Poppins',
                   fontSize: 56.0,
                   fontWeight: FontWeight.w700),
             ),

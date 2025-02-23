@@ -701,7 +701,7 @@ class _RepeatButtonState extends State<RepeatButton> {
         );
       case LoopMode.all:
         return Icon(
-          AlchemyIcons.repeat_active,
+          AlchemyIcons.repeat_active_small,
           size: widget.iconSize,
           semanticLabel: 'Repeat'.i18n,
         );
@@ -899,7 +899,7 @@ class _PlaybackControlsState extends State<PlaybackControls> {
                 icon: Icon(
                   //cons.shuffle,
                   shuffleModeEnabled
-                      ? AlchemyIcons.shuffle_active
+                      ? AlchemyIcons.shuffle_active_small
                       : AlchemyIcons.shuffle,
                   semanticLabel: 'Shuffle'.i18n,
                   color: Colors.white,
@@ -1257,7 +1257,7 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
               icon: Icon(
                 //cons.shuffle,
                 shuffleModeEnabled
-                    ? AlchemyIcons.shuffle_active
+                    ? AlchemyIcons.shuffle_active_small
                     : AlchemyIcons.shuffle,
                 semanticLabel: 'Shuffle'.i18n,
               ),

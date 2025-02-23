@@ -14,7 +14,7 @@ def replace_font_family_in_files(folder_path):
                 with open(file_path, 'r') as f:
                     file_content = f.read()
 
-                modified_content = file_content.replace("fontFamily: 'Definitely not Deezer'", "fontFamily: 'Alchemy'")
+                modified_content = file_content.replace("'MontSerrat'", "'Poppins'")
 
                 if modified_content != file_content:
                     with open(file_path, 'w') as f:

@@ -524,7 +524,7 @@ class _CardCarouselWidgetState<T> extends State<CardCarouselWidget<T>>
                         (((_rotationAnimation?.value ?? 0) + 180) / 90)
                     : 0)
             ..setEntry(3, 2, 0.001)
-            ..rotateZ(rotation * pi / 720)
+            ..rotateZ(rotation * pi / 2800)
             ..scale(scale, scale),
           child: AnimatedOpacity(
             opacity: controllerValue >= 0.5 ? 1 - controllerValue : 1,

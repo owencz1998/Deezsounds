@@ -24,6 +24,7 @@ class DeezerAPI {
   String? licenseToken;
   String? userId;
   String? userName;
+  String? displayName;
   ImageDetails? userPicture;
   String? favoritesPlaylistId;
   String? sid;
@@ -196,6 +197,7 @@ class DeezerAPI {
 
   Future<void> getUser(String userId) async {
     Map<dynamic, dynamic> userData = await callPublicApi('/user/$userId');
+    displayName = userData['name'];
     userPicture = ImageDetails(
         fullUrl: userData['picture_big'], thumbUrl: userData['picture_small']);
   }

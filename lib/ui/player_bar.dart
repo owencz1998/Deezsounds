@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:deezer/fonts/alchemy_icons.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 
 import '../service/audio_service.dart';
 import '../settings.dart';
@@ -126,12 +127,15 @@ class _PlayerBarState extends State<PlayerBar> {
             }
             return Container(
               clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  border: Border.all(
-                      color: _bgColor?.withAlpha(180) ??
-                          Theme.of(context).scaffoldBackgroundColor),
-                  borderRadius: BorderRadius.circular(17)),
+              decoration: ShapeDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                shape: SmoothRectangleBorder(
+                  borderRadius: SmoothBorderRadius(
+                    cornerRadius: 20,
+                    cornerSmoothing: 0.4,
+                  ),
+                ),
+              ),
               child: Container(
                   decoration: BoxDecoration(
                     color: _bgColor?.withAlpha(180) ??
@@ -154,18 +158,21 @@ class _PlayerBarState extends State<PlayerBar> {
                                   Theme.of(context).scaffoldBackgroundColor,
                             ));
                           },
-                          leading: CachedImage(
-                            width: 40,
-                            height: 40,
-                            url: GetIt.I<AudioPlayerHandler>()
-                                    .mediaItem
-                                    .value
-                                    ?.extras?['thumb'] ??
-                                GetIt.I<AudioPlayerHandler>()
-                                    .mediaItem
-                                    .value
-                                    ?.artUri
-                                    .toString(),
+                          leading: Padding(
+                            padding: EdgeInsets.only(left: 6),
+                            child: CachedImage(
+                              width: 40,
+                              height: 40,
+                              url: GetIt.I<AudioPlayerHandler>()
+                                      .mediaItem
+                                      .value
+                                      ?.extras?['thumb'] ??
+                                  GetIt.I<AudioPlayerHandler>()
+                                      .mediaItem
+                                      .value
+                                      ?.artUri
+                                      .toString(),
+                            ),
                           ),
                           title: Text(
                             GetIt.I<AudioPlayerHandler>()

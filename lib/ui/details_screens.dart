@@ -884,7 +884,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                   textAlign: TextAlign.start,
                                   maxLines: 1,
                                   style: const TextStyle(
-                                      fontFamily: 'MontSerrat',
+                                      fontFamily: 'Poppins',
                                       fontSize: 40.0,
                                       fontWeight: FontWeight.w900),
                                 ),
@@ -1455,6 +1455,8 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                                   color: Colors.white
                                                       .withAlpha(30)),
                                               child: InkWell(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
                                                 radius: 10.0,
                                                 onTap: () {
                                                   Navigator.of(context).push(
@@ -1731,7 +1733,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                       artist.name ?? '',
                                       textAlign: TextAlign.left,
                                       style: TextStyle(
-                                          fontFamily: 'MontSerrat',
+                                          fontFamily: 'Poppins',
                                           fontSize: 40.0,
                                           fontWeight: FontWeight.w900),
                                     ),
@@ -1925,6 +1927,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                         borderRadius: BorderRadius.circular(10),
                                         color: Colors.white.withAlpha(30)),
                                     child: InkWell(
+                                      borderRadius: BorderRadius.circular(10),
                                       radius: 10.0,
                                       onTap: () {
                                         Navigator.of(context).push(
@@ -3265,7 +3268,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                 textAlign: TextAlign.start,
                                 maxLines: 1,
                                 style: const TextStyle(
-                                    fontFamily: 'MontSerrat',
+                                    fontFamily: 'Poppins',
                                     fontSize: 40.0,
                                     fontWeight: FontWeight.w900),
                               ),

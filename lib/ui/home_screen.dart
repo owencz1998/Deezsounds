@@ -160,7 +160,7 @@ class _GamePageScreenState extends State<GamePageScreen> {
             child: Text(
               'Quizzes for you :',
               style: TextStyle(
-                  fontFamily: 'MontSerrat',
+                  fontFamily: 'Poppins',
                   fontWeight: FontWeight.bold,
                   fontSize: 24),
             ),
@@ -191,7 +191,7 @@ class _GamePageScreenState extends State<GamePageScreen> {
             child: Text(
               'Deezer quizzes :',
               style: TextStyle(
-                  fontFamily: 'MontSerrat',
+                  fontFamily: 'Poppins',
                   fontWeight: FontWeight.bold,
                   fontSize: 24),
             ),
@@ -311,7 +311,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
       setState(() {
-        cardSize = MediaQuery.of(context).size.width * 0.75;
+        cardSize = MediaQuery.of(context).orientation == Orientation.portrait
+            ? MediaQuery.of(context).size.width * 0.75
+            : MediaQuery.of(context).size.height * 0.75;
       });
     });
   }
@@ -348,14 +350,19 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 circular: true,
               )),
           title: Text(
-            'Hi '.i18n + (deezerAPI.userName ?? ''),
+            'Hi '.i18n + (deezerAPI.displayName ?? ''),
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
             'Welcome back !'.i18n,
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
-          trailing: Icon(Icons.notifications_none_rounded),
+          trailing: IconButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => SettingsScreen()));
+              },
+              icon: Icon(AlchemyIcons.settings)),
         ),
       ),
 /*      Padding(
@@ -529,7 +536,7 @@ class HomepageRowSection extends StatelessWidget {
       children: [
         ListTile(
           title: Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 32.0, 8.0, 16.0),
+            padding: const EdgeInsets.fromLTRB(8.0, 12.0, 8.0, 16.0),
             child: Text(
               section.title ?? '',
               textAlign: TextAlign.left,
@@ -543,36 +550,39 @@ class HomepageRowSection extends StatelessWidget {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           padding: EdgeInsets.symmetric(horizontal: 8.0),
-          child: Row(
-            children: List.generate((section.items?.length ?? 0) + 1, (j) {
-              //Has more items
-              if (j == (section.items?.length ?? 0)) {
-                if (section.hasMore ?? false) {
-                  return TextButton(
-                    child: Text(
-                      'Show more'.i18n,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 20.0),
-                    ),
-                    onPressed: () =>
-                        Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => Scaffold(
-                        appBar: FreezerAppBar(section.title ?? ''),
-                        body: SingleChildScrollView(
-                            child: HomePageScreen(
-                                channel:
-                                    DeezerChannel(target: section.pagePath))),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Row(
+              children: List.generate((section.items?.length ?? 0) + 1, (j) {
+                //Has more items
+                if (j == (section.items?.length ?? 0)) {
+                  if (section.hasMore ?? false) {
+                    return TextButton(
+                      child: Text(
+                        'Show more'.i18n,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 20.0),
                       ),
-                    )),
-                  );
+                      onPressed: () =>
+                          Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => Scaffold(
+                          appBar: FreezerAppBar(section.title ?? ''),
+                          body: SingleChildScrollView(
+                              child: HomePageScreen(
+                                  channel:
+                                      DeezerChannel(target: section.pagePath))),
+                        ),
+                      )),
+                    );
+                  }
+                  return const SizedBox(height: 0, width: 0);
                 }
-                return const SizedBox(height: 0, width: 0);
-              }
 
-              //Show item
-              HomePageItem item = section.items![j] ?? HomePageItem();
-              return HomePageItemWidget(item);
-            }),
+                //Show item
+                HomePageItem item = section.items![j] ?? HomePageItem();
+                return HomePageItemWidget(item);
+              }),
+            ),
           ),
         )
       ],

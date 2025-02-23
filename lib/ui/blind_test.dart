@@ -193,7 +193,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                                           title: Text(
                                             'Deezer'.i18n,
                                             style: TextStyle(
-                                              fontFamily: 'MontSerrat',
+                                              fontFamily: 'Poppins',
                                               fontWeight: FontWeight.w900,
                                               fontSize: 18,
                                             ),
@@ -252,7 +252,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                                           title: Text(
                                             'Alchemy'.i18n,
                                             style: TextStyle(
-                                              fontFamily: 'MontSerrat',
+                                              fontFamily: 'Poppins',
                                               fontWeight: FontWeight.w900,
                                               fontSize: 18,
                                             ),
@@ -327,7 +327,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                           style: TextStyle(
                               color: Theme.of(context).scaffoldBackgroundColor,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'MontSerrat',
+                              fontFamily: 'Poppins',
                               fontSize: 18),
                           textHeightBehavior: TextHeightBehavior(
                             applyHeightToFirstAscent:
@@ -343,7 +343,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                       '#' + rank.toString(),
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'MontSerrat',
+                          fontFamily: 'Poppins',
                           fontSize: 18),
                       textHeightBehavior: TextHeightBehavior(
                         applyHeightToFirstAscent:
@@ -393,7 +393,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                             style: TextStyle(
                               fontSize: 34,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'MontSerrat',
+                              fontFamily: 'Poppins',
                             ),
                           ),
                         ),
@@ -436,7 +436,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                                 title: Text(
                                   'Titles'.i18n,
                                   style: TextStyle(
-                                      fontFamily: 'MontSerrat',
+                                      fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w900,
                                       color: Colors.black,
                                       fontSize: 20),
@@ -490,7 +490,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                                 title: Text(
                                   'Artists'.i18n,
                                   style: TextStyle(
-                                      fontFamily: 'MontSerrat',
+                                      fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w900,
                                       color: Colors.black,
                                       fontSize: 20),
@@ -903,7 +903,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                   '/' +
                                   _testLegnth.toString(),
                               style: TextStyle(
-                                  fontFamily: 'MontSerrat',
+                                  fontFamily: 'Poppins',
                                   fontWeight: FontWeight.bold),
                             ),
                             Container(
@@ -1020,7 +1020,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                           '/' +
                                           _testLegnth.toString(),
                                       style: TextStyle(
-                                          fontFamily: 'MontSerrat',
+                                          fontFamily: 'Poppins',
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Container(
@@ -1054,7 +1054,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                     Text(
                                       remaining.toString(),
                                       style: TextStyle(
-                                          fontFamily: 'MontSerrat',
+                                          fontFamily: 'Poppins',
                                           fontWeight: FontWeight.w900,
                                           fontSize: 50),
                                       textHeightBehavior: TextHeightBehavior(
@@ -1111,7 +1111,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  fontFamily: 'MontSerrat',
+                                                  fontFamily: 'Poppins',
                                                   fontSize: 18),
                                               textHeightBehavior:
                                                   TextHeightBehavior(
@@ -1137,7 +1137,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                         child: Text(
                                           remaining.toString() + "'",
                                           style: TextStyle(
-                                              fontFamily: 'MontSerrat',
+                                              fontFamily: 'Poppins',
                                               fontWeight: FontWeight.w900,
                                               fontSize: 50),
                                           textHeightBehavior:
@@ -1197,7 +1197,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  fontFamily: 'MontSerrat',
+                                                  fontFamily: 'Poppins',
                                                   fontSize: 18),
                                               textHeightBehavior:
                                                   TextHeightBehavior(
@@ -1279,7 +1279,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                                         '',
                                                     style: TextStyle(
                                                         fontFamily:
-                                                            'MontSerrat',
+                                                            'Poppins',
                                                         fontWeight:
                                                             FontWeight.w900,
                                                         color: Colors.black,
@@ -1632,7 +1632,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'MontSerrat',
+                              fontFamily: 'Poppins',
                               fontSize: 18),
                           textHeightBehavior: TextHeightBehavior(
                             applyHeightToFirstAscent:
@@ -1685,7 +1685,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                               style: TextStyle(
                                 fontSize: 34,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'MontSerrat',
+                                fontFamily: 'Poppins',
                               ),
                             ),
                           ],
@@ -1704,7 +1704,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                           style: TextStyle(
                                             fontSize: 46,
                                             fontWeight: FontWeight.w900,
-                                            fontFamily: 'MontSerrat',
+                                            fontFamily: 'Poppins',
                                           ),
                                         ),
                                         title: Text(
@@ -1794,7 +1794,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                 style: TextStyle(
                                   fontSize: 34,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'MontSerrat',
+                                  fontFamily: 'Poppins',
                                 ),
                               ),
                             ],

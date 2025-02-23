@@ -252,10 +252,9 @@ class _MainScreenState extends State<MainScreen>
   late final AppLifecycleListener _lifeCycleListener;
   final List<Widget> _screens = [
     const HomeScreen(),
-    const LibraryScreen(),
-    const FavoriteScreen(),
     const SearchScreen(),
-    const SettingsScreen()
+    const FavoriteScreen(),
+    const LibraryScreen(),
   ];
   Future<void>? _initialization;
   int _selected = 0;
@@ -484,9 +483,8 @@ class _MainScreenState extends State<MainScreen>
           return OrientationBuilder(
             builder: (context, orientation) {
               SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-                systemNavigationBarColor: orientation == Orientation.portrait
-                    ? settings.themeData.bottomAppBarTheme.color
-                    : Colors.white.withAlpha(30),
+                systemNavigationBarColor:
+                    settings.themeData.bottomAppBarTheme.color,
               ));
               return KeyboardListener(
                   focusNode: FocusNode(),
@@ -538,33 +536,49 @@ class _MainScreenState extends State<MainScreen>
                                         color: Settings.secondaryText),
                                     items: <BottomNavigationBarItem>[
                                       BottomNavigationBarItem(
-                                          activeIcon: const Icon(
-                                              AlchemyIcons.house_fill),
-                                          icon: const Icon(AlchemyIcons.house),
+                                          activeIcon: const Padding(
+                                            padding: EdgeInsets.only(top: 4),
+                                            child:
+                                                Icon(AlchemyIcons.house_fill),
+                                          ),
+                                          icon: const Padding(
+                                            padding: EdgeInsets.only(top: 4),
+                                            child: Icon(AlchemyIcons.house),
+                                          ),
                                           label: 'Home'.i18n),
                                       BottomNavigationBarItem(
-                                          activeIcon: const Icon(
-                                              AlchemyIcons.compass_fill),
-                                          icon:
-                                              const Icon(AlchemyIcons.compass),
-                                          label: 'Explore'.i18n),
-                                      BottomNavigationBarItem(
-                                          activeIcon: const Icon(
-                                              AlchemyIcons.heart_fill),
-                                          icon: const Icon(AlchemyIcons.heart),
-                                          label: 'Favorites'.i18n),
-                                      BottomNavigationBarItem(
-                                        activeIcon: const Icon(
-                                            AlchemyIcons.search_fill),
-                                        icon: const Icon(AlchemyIcons.search),
+                                        activeIcon: const Padding(
+                                          padding: EdgeInsets.only(top: 4),
+                                          child: Icon(AlchemyIcons.search_fill),
+                                        ),
+                                        icon: const Padding(
+                                          padding: EdgeInsets.only(top: 4),
+                                          child: Icon(AlchemyIcons.search),
+                                        ),
                                         label: 'Search'.i18n,
                                       ),
                                       BottomNavigationBarItem(
-                                          activeIcon:
-                                              const Icon(AlchemyIcons.settings),
-                                          icon:
-                                              const Icon(AlchemyIcons.settings),
-                                          label: 'Settings'.i18n)
+                                          activeIcon: const Padding(
+                                            padding: EdgeInsets.only(top: 4),
+                                            child:
+                                                Icon(AlchemyIcons.heart_fill),
+                                          ),
+                                          icon: const Padding(
+                                            padding: EdgeInsets.only(top: 4),
+                                            child: Icon(AlchemyIcons.heart),
+                                          ),
+                                          label: 'Library'.i18n),
+                                      BottomNavigationBarItem(
+                                          activeIcon: const Padding(
+                                            padding: EdgeInsets.only(top: 4),
+                                            child:
+                                                Icon(AlchemyIcons.human_fill),
+                                          ),
+                                          icon: const Padding(
+                                            padding: EdgeInsets.only(top: 4),
+                                            child: Icon(AlchemyIcons.human),
+                                          ),
+                                          label: 'Profile'.i18n),
                                     ],
                                   )))
                           : null,
@@ -587,18 +601,6 @@ class _MainScreenState extends State<MainScreen>
                                                   AlchemyIcons.house),
                                               label: Text('Home'.i18n)),
                                           NavigationRailDestination(
-                                              selectedIcon: const Icon(
-                                                  AlchemyIcons.compass_fill),
-                                              icon: const Icon(
-                                                  AlchemyIcons.compass),
-                                              label: Text('Explore'.i18n)),
-                                          NavigationRailDestination(
-                                              selectedIcon: const Icon(
-                                                  AlchemyIcons.heart_fill),
-                                              icon: const Icon(
-                                                  AlchemyIcons.heart),
-                                              label: Text('Favorites'.i18n)),
-                                          NavigationRailDestination(
                                             selectedIcon: const Icon(
                                                 AlchemyIcons.search_fill),
                                             icon:
@@ -607,10 +609,16 @@ class _MainScreenState extends State<MainScreen>
                                           ),
                                           NavigationRailDestination(
                                               selectedIcon: const Icon(
-                                                  AlchemyIcons.settings),
+                                                  AlchemyIcons.heart_fill),
                                               icon: const Icon(
-                                                  AlchemyIcons.settings),
-                                              label: Text('Settings'.i18n))
+                                                  AlchemyIcons.heart),
+                                              label: Text('Library'.i18n)),
+                                          NavigationRailDestination(
+                                              selectedIcon: const Icon(
+                                                  AlchemyIcons.human_fill),
+                                              icon: const Icon(
+                                                  AlchemyIcons.human),
+                                              label: Text('Profile'.i18n)),
                                         ],
                                         selectedIndex: _selected,
                                         onDestinationSelected:
