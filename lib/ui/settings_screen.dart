@@ -364,7 +364,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             _swatch(0xff4b2e7e),
                             _swatch(0xff384697),
                             _swatch(0xff0880b5),
-                            _swatch(0xff009a85),
+                            _swatch(0xff00ff7f),
                             _swatch(0xFFA238FF),
                           ],
                           allowShades: false,

@@ -123,6 +123,9 @@ dev_dependencies:
   build_runner: ^2.4.7
   flutter_lints: ^5.0.0
   envied_generator: ^1.1.1
+  figma_squircle:
+    path: ./figma_squircle
+  flutter_custom_carousel: ^0.1.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

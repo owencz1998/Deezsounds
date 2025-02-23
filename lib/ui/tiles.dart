@@ -533,8 +533,9 @@ class FlowTrackListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        width: 120,
+        width: 105,
         child: InkWell(
+          borderRadius: BorderRadius.circular(15),
           onTap: onTap,
           onLongPress: onHold,
           child: Column(
@@ -546,7 +547,7 @@ class FlowTrackListTile extends StatelessWidget {
               CachedImage(
                 url: deezerFlow.cover?.full ?? '',
                 circular: true,
-                width: 90,
+                width: 85,
               ),
               Container(
                 height: 8,

@@ -117,6 +117,7 @@ class Settings {
   //Colors
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
   Color primaryColor = Colors.lightBlue;
+  //  static const bgColor = Color(0xFF1B1B1E);
   static const bgColor = Color(0xFF0D0D28);
   static const secondaryText = Color(0xFFA9A6AA);
 

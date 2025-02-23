@@ -346,9 +346,19 @@ HomePage _$HomePageFromJson(Map<String, dynamic> json) => HomePage(
               ?.map((e) => HomePageSection.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-    );
+    )
+      ..flowSection = json['flowSection'] == null
+          ? null
+          : HomePageSection.fromJson(
+              json['flowSection'] as Map<String, dynamic>)
+      ..mainSection = json['mainSection'] == null
+          ? null
+          : HomePageSection.fromJson(
+              json['mainSection'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$HomePageToJson(HomePage instance) => <String, dynamic>{
+      'flowSection': instance.flowSection,
+      'mainSection': instance.mainSection,
       'sections': instance.sections,
     };
 
@@ -356,6 +366,8 @@ HomePageSection _$HomePageSectionFromJson(Map<String, dynamic> json) =>
     HomePageSection(
       layout:
           $enumDecodeNullable(_$HomePageSectionLayoutEnumMap, json['layout']),
+      type: $enumDecodeNullable(_$HomePageSectionTypeEnumMap, json['type']),
+      source: json['source'] as String?,
       items: HomePageSection._homePageItemFromJson(json['items']),
       title: json['title'] as String?,
       pagePath: json['pagePath'] as String?,
@@ -366,6 +378,8 @@ Map<String, dynamic> _$HomePageSectionToJson(HomePageSection instance) =>
     <String, dynamic>{
       'title': instance.title,
       'layout': _$HomePageSectionLayoutEnumMap[instance.layout],
+      'type': _$HomePageSectionTypeEnumMap[instance.type],
+      'source': instance.source,
       'pagePath': instance.pagePath,
       'hasMore': instance.hasMore,
       'items': HomePageSection._homePageItemToJson(instance.items),
@@ -374,6 +388,12 @@ Map<String, dynamic> _$HomePageSectionToJson(HomePageSection instance) =>
 const _$HomePageSectionLayoutEnumMap = {
   HomePageSectionLayout.ROW: 'ROW',
   HomePageSectionLayout.GRID: 'GRID',
+};
+
+const _$HomePageSectionTypeEnumMap = {
+  HomePageSectionType.FLOW: 'FLOW',
+  HomePageSectionType.MAIN: 'MAIN',
+  HomePageSectionType.OTHER: 'OTHER',
 };
 
 DeezerChannel _$DeezerChannelFromJson(Map<String, dynamic> json) =>

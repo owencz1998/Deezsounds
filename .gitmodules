@@ -16,3 +16,6 @@
 [submodule "liquid_progress_indicator_v2"]
 	path = liquid_progress_indicator_v2
 	url = https://github.com/PetitPrinc3/liquid_progress_indicator_v2.git
+[submodule "figma_squircle"]
+	path = figma_squircle
+	url = https://github.com/SedlarDavid/figma_squircle

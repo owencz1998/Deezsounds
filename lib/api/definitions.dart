@@ -868,6 +868,8 @@ class SmartTrackList {
 
 @JsonSerializable()
 class HomePage {
+  HomePageSection? flowSection;
+  HomePageSection? mainSection;
   List<HomePageSection> sections;
 
   HomePage({this.sections = const []});
@@ -904,7 +906,15 @@ class HomePage {
     //Parse every section
     for (var s in (json['sections'] ?? [])) {
       HomePageSection? section = HomePageSection.fromPrivateJson(s);
-      if (section != null) hp.sections.add(section);
+      if (section != null) {
+        if (section.type == HomePageSectionType.FLOW) {
+          hp.flowSection = section;
+        } else if (section.type == HomePageSectionType.MAIN) {
+          hp.mainSection = section;
+        } else {
+          hp.sections.add(section);
+        }
+      }
     }
     return hp;
   }
@@ -918,6 +928,8 @@ class HomePage {
 class HomePageSection {
   String? title;
   HomePageSectionLayout? layout;
+  HomePageSectionType? type;
+  String? source;
 
   //For loading more items
   String? pagePath;
@@ -927,7 +939,13 @@ class HomePageSection {
   List<HomePageItem?>? items;
 
   HomePageSection(
-      {this.layout, this.items, this.title, this.pagePath, this.hasMore});
+      {this.layout,
+      this.type,
+      this.source,
+      this.items,
+      this.title,
+      this.pagePath,
+      this.hasMore});
 
   //JSON
   static HomePageSection? fromPrivateJson(Map<dynamic, dynamic> json) {
@@ -954,6 +972,15 @@ class HomePageSection {
         return null;
     }
 
+    if (json['section_id']
+        .toString()
+        .contains('content_source=playlists_content-source_user-suggested')) {
+      hps.type = HomePageSectionType.MAIN;
+    } else if (json['section_id'].toString().contains('content_source=flow')) {
+      hps.type = HomePageSectionType.FLOW;
+    } else {
+      hps.type = HomePageSectionType.OTHER;
+    }
     //Parse items
     for (var i in (json['items'] ?? [])) {
       HomePageItem? hpi = HomePageItem.fromPrivateJson(i);
@@ -1137,6 +1164,8 @@ enum HomePageItemType {
 }
 
 enum HomePageSectionLayout { ROW, GRID }
+
+enum HomePageSectionType { FLOW, MAIN, OTHER }
 
 enum RepeatType { NONE, LIST, TRACK }
 

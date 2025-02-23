@@ -548,7 +548,7 @@ class MenuSheet {
       Function? onRemove,
       Function? onUpdate}) {
     show(context, [
-      (playlist.library != null)
+      (playlist.library == true)
           ? removePlaylistLibrary(playlist, context, onRemove: onRemove)
           : addPlaylistLibrary(playlist, context),
       playBlindTest(playlist, context),
