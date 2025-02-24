@@ -236,6 +236,7 @@ class SimpleTrackTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      contentPadding: EdgeInsets.zero,
       dense: true,
       minVerticalPadding: 0,
       visualDensity: VisualDensity.compact,
@@ -865,7 +866,8 @@ class LargePlaylistTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: EdgeInsets.symmetric(horizontal: 4),
+        padding: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.02),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -891,13 +893,13 @@ class LargePlaylistTile extends StatelessWidget {
                 ),
                 child: CachedImage(
                   url: playlist.image?.fullUrl ?? '',
-                  height: 180,
-                  width: 180,
+                  height: 160,
+                  width: 160,
                 ),
               ),
             ),
             SizedBox(
-              width: 180,
+              width: 160,
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 6.0),
                 child: Text(playlist.title ?? '',

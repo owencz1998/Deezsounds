@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final double _minScrollOffset = 0.0;
   final double _maxScrollOffset = 250;
 
-  double _userPictureSize = 50.0;
+  double _userPictureSize = 60.0;
   double _subtitleOffset = 0.0;
   bool _subtitleVisible = true;
 
@@ -210,6 +210,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     //Load local
     try {
       HomePage hp = await HomePage().load();
+      await deezerAPI.getUser(deezerAPI.userId ?? '');
       setState(() => _homePage = hp);
     } catch (e) {
       if (kDebugMode) {

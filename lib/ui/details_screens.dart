@@ -2367,7 +2367,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
     if (playlist.tracks?.isEmpty ?? true) {
       //If playlist is offline
       Playlist? offlinePlaylist = await downloadManager
-          .getOfflinePlaylist(playlist.id!)
+          .getOfflinePlaylist(playlist.id ?? '')
           .catchError((e) {
         setState(() {
           _error = true;
@@ -2392,7 +2392,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
       } else {
         //If playlist is not offline
         Playlist? onlinePlaylist =
-            await deezerAPI.playlist(playlist.id!, nb: 25).catchError((e) {
+            await deezerAPI.playlist(playlist.id ?? '', nb: 25).catchError((e) {
           setState(() {
             _error = true;
           });
