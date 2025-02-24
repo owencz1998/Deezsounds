@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = true;
       });
     }
-    await deezerAPI.getUser();
+    await deezerAPI.rawAuthorize();
 
     if (mounted) {
       setState(() {

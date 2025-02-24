@@ -193,18 +193,6 @@ class DeezerAPI {
     }));
   }
 
-  Future<void> getUser() async {
-    await rawAuthorize();
-    Map<dynamic, dynamic> userData = await callPublicApi('/user/$userId');
-    String? displayName = userData['name'];
-    ImageDetails? userPicture = ImageDetails(
-        fullUrl: userData['picture_big'], thumbUrl: userData['picture_small']);
-
-    cache.userDisplayName = displayName ?? '';
-    cache.userPicture = userPicture;
-    await cache.save();
-  }
-
   //Authorize, bool = success
   Future<bool> rawAuthorize({Function? onError}) async {
     try {
@@ -221,6 +209,10 @@ class DeezerAPI {
         //Store favoritesPlaylistId
         cache.favoritesPlaylistId =
             favoritesPlaylistId ?? cache.favoritesPlaylistId;
+        cache.userDisplayName = userName ?? '';
+        cache.userPicture = ImageDetails.fromPrivateString(
+            data['results']['USER']['USER_PICTURE'],
+            type: 'user');
         cache.save();
 
         return true;
