@@ -1,10 +1,9 @@
 import 'dart:math';
 
+import 'package:deezer/service/audio_service.dart';
 import 'package:deezer/ui/cached_image.dart';
 import 'package:deezer/ui/downloads_screen.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
 import 'package:deezer/fonts/alchemy_icons.dart';
 import 'package:deezer/main.dart';
 import 'package:deezer/ui/details_screens.dart';
@@ -13,6 +12,7 @@ import 'package:deezer/ui/menu.dart';
 import 'package:deezer/ui/tiles.dart';
 import 'package:deezer/utils/connectivity.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:get_it/get_it.dart';
 
 import '../api/cache.dart';
 import '../api/deezer.dart';
@@ -30,8 +30,8 @@ class FavoriteScreen extends StatefulWidget {
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
   String offlineTrackCount = '0';
-  String favoriteArtists = '0';
-  String favoriteAlbums = '0';
+  String? favoriteArtists = '0';
+  String? favoriteAlbums = '0';
 
   List<Playlist>? _playlists;
 
@@ -39,7 +39,6 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   bool _loading = false;
 
   List<Track> tracks = [];
-  List<Track> allTracks = [];
   List<Track> randomTracks = [];
   int? trackCount;
 
@@ -118,44 +117,36 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
 
     if (mounted) {
       setState(() {
-        if (favPlaylist != null) {
-          tracks = favPlaylist.tracks ?? [];
-          trackCount = favPlaylist.tracks?.length;
+        if (onlineFavPlaylist?.id != null) {
+          favoritesPlaylist = onlineFavPlaylist;
+          tracks = onlineFavPlaylist?.tracks ?? [];
+          trackCount = onlineFavPlaylist?.tracks?.length;
           selectRandom3(tracks); // Reselect random tracks after loading
-        }
-        if (playlists.length > (_playlists?.length ?? 0)) {
-          _playlists = playlists;
-        }
-        if (isOnline) {
-          if (onlineFavPlaylist?.id != null) {
-            trackCount = onlineFavPlaylist?.trackCount;
-            if (tracks.isEmpty) tracks = onlineFavPlaylist?.tracks ?? [];
-            _makeFavorite();
-            favoritesPlaylist = onlineFavPlaylist;
-            selectRandom3(tracks); // Reselect random tracks after online load
-          }
-          if (onlinePlaylists != null) {
-            playlists = onlinePlaylists;
-          }
+        } else if (favPlaylist?.id != null) {
+          favoritesPlaylist = favPlaylist;
+          tracks = favPlaylist?.tracks ?? [];
+          trackCount = favPlaylist?.tracks?.length;
+          _makeFavorite();
+          selectRandom3(tracks);
         } else {
           downloadManager.allOfflineTracks().then((offlineTracks) {
             if (mounted) {
               setState(() {
-                allTracks = offlineTracks;
+                tracks = offlineTracks;
                 trackCount = offlineTracks.length;
-                favoritesPlaylist = null;
-                selectRandom3(allTracks); // Reselect random tracks for offline
+                favoritesPlaylist = Playlist(
+                    id: '0', title: 'Offline tracks', tracks: offlineTracks);
+                selectRandom3(tracks); // Reselect random tracks for offline
               });
             }
           });
         }
-        _playlists = playlists;
+        _playlists = onlinePlaylists ?? playlists;
         _loading = false;
-        cache.favoritePlaylists =
-            playlists.isEmpty ? cache.favoritePlaylists : playlists;
+        cache.favoritePlaylists = _playlists ?? cache.favoritePlaylists;
         offlineTrackCount = snapData[0];
-        favoriteArtists = userArtists?.length.toString() ?? '0';
-        favoriteAlbums = userAlbums?.length.toString() ?? '0';
+        favoriteArtists = userArtists?.length.toString();
+        favoriteAlbums = userAlbums?.length.toString();
       });
     }
   }
@@ -183,7 +174,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                       width: 60,
                       height: 60,
                       child: CachedImage(
-                        url: deezerAPI.userPicture?.fullUrl ?? '',
+                        url: cache.userPicture.fullUrl ?? '',
                       ),
                     ),
                   ),
@@ -197,7 +188,18 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                 trailing: SizedBox(
                   width: 60,
                   child: IconButton(
-                      onPressed: () {}, icon: const Icon(AlchemyIcons.shuffle)),
+                      onPressed: () {
+                        List<Track> trackList = List.from(tracks);
+                        trackList.shuffle();
+                        GetIt.I<AudioPlayerHandler>().playFromTrackList(
+                            trackList,
+                            trackList[0].id ?? '',
+                            QueueSource(
+                                id: '',
+                                source: 'Library',
+                                text: 'Library shuffle'.i18n));
+                      },
+                      icon: const Icon(AlchemyIcons.shuffle)),
                 ),
               ),
               SizedBox(
@@ -229,8 +231,10 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                           Expanded(
                             child: LibraryGridItem(
                               title: 'Artists'.i18n,
-                              subtitle: '$favoriteArtists Artists'.i18n,
-                              icon: AlchemyIcons.human,
+                              subtitle: favoriteArtists != null
+                                  ? '$favoriteArtists Artists'.i18n
+                                  : 'You are offline',
+                              icon: AlchemyIcons.human_circle,
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => LibraryArtists()));
@@ -264,7 +268,9 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                           Expanded(
                             child: LibraryGridItem(
                               title: 'Albums'.i18n,
-                              subtitle: '$favoriteAlbums Albums'.i18n,
+                              subtitle: favoriteAlbums != null
+                                  ? '$favoriteAlbums Albums'.i18n
+                                  : 'You are offline',
                               icon: AlchemyIcons.album,
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
@@ -278,28 +284,25 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                   ),
                 ),
               ),
-              if (_playlists?.isEmpty ?? true)
+              if (_playlists?.isEmpty ?? true && _loading)
                 SizedBox(
                   height: 260,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
+                  child: ListTile(
+                    contentPadding: EdgeInsets.symmetric(
                         horizontal: MediaQuery.of(context).size.width * 0.05),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(
-                        'Favorite Playlists'.i18n,
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      trailing: Transform.scale(
-                          scale: 0.5,
-                          child: CircularProgressIndicator(
-                              color: Theme.of(context).primaryColor)),
-                      onTap: () => {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const LibraryPlaylists()))
-                      },
+                    title: Text(
+                      'Your Playlists'.i18n,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
+                    trailing: Transform.scale(
+                        scale: 0.5,
+                        child: CircularProgressIndicator(
+                            color: Theme.of(context).primaryColor)),
+                    onTap: () => {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const LibraryPlaylists()))
+                    },
                   ),
                 ),
               if (_playlists?.isNotEmpty ?? false)
@@ -307,40 +310,37 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                   height: 260,
                   child: Column(
                     children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(
+                      ListTile(
+                        contentPadding: EdgeInsets.symmetric(
                             horizontal:
                                 MediaQuery.of(context).size.width * 0.05),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(
-                            'Favorite Playlists'.i18n,
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          trailing: _loading
-                              ? Transform.scale(
-                                  scale: 0.5,
-                                  child: CircularProgressIndicator(
-                                      color: Theme.of(context).primaryColor))
-                              : Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text((_playlists!.length).toString(),
-                                        style: TextStyle(
-                                            color: Settings.secondaryText)),
-                                    const Icon(
-                                      Icons.chevron_right,
-                                    )
-                                  ],
-                                ),
-                          onTap: () => {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => const LibraryPlaylists()))
-                          },
+                        title: Text(
+                          'Your Playlists'.i18n,
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
+                        trailing: _loading
+                            ? Transform.scale(
+                                scale: 0.5,
+                                child: CircularProgressIndicator(
+                                    color: Theme.of(context).primaryColor))
+                            : Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text((_playlists!.length).toString(),
+                                      style: TextStyle(
+                                          color: Settings.secondaryText)),
+                                  const Icon(
+                                    Icons.chevron_right,
+                                  )
+                                ],
+                              ),
+                        onTap: () => {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => const LibraryPlaylists()))
+                        },
                       ),
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
@@ -356,70 +356,64 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                     ],
                   ),
                 ),
-              if (randomTracks.isEmpty)
+              if (randomTracks.isEmpty && _loading)
                 Column(children: [
                   SizedBox(
                     height: 224,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
+                    child: ListTile(
+                      contentPadding: EdgeInsets.symmetric(
                           horizontal: MediaQuery.of(context).size.width * 0.05),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          'Favorite Tracks'.i18n,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        trailing: Transform.scale(
-                            scale: 0.5,
-                            child: CircularProgressIndicator(
-                                color: Theme.of(context).primaryColor)),
-                        onTap: () => (favoritesPlaylist != null)
-                            ? Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => PlaylistDetails(
-                                    favoritesPlaylist ?? Playlist())))
-                            : null,
+                      title: Text(
+                        'Your Tracks'.i18n,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
+                      trailing: Transform.scale(
+                          scale: 0.5,
+                          child: CircularProgressIndicator(
+                              color: Theme.of(context).primaryColor)),
+                      onTap: () => (favoritesPlaylist != null)
+                          ? Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => PlaylistDetails(
+                                  favoritesPlaylist ?? Playlist())))
+                          : null,
                     ),
                   ),
                 ]),
               if (randomTracks.isNotEmpty)
                 SizedBox(
                   child: Column(children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
+                    ListTile(
+                      contentPadding: EdgeInsets.symmetric(
                           horizontal: MediaQuery.of(context).size.width * 0.05),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(
-                          'Favorite Tracks'.i18n,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        trailing: _loading
-                            ? Transform.scale(
-                                scale: 0.5,
-                                child: CircularProgressIndicator(
-                                    color: Theme.of(context).primaryColor))
-                            : Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text((trackCount ?? 0).toString(),
-                                      style: TextStyle(
-                                          color: Settings.secondaryText)),
-                                  const Icon(
-                                    Icons.chevron_right,
-                                  )
-                                ],
-                              ),
-                        onTap: () => (favoritesPlaylist != null)
-                            ? Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => PlaylistDetails(
-                                    favoritesPlaylist ?? Playlist())))
-                            : null,
+                      title: Text(
+                        'Your Tracks'.i18n,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
+                      trailing: _loading
+                          ? Transform.scale(
+                              scale: 0.5,
+                              child: CircularProgressIndicator(
+                                  color: Theme.of(context).primaryColor))
+                          : Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text((trackCount ?? 0).toString(),
+                                    style: TextStyle(
+                                        color: Settings.secondaryText)),
+                                const Icon(
+                                  Icons.chevron_right,
+                                )
+                              ],
+                            ),
+                      onTap: () => (favoritesPlaylist != null)
+                          ? Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => PlaylistDetails(
+                                  favoritesPlaylist ?? Playlist())))
+                          : null,
                     ),
                     ...List.generate(
                       randomTracks.length,
@@ -488,7 +482,9 @@ class LibraryGridItem extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
         decoration: ShapeDecoration(
-          color: Colors.white.withAlpha(30),
+          color: settings.theme == Themes.Light
+              ? Colors.black.withAlpha(30)
+              : Colors.white.withAlpha(30),
           shape: SmoothRectangleBorder(
             borderRadius: SmoothBorderRadius(
               cornerRadius: 25,

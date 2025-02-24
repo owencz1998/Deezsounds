@@ -24,8 +24,6 @@ class DeezerAPI {
   String? licenseToken;
   String? userId;
   String? userName;
-  String? displayName;
-  ImageDetails? userPicture;
   String? favoritesPlaylistId;
   String? sid;
 
@@ -195,11 +193,16 @@ class DeezerAPI {
     }));
   }
 
-  Future<void> getUser(String userId) async {
+  Future<void> getUser() async {
+    await rawAuthorize();
     Map<dynamic, dynamic> userData = await callPublicApi('/user/$userId');
-    displayName = userData['name'];
-    userPicture = ImageDetails(
+    String? displayName = userData['name'];
+    ImageDetails? userPicture = ImageDetails(
         fullUrl: userData['picture_big'], thumbUrl: userData['picture_small']);
+
+    cache.userDisplayName = displayName ?? '';
+    cache.userPicture = userPicture;
+    await cache.save();
   }
 
   //Authorize, bool = success
@@ -219,9 +222,6 @@ class DeezerAPI {
         cache.favoritesPlaylistId =
             favoritesPlaylistId ?? cache.favoritesPlaylistId;
         cache.save();
-
-        //Retrieve user picture
-        getUser(userId!);
 
         return true;
       }

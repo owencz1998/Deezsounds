@@ -26,9 +26,10 @@ import 'package:scrobblenaut/scrobblenaut.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:deezer/fonts/alchemy_icons.dart';
 
+import '../api/importer.dart';
+import '../ui/importer_screen.dart';
 import '../api/cache.dart';
 import '../api/deezer.dart';
-import '../fonts/refreezer_icons.dart';
 import '../main.dart';
 import '../utils/env.dart';
 import '../service/audio_service.dart';
@@ -308,9 +309,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               );
                             }).toList(),
                           ),
-                          SizedBox(
-                            height: 12,
-                          )
                         ],
                       ),
                     ),
@@ -660,6 +658,73 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   });
             },
           ),
+          ListTile(
+            title: Text('Import'.i18n),
+            leading: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Icon(
+                    AlchemyIcons.arrows_start_end,
+                  ),
+                ]),
+            subtitle: Text('Import playlists & favorites'.i18n),
+            onTap: () {
+              //Show progress
+              if (importer.done || importer.busy) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ImporterStatusScreen()));
+                return;
+              }
+
+              //Pick importer dialog
+              showDialog(
+                  context: context,
+                  builder: (context) => SimpleDialog(
+                        title: Text('Importer'.i18n),
+                        children: [
+                          ListTile(
+                            leading: const Icon(FontAwesome5.spotify),
+                            title: Text('Spotify v1'.i18n),
+                            subtitle: Text(
+                                'Import Spotify playlists up to 100 tracks without any login.'
+                                    .i18n),
+                            enabled:
+                                false, // Spotify reworked embedded playlist. Source format is changed and data no longer contains ISRC.
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      const SpotifyImporterV1()));
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(FontAwesome5.spotify),
+                            title: Text('Spotify v2'.i18n),
+                            subtitle: Text(
+                                'Import any Spotify playlist, import from own Spotify library. Requires free account.'
+                                    .i18n),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      const SpotifyImporterV2()));
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(AlchemyIcons.link),
+                            title: Text('Tunemymusic.com'.i18n),
+                            subtitle: Text(
+                                'Import playlists from another music service. (Spotify, Apple, Youtube and many more.)'
+                                    .i18n),
+                            onTap: () {
+                              launchUrlString(
+                                  'https://tunemymusic.com/transfer');
+                            },
+                          )
+                        ],
+                      ));
+            },
+          ),
           Padding(
             padding: EdgeInsets.fromLTRB(
               16,
@@ -844,7 +909,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  const Icon(Icons.developer_mode),
+                  const Icon(AlchemyIcons.rocket),
                 ]),
             onTap: () => Navigator.push(
                 context,
@@ -853,7 +918,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             title: Text('Updates'.i18n),
-            leading: const Icon(Icons.update),
+            leading: const Icon(AlchemyIcons.party),
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const UpdaterScreen())),
           ),
@@ -2176,7 +2241,7 @@ class _CreditsScreenState extends State<CreditsScreen> {
           ListTile(
             title: Text('Crowdin'.i18n),
             subtitle: Text('Help translating this app on Crowdin!'.i18n),
-            leading: const Icon(ReFreezerIcons.crowdin,
+            leading: const Icon(AlchemyIcons.open_new,
                 color: Color(0xffbdc1c6), size: 36.0),
             onTap: () {
               launchUrlString('https://crowdin.com/project/refreezer');
@@ -2407,6 +2472,7 @@ class ThemeTile extends StatelessWidget {
             Text(
               _getThemeName(theme).i18n,
               style: TextStyle(fontSize: 14),
+              maxLines: 1,
               textAlign: TextAlign.center,
             ),
           ],

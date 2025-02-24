@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:deezer/api/cache.dart';
 import 'package:deezer/ui/blind_test.dart';
 import 'package:deezer/ui/cached_image.dart';
 import 'package:deezer/ui/card_carousel.dart';
@@ -41,8 +42,40 @@ class _HomeScreenState extends State<HomeScreen> {
   double _subtitleOffset = 0.0;
   bool _subtitleVisible = true;
 
+  bool _isLoading = false;
+  String displayName = '';
+  String imageUrl = '';
+
+  void _load() async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+    await deezerAPI.getUser();
+
+    if (mounted) {
+      setState(() {
+        displayName = cache.userDisplayName;
+        imageUrl =
+            cache.userPicture.fullUrl ?? cache.userPicture.thumbUrl ?? '';
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   void initState() {
+    if (cache.userDisplayName == '' || cache.userPicture == ImageDetails()) {
+      _load();
+    } else {
+      if (mounted) {
+        setState(() {
+          displayName = cache.userDisplayName;
+          imageUrl = cache.userPicture.fullUrl ?? '';
+        });
+      }
+    }
     super.initState();
     _scrollController.addListener(_onScroll);
   }
@@ -108,15 +141,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       // Ensure CachedImage has specific size for FittedBox to work
                       width: _userPictureSize,
                       height: _userPictureSize,
-                      child: CachedImage(
-                        // Now CachedImage is inside FittedBox and ClipRRect
-                        url: deezerAPI.userPicture?.fullUrl ?? '',
-                      ),
+                      child: _isLoading
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : CachedImage(
+                              // Now CachedImage is inside FittedBox and ClipRRect
+                              url: imageUrl,
+                            ),
                     ),
                   ),
                 ),
                 title: Text(
-                  'Hi ${deezerAPI.displayName ?? ''}',
+                  'Hi $displayName',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 subtitle: _subtitleVisible
@@ -210,7 +247,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
     //Load local
     try {
       HomePage hp = await HomePage().load();
-      await deezerAPI.getUser(deezerAPI.userId ?? '');
       setState(() => _homePage = hp);
     } catch (e) {
       if (kDebugMode) {

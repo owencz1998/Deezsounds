@@ -14,7 +14,6 @@ import '../api/cache.dart';
 import '../api/deezer.dart';
 import '../api/definitions.dart';
 import '../api/download.dart';
-import '../api/importer.dart';
 import '../service/audio_service.dart';
 import '../settings.dart';
 import '../translations.i18n.dart';
@@ -22,7 +21,6 @@ import '../ui/details_screens.dart';
 import '../ui/downloads_screen.dart';
 import '../ui/elements.dart';
 import '../ui/error.dart';
-import '../ui/importer_screen.dart';
 import '../ui/tiles.dart';
 import 'menu.dart';
 import 'settings_screen.dart';
@@ -153,57 +151,6 @@ class LibraryScreen extends StatelessWidget {
             },
           ),
           const FreezerDivider(),
-          ListTile(
-            title: Text('Import'.i18n),
-            leading: const LeadingIcon(Icons.import_export,
-                color: Color(0xff2ba766)),
-            subtitle: Text('Import playlists from Spotify'.i18n),
-            onTap: () {
-              //Show progress
-              if (importer.done || importer.busy) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const ImporterStatusScreen()));
-                return;
-              }
-
-              //Pick importer dialog
-              showDialog(
-                  context: context,
-                  builder: (context) => SimpleDialog(
-                        title: Text('Importer'.i18n),
-                        children: [
-                          ListTile(
-                            leading: const Icon(FontAwesome5.spotify),
-                            title: Text('Spotify v1'.i18n),
-                            subtitle: Text(
-                                'Import Spotify playlists up to 100 tracks without any login.'
-                                    .i18n),
-                            enabled:
-                                false, // Spotify reworked embedded playlist. Source format is changed and data no longer contains ISRC.
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SpotifyImporterV1()));
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(FontAwesome5.spotify),
-                            title: Text('Spotify v2'.i18n),
-                            subtitle: Text(
-                                'Import any Spotify playlist, import from own Spotify library. Requires free account.'
-                                    .i18n),
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SpotifyImporterV2()));
-                            },
-                          )
-                        ],
-                      ));
-            },
-          ),
           ExpansionTile(
             textColor: settings.primaryColor,
             title: Text('Statistics'.i18n),

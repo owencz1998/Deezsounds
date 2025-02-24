@@ -1302,6 +1302,11 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
                           onPressed: () async {
                             await audioHandler
                                 .removeQueueItem(queueState.queue[index]);
+                            if (mounted) {
+                              setState(() {
+                                queueState.queue;
+                              });
+                            }
                           },
                         ),
                       )),
@@ -1331,6 +1336,11 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
                           onPressed: () async {
                             await audioHandler
                                 .removeQueueItem(queueState.queue[index]);
+                            if (mounted) {
+                              setState(() {
+                                queueState.queue;
+                              });
+                            }
                           },
                         ),
                       ))),

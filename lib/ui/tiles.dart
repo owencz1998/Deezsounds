@@ -243,8 +243,8 @@ class SimpleTrackTile extends StatelessWidget {
       leading: CachedImage(
         url: track.albumArt?.full ?? '',
         rounded: true,
-        height: 40,
-        width: 40,
+        height: 48,
+        width: 48,
       ),
       title: Text(track.title ?? '',
           maxLines: 1,

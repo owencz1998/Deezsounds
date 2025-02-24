@@ -2827,7 +2827,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                                   playlist)));
                                                 },
                                                 icon: Icon(
-                                                  AlchemyIcons.question,
+                                                  AlchemyIcons.music_quiz,
                                                   size: 20,
                                                 )),
                                           ),
@@ -3375,7 +3375,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                           playlist)));
                                         },
                                         icon: Icon(
-                                          AlchemyIcons.question,
+                                          AlchemyIcons.music_quiz,
                                           size: 20,
                                         )),
                                   ),

@@ -13,12 +13,6 @@
 
 ---
 
->[!CAUTION]
-> The "Deezer" name, brand, and associated designs are registered trademarks of **Deezer SA**.  
-> Using the Deezer branding theme or bypassing its restrictions is illegal.  
-> Therefore, no APK releases or compilation steps will be published in this repository.  
-> Developers interested in continuing the project are welcome to fork it.  
-
 #### :rocket: Alchemy Features :
 - Log in with an official Deezer account ;
 - Explore the official Deezer catalog ;
@@ -60,13 +54,15 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
     <img src="./assets/screenshots/playlist_landscape.png" height=150>
 </p>
 
-## :star2: Bugs & features
+## :star2: Credits
+- Built upon [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by **@DJDoubleD**.
+- Design inspired by [Mallari Kishor's Spotify Redesign](https://www.behance.net/gallery/194018249/Spotify-App-Redesign).
 
-#### :building_construction: Upcoming features
+## :building_construction: Upcoming features
 - Find another source for lyrics
 - Redesign the Home page
 
-#### :lady_beetle: Bugs
+## :lady_beetle: Bugs
 - Lyrics are not available
 - Some home tiles are not and will not be implemented (Concerts, Did you know, Original videos, ...)
 - [Tell me !](https://github.com/PetitPrinc3/Deezer/issues)

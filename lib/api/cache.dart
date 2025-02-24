@@ -24,6 +24,12 @@ class Cache {
   @JsonKey(defaultValue: [])
   List<Playlist> favoritePlaylists = [];
 
+  @JsonKey(defaultValue: '')
+  String userDisplayName = '';
+
+  @JsonKey(defaultValue: {})
+  ImageDetails userPicture = ImageDetails();
+
   //ID's of tracks that are in library
   List<String>? libraryTracks = [];
 
