@@ -2730,8 +2730,8 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
-                                          if (playlist.user?.name !=
-                                              deezerAPI.userName)
+                                          if (playlist.user?.id !=
+                                              deezerAPI.userId)
                                             Padding(
                                               padding:
                                                   EdgeInsets.only(right: 8.0),
@@ -3292,7 +3292,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  if (playlist.user?.name != deezerAPI.userName)
+                                  if (playlist.user?.id != deezerAPI.userId)
                                     Padding(
                                       padding: EdgeInsets.only(right: 8.0),
                                       child: IconButton(

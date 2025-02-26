@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:deezer/api/cache.dart';
 import 'package:deezer/api/deezer.dart';
 import 'package:deezer/api/definitions.dart';
 import 'package:deezer/fonts/alchemy_icons.dart';
@@ -1278,8 +1279,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                                             .title ??
                                                         '',
                                                     style: TextStyle(
-                                                        fontFamily:
-                                                            'Poppins',
+                                                        fontFamily: 'Poppins',
                                                         fontWeight:
                                                             FontWeight.w900,
                                                         color: Colors.black,
@@ -1509,7 +1509,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
       }
     } else {
       _leaderboard.add({
-        'user': {'name': deezerAPI.userName},
+        'user': {'name': cache.userName},
         'bestScore': widget.blindTest.points
       });
     }

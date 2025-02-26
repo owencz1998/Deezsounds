@@ -56,9 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (mounted) {
       setState(() {
-        displayName = cache.userDisplayName;
-        imageUrl =
-            cache.userPicture.fullUrl ?? cache.userPicture.thumbUrl ?? '';
+        displayName = cache.userName;
+        imageUrl = ImageDetails.fromJson(cache.userPicture).fullUrl ??
+            ImageDetails.fromJson(cache.userPicture).thumbUrl ??
+            '';
         _isLoading = false;
       });
     }
@@ -66,13 +67,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    if (cache.userDisplayName == '' || cache.userPicture == ImageDetails()) {
+    if (cache.userName == '' || cache.userPicture == ImageDetails()) {
       _load();
     } else {
       if (mounted) {
         setState(() {
-          displayName = cache.userDisplayName;
-          imageUrl = cache.userPicture.fullUrl ?? '';
+          displayName = cache.userName;
+          imageUrl = ImageDetails.fromJson(cache.userPicture).fullUrl ?? '';
         });
       }
     }
@@ -145,10 +146,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           ? Center(
                               child: CircularProgressIndicator(),
                             )
-                          : CachedImage(
-                              // Now CachedImage is inside FittedBox and ClipRRect
-                              url: imageUrl,
-                            ),
+                          : imageUrl == ''
+                              ? Container(
+                                  decoration: ShapeDecoration(
+                                      shape: CircleBorder(),
+                                      color: settings.theme == Themes.Light
+                                          ? Colors.black.withAlpha(30)
+                                          : Colors.white.withAlpha(30)),
+                                  child: Center(
+                                    child: Text(
+                                      displayName != '' ? displayName[0] : '',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: _userPictureSize / 2),
+                                    ),
+                                  ),
+                                )
+                              : CachedImage(
+                                  // Now CachedImage is inside FittedBox and ClipRRect
+                                  url: imageUrl,
+                                ),
                     ),
                   ),
                 ),

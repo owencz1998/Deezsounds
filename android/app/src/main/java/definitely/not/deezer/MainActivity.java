@@ -292,7 +292,7 @@ public class MainActivity extends AudioServiceActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        db.close();
+        //db.close();
     }
 
     @Override
@@ -307,6 +307,8 @@ public class MainActivity extends AudioServiceActivity {
             unbindService(connection);
             serviceBound = false;
         }
+        // Close database only when Activity is truly destroyed
+        db.close(); // MOVE db.close() HERE
     }
 
     //Connection to download service

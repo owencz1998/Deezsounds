@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fluttericon/octicons_icons.dart';
@@ -678,46 +679,58 @@ class ChannelTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: Card(
-        color: channel.backgroundImage == null ? channel.backgroundColor : null,
-        child: InkWell(
-          onTap: onTap,
-          child: SizedBox(
-            width: 148,
-            height: 75,
-            child: Center(
-                child: Stack(
-              children: [
-                if (channel.backgroundImage != null)
-                  CachedImage(
-                    url: channel.backgroundImage
-                            ?.customUrl('134', '264', quality: '100') ??
-                        '',
-                    width: 150,
-                    height: 75,
+    return InkWell(
+      borderRadius: BorderRadius.circular(25),
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.all(4.0),
+        child: Container(
+          width: 180,
+          height: 80,
+          clipBehavior: Clip.hardEdge,
+          decoration: ShapeDecoration(
+            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: 25,
+                cornerSmoothing: 0.6,
+              ),
+            ),
+            color: channel.backgroundColor,
+          ),
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Transform.translate(
+                  offset: Offset(15, 15),
+                  child: Transform.rotate(
+                    angle: pi / 10,
+                    child: CachedImage(
+                      url: channel.backgroundImage
+                              ?.customUrl('80', '80', quality: '100') ??
+                          '',
+                      width: 80,
+                      height: 80,
+                      rounded: true,
+                    ),
                   ),
-                if (channel.logoImage != null)
-                  CachedImage(
-                    url: channel.logoImage?.thumbUrl ?? '',
-                    width: 150,
-                    height: 75,
-                  ),
-                if (channel.title != null && channel.logo == null)
-                  Center(
-                      child: Text(
-                    channel.title!,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(12.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    channel.title ?? '',
+                    maxLines: 1,
                     textAlign: TextAlign.center,
-                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: _textColor()),
-                  ))
-              ],
-            )),
+                    style:
+                        TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

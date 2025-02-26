@@ -23,7 +23,6 @@ class DeezerAPI {
   String? token;
   String? licenseToken;
   String? userId;
-  String? userName;
   String? favoritesPlaylistId;
   String? sid;
 
@@ -202,17 +201,17 @@ class DeezerAPI {
       } else {
         token = data['results']['checkForm'];
         userId = data['results']['USER']['USER_ID']?.toString() ?? '';
-        userName = data['results']['USER']['BLOG_NAME'];
         favoritesPlaylistId = data['results']['USER']['LOVEDTRACKS_ID'];
         licenseToken = data['results']['USER']['OPTIONS']['license_token'];
 
         //Store favoritesPlaylistId
         cache.favoritesPlaylistId =
             favoritesPlaylistId ?? cache.favoritesPlaylistId;
-        cache.userDisplayName = userName ?? '';
+        cache.userName = data['results']['USER']['BLOG_NAME'] ?? '';
         cache.userPicture = ImageDetails.fromPrivateString(
-            data['results']['USER']['USER_PICTURE'],
-            type: 'user');
+                data['results']['USER']['USER_PICTURE'],
+                type: 'user')
+            .toJson();
         cache.save();
 
         return true;

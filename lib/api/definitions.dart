@@ -1116,9 +1116,9 @@ class DeezerChannel {
               (json['background_color'] ?? '#000000').replaceFirst('#', 'FF'),
               radix: 16)),
           target: json['target'].replaceFirst('/', ''),
-          backgroundImage: ((json['pictures']) == null)
+          backgroundImage: ((json['image_linked_item']) == null)
               ? null
-              : ImageDetails.fromPrivateJson(json['pictures'][0]),
+              : ImageDetails.fromPrivateJson(json['image_linked_item']),
           logoImage: ((json['logo_image']) == null)
               ? null
               : LogoDetails.fromPrivateJson(json['logo_image']));

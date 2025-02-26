@@ -1019,9 +1019,9 @@ class _LibraryPlaylistsState extends State<LibraryPlaylists> {
       case SortType.DEFAULT:
         break;
       case SortType.USER:
-        playlists.sort((a, b) => (a.user?.name ?? deezerAPI.userName!)
+        playlists.sort((a, b) => (a.user?.id ?? deezerAPI.userId!)
             .toLowerCase()
-            .compareTo((b.user?.name ?? deezerAPI.userName!).toLowerCase()));
+            .compareTo((b.user?.id ?? deezerAPI.userId!).toLowerCase()));
         break;
       case SortType.TRACK_COUNT:
         playlists.sort((a, b) => b.trackCount! - a.trackCount!);
@@ -1079,7 +1079,7 @@ class _LibraryPlaylistsState extends State<LibraryPlaylists> {
   Playlist get favoritesPlaylist => Playlist(
       id: cache.favoritesPlaylistId,
       title: 'Favorites'.i18n,
-      user: User(name: deezerAPI.userName),
+      user: User(name: cache.userName),
       image: ImageDetails(thumbUrl: 'assets/favorites_thumb.jpg'),
       tracks: [],
       trackCount: 1,

@@ -142,9 +142,10 @@ const _$AudioQualityEnumMap = {
 };
 
 const _$ThemesEnumMap = {
-  Themes.Light: 'Light',
   Themes.Alchemy: 'Alchemy',
   Themes.Deezer: 'Deezer',
+  Themes.Spotify: 'Spotify',
+  Themes.Light: 'Light',
   Themes.Black: 'Black',
 };
 

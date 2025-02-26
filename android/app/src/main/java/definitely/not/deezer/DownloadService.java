@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Looper;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -73,7 +74,7 @@ public class DownloadService extends Service {
     ArrayList<DownloadThread> threads = new ArrayList<>();
     ArrayList<Boolean> updateRequests = new ArrayList<>();
     boolean updating = false;
-    Handler progressUpdateHandler = new Handler();
+    Handler progressUpdateHandler = new Handler(Looper.getMainLooper());
     DownloadLog logger = new DownloadLog();
 
     public DownloadService() {

@@ -174,7 +174,8 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                       width: 60,
                       height: 60,
                       child: CachedImage(
-                        url: cache.userPicture.fullUrl ?? '',
+                        url: ImageDetails.fromJson(cache.userPicture).fullUrl ??
+                            '',
                       ),
                     ),
                   ),
@@ -258,7 +259,10 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => PlaylistDetails(
-                                        favoritesPlaylist ?? Playlist())));
+                                        favoritesPlaylist ??
+                                            Playlist(
+                                                id: cache
+                                                    .favoritesPlaylistId))));
                               },
                             ),
                           ),

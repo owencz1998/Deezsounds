@@ -25,10 +25,10 @@ class Cache {
   List<Playlist> favoritePlaylists = [];
 
   @JsonKey(defaultValue: '')
-  String userDisplayName = '';
+  String userName = '';
 
   @JsonKey(defaultValue: {})
-  ImageDetails userPicture = ImageDetails();
+  Map<String, dynamic> userPicture = ImageDetails().toJson();
 
   //ID's of tracks that are in library
   List<String>? libraryTracks = [];
