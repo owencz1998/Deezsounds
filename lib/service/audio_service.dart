@@ -915,7 +915,7 @@ class AudioPlayerHandler extends BaseAudioHandler
       if (stl.id == 'flow') {
         stl.tracks = await deezerAPI.flow(type: stl.flowType);
       } else {
-        stl = await deezerAPI.smartTrackList(stl.id ?? '');
+        stl = await deezerAPI.smartTrackList(stl.id ?? '') ?? SmartTrackList();
       }
     }
     QueueSource queueSource = QueueSource(

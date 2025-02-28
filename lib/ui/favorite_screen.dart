@@ -32,6 +32,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   String offlineTrackCount = '0';
   String? favoriteArtists = '0';
   String? favoriteAlbums = '0';
+  Playlist? topPlaylist;
 
   List<Playlist>? _playlists;
 
@@ -41,23 +42,6 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   List<Track> tracks = [];
   List<Track> randomTracks = [];
   int? trackCount;
-
-  //Get 3 random favorite titles
-  void selectRandom3(List<Track> trackList) {
-    if (trackList.isEmpty) {
-      setState(() {
-        randomTracks = [];
-        cache.favoriteTracks = [];
-      });
-      return;
-    }
-    List<Track> tcopy = List.from(trackList);
-    tcopy.shuffle(); // More efficient shuffling
-    setState(() {
-      randomTracks = tcopy.take(min(trackList.length, 3)).toList();
-      cache.favoriteTracks = randomTracks;
-    });
-  }
 
   void _makeFavorite() {
     for (final track in tracks) {
@@ -76,7 +60,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       });
     }
     if (cache.favoriteTracks.isNotEmpty) {
-      selectRandom3(cache.favoriteTracks);
+      tracks = cache.favoriteTracks;
     }
 
     // Load offline and online data concurrently
@@ -84,6 +68,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     final favPlaylistFuture =
         downloadManager.getOfflinePlaylist(cache.favoritesPlaylistId);
     final offlinePlaylistsFuture = downloadManager.getOfflinePlaylists();
+    final offlineAlbumsFuture = downloadManager.getOfflineAlbums();
     final snapDataFuture = downloadManager.getStats();
     final onlineFutures = isOnline
         ? [
@@ -91,6 +76,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
             deezerAPI.getPlaylists(),
             deezerAPI.getArtists(),
             deezerAPI.getAlbums(),
+            deezerAPI.smartTrackList('annual-top'),
           ]
         : [];
 
@@ -99,6 +85,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       snapDataFuture,
       favPlaylistFuture,
       offlinePlaylistsFuture,
+      offlineAlbumsFuture,
       ...onlineFutures,
     ]);
 
@@ -106,28 +93,35 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
 
     Playlist? favPlaylist = results[1] as Playlist?;
     List<Playlist> playlists = results[2] as List<Playlist>;
+    List<Album> albums = results[3] as List<Album>;
     Playlist? onlineFavPlaylist =
-        isOnline && results.length > 3 ? results[3] as Playlist? : null;
+        isOnline && results.length > 4 ? results[4] as Playlist? : null;
     List<Playlist>? onlinePlaylists =
-        isOnline && results.length > 4 ? results[4] as List<Playlist>? : null;
+        isOnline && results.length > 5 ? results[5] as List<Playlist>? : null;
     List<Artist>? userArtists =
-        isOnline && results.length > 5 ? results[5] as List<Artist> : null;
+        isOnline && results.length > 6 ? results[6] as List<Artist> : null;
     List<Album>? userAlbums =
-        isOnline && results.length > 6 ? results[6] as List<Album> : null;
+        isOnline && results.length > 7 ? results[7] as List<Album> : null;
+    SmartTrackList? topTracks =
+        isOnline && results.length > 8 ? results[8] as SmartTrackList? : null;
 
     if (mounted) {
       setState(() {
+        tracks = topTracks?.tracks ??
+            onlineFavPlaylist?.tracks ??
+            favPlaylist?.tracks ??
+            [];
+        topPlaylist = topTracks != null
+            ? Playlist.fromSmartTrackList(topTracks)
+            : onlineFavPlaylist ?? favPlaylist;
+        cache.favoriteTracks = tracks;
         if (onlineFavPlaylist?.id != null) {
           favoritesPlaylist = onlineFavPlaylist;
-          tracks = onlineFavPlaylist?.tracks ?? [];
           trackCount = onlineFavPlaylist?.tracks?.length;
-          selectRandom3(tracks); // Reselect random tracks after loading
         } else if (favPlaylist?.id != null) {
           favoritesPlaylist = favPlaylist;
-          tracks = favPlaylist?.tracks ?? [];
           trackCount = favPlaylist?.tracks?.length;
           _makeFavorite();
-          selectRandom3(tracks);
         } else {
           downloadManager.allOfflineTracks().then((offlineTracks) {
             if (mounted) {
@@ -135,8 +129,10 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                 tracks = offlineTracks;
                 trackCount = offlineTracks.length;
                 favoritesPlaylist = Playlist(
-                    id: '0', title: 'Offline tracks', tracks: offlineTracks);
-                selectRandom3(tracks); // Reselect random tracks for offline
+                    id: '0',
+                    title: 'Offline tracks',
+                    duration: Duration.zero,
+                    tracks: offlineTracks);
               });
             }
           });
@@ -146,7 +142,9 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
         cache.favoritePlaylists = _playlists ?? cache.favoritePlaylists;
         offlineTrackCount = snapData[0];
         favoriteArtists = userArtists?.length.toString();
-        favoriteAlbums = userAlbums?.length.toString();
+        favoriteAlbums =
+            userAlbums?.length.toString() ?? albums.length.toString();
+        cache.save();
       });
     }
   }
@@ -155,7 +153,6 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   void initState() {
     super.initState();
     _load();
-    cache.save();
   }
 
   @override
@@ -166,16 +163,21 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
             padding: const EdgeInsets.only(top: 12.0),
             children: <Widget>[
               ListTile(
+                contentPadding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.05),
                 leading: ClipRRect(
                   borderRadius: BorderRadius.circular(60),
-                  child: FittedBox(
-                    fit: BoxFit.contain,
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    alignment: Alignment.centerLeft,
                     child: SizedBox(
-                      width: 60,
-                      height: 60,
+                      width: 30,
+                      height: 30,
                       child: CachedImage(
                         url: ImageDetails.fromJson(cache.userPicture).fullUrl ??
                             '',
+                        circular: true,
                       ),
                     ),
                   ),
@@ -187,8 +189,13 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                   ),
                 ),
                 trailing: SizedBox(
+                  height: 60,
                   width: 60,
-                  child: IconButton(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.05),
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
                       onPressed: () {
                         List<Track> trackList = List.from(tracks);
                         trackList.shuffle();
@@ -200,7 +207,9 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                                 source: 'Library',
                                 text: 'Library shuffle'.i18n));
                       },
-                      icon: const Icon(AlchemyIcons.shuffle)),
+                      icon: const Icon(AlchemyIcons.shuffle),
+                    ),
+                  ),
                 ),
               ),
               SizedBox(
@@ -360,7 +369,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                     ],
                   ),
                 ),
-              if (randomTracks.isEmpty && _loading)
+              if (tracks.isEmpty && _loading)
                 Column(children: [
                   SizedBox(
                     height: 224,
@@ -368,7 +377,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                       contentPadding: EdgeInsets.symmetric(
                           horizontal: MediaQuery.of(context).size.width * 0.05),
                       title: Text(
-                        'Your Tracks'.i18n,
+                        'Your Top Tracks'.i18n,
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
@@ -384,14 +393,14 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                     ),
                   ),
                 ]),
-              if (randomTracks.isNotEmpty)
+              if (tracks.isNotEmpty)
                 SizedBox(
                   child: Column(children: [
                     ListTile(
                       contentPadding: EdgeInsets.symmetric(
                           horizontal: MediaQuery.of(context).size.width * 0.05),
                       title: Text(
-                        'Your Tracks'.i18n,
+                        'Your Top Tracks'.i18n,
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
@@ -405,7 +414,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text((trackCount ?? 0).toString(),
+                                Text((tracks.length).toString(),
                                     style: TextStyle(
                                         color: Settings.secondaryText)),
                                 const Icon(
@@ -413,20 +422,22 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                                 )
                               ],
                             ),
-                      onTap: () => (favoritesPlaylist != null)
-                          ? Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => PlaylistDetails(
-                                  favoritesPlaylist ?? Playlist())))
-                          : null,
+                      onTap: () =>
+                          (topPlaylist != null || favoritesPlaylist != null)
+                              ? Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => PlaylistDetails(
+                                      topPlaylist ??
+                                          favoritesPlaylist ??
+                                          Playlist())))
+                              : null,
                     ),
                     ...List.generate(
-                      randomTracks.length,
+                      min(5, tracks.length),
                       (int index) => Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal:
                                   MediaQuery.of(context).size.width * 0.05),
-                          child: SimpleTrackTile(
-                              randomTracks[index], favoritesPlaylist)),
+                          child: SimpleTrackTile(tracks[index], topPlaylist)),
                     ),
                   ]),
                 ),

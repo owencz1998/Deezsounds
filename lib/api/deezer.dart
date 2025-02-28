@@ -632,9 +632,12 @@ class DeezerAPI {
     return LyricsFull.fromPrivateJson(data['data']);
   }
 
-  Future<SmartTrackList> smartTrackList(String id) async {
+  Future<SmartTrackList?> smartTrackList(String id) async {
     Map data = await callGwApi('deezer.pageSmartTracklist',
         params: {'smarttracklist_id': id});
+    if (data['results']['DATA'] == null) {
+      return null;
+    }
     return SmartTrackList.fromPrivateJson(data['results']['DATA'],
         songsJson: data['results']['SONGS']);
   }

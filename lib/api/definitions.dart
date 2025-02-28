@@ -240,7 +240,7 @@ class Album {
   String? get artistString =>
       artists?.map<String>((art) => art.name ?? '').join(', ');
   Duration get duration => tracks == null
-      ? Duration()
+      ? Duration(seconds: 0)
       : Duration(
           seconds: tracks!.fold(0, (v, t) => v += t.duration!.inSeconds));
   String get durationString =>
@@ -538,6 +538,16 @@ class Playlist {
     }
     return false;
   }
+
+  factory Playlist.fromSmartTrackList(SmartTrackList trackList) => Playlist(
+        id: trackList.id,
+        title: trackList.title,
+        tracks: trackList.tracks,
+        image: trackList.cover,
+        duration: Duration.zero,
+        trackCount: trackList.trackCount,
+        description: trackList.description,
+      );
 }
 
 @JsonSerializable()

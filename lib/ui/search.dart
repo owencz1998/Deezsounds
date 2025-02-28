@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:deezer/settings.dart';
+import 'package:deezer/ui/cached_image.dart';
 import 'package:deezer/ui/settings_screen.dart';
 import 'package:deezer/utils/connectivity.dart';
 import 'package:flutter/foundation.dart';
@@ -188,8 +189,24 @@ class _SearchScreenState extends State<SearchScreen> {
             padding: const EdgeInsets.only(top: 12.0),
             children: <Widget>[
               ListTile(
-                leading: SizedBox(
-                  width: 60,
+                contentPadding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.05),
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(60),
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    alignment: Alignment.centerLeft,
+                    child: SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: CachedImage(
+                        url: ImageDetails.fromJson(cache.userPicture).fullUrl ??
+                            '',
+                        circular: true,
+                      ),
+                    ),
+                  ),
                 ),
                 title: const Center(
                   child: Text(
@@ -198,18 +215,25 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ),
                 trailing: SizedBox(
+                  height: 60,
                   width: 60,
-                  child: IconButton(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.05),
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => SettingsScreen()));
                       },
-                      icon: const Icon(AlchemyIcons.settings)),
+                      icon: const Icon(AlchemyIcons.settings),
+                    ),
+                  ),
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+                padding: EdgeInsets.fromLTRB(
+                    16.0, MediaQuery.of(context).size.width * 0.05, 16.0, 12.0),
                 child: Row(
                   children: <Widget>[
                     Expanded(

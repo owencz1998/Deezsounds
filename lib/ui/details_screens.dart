@@ -2278,30 +2278,6 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
   int _currentPage = 0;
   bool isLibrary = false;
 
-  //Get sorted playlist
-  List<Track> get sorted {
-    List<Track> tracks = List.from(playlist.tracks ?? []);
-    switch (_sort.type) {
-      case SortType.ALPHABETIC:
-        tracks.sort((a, b) => a.title!.compareTo(b.title!));
-        break;
-      case SortType.ARTIST:
-        tracks.sort((a, b) => a.artists![0].name!
-            .toLowerCase()
-            .compareTo(b.artists![0].name!.toLowerCase()));
-        break;
-      case SortType.DATE_ADDED:
-        tracks.sort((a, b) => (a.addedDate ?? 0) - (b.addedDate ?? 0));
-        break;
-      case SortType.DEFAULT:
-      default:
-        break;
-    }
-    //Reverse
-    if (_sort.reverse) return tracks.reversed.toList();
-    return tracks;
-  }
-
   //Load cached playlist sorting
   void _restoreSort() async {
     //Find index
@@ -2309,8 +2285,8 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
     if (index == null) return;
 
     //Preload tracks
-    if (playlist.tracks!.length < (playlist.trackCount ?? 0)) {
-      playlist = await deezerAPI.fullPlaylist(playlist.id!);
+    if ((playlist.tracks?.length ?? 0) < (playlist.trackCount ?? 0)) {
+      playlist = await deezerAPI.fullPlaylist(playlist.id ?? '');
     }
     setState(() => _sort = cache.sorts[index]);
   }
@@ -2333,17 +2309,18 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
   void _loadTracks() async {
     // Got all tracks, return
     if (_isLoadingTracks ||
-        playlist.tracks!.length >=
-            (playlist.trackCount ?? playlist.tracks!.length)) {
+        (playlist.tracks?.length ?? 0) >=
+            (playlist.trackCount ?? playlist.tracks?.length ?? 0)) {
       return;
     }
 
     setState(() => _isLoadingTracks = true);
-    int pos = playlist.tracks!.length;
+    int pos = playlist.tracks?.length ?? 0;
     //Get another page of tracks
     List<Track> tracks;
     try {
-      tracks = await deezerAPI.playlistTracksPage(playlist.id!, pos, nb: 25);
+      tracks =
+          await deezerAPI.playlistTracksPage(playlist.id ?? '', pos, nb: 25);
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -2355,7 +2332,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
     }
 
     setState(() {
-      playlist.tracks!.addAll(tracks);
+      playlist.tracks?.addAll(tracks);
       _isLoadingTracks = false;
     });
   }
@@ -2376,12 +2353,13 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
       });
       if (offlinePlaylist?.tracks?.isNotEmpty ?? false) {
         setState(() {
-          playlist = offlinePlaylist!;
+          playlist = offlinePlaylist ?? Playlist();
           _isLoading = false;
         });
 
         //Try to update offline playlist
-        Playlist? fullPlaylist = await deezerAPI.fullPlaylist(playlist.id!);
+        Playlist? fullPlaylist =
+            await deezerAPI.fullPlaylist(playlist.id ?? '');
         if (fullPlaylist.tracks != offlinePlaylist?.tracks &&
             (fullPlaylist.tracks?.isNotEmpty ?? false)) {
           setState(() {
@@ -2431,7 +2409,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
 
     _playlistController.addListener(() {
       setState(() {
-        _currentPage = _playlistController.page!.round();
+        _currentPage = _playlistController.page?.round() ?? 0;
       });
     });
   }
@@ -2981,7 +2959,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                     ),
                                   ),
                                 if (_error &&
-                                    playlist.tracks!.length !=
+                                    playlist.tracks?.length !=
                                         playlist.trackCount)
                                   const ErrorScreen(),
                                 ListenableBuilder(
@@ -3179,7 +3157,8 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                               subtitle: Text(
                                                   (NumberFormat.decimalPattern()
                                                           .format(
-                                                              playlist.fans))
+                                                              playlist.fans ??
+                                                                  0))
                                                       .toString(),
                                                   style: TextStyle(
                                                       color: Settings
@@ -3436,8 +3415,8 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                           ),
                         ),
                         const FreezerDivider(),
-                        ...List.generate(playlist.tracks!.length, (i) {
-                          Track t = sorted[i];
+                        ...List.generate(playlist.tracks?.length ?? 0, (i) {
+                          Track t = playlist.tracks?[i] ?? Track();
                           return TrackTile(t, onTap: () async {
                             (playlist.trackCount != playlist.tracks?.length &&
                                     await isConnected())
@@ -3507,7 +3486,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                             ),
                           ),
                         if (_error &&
-                            playlist.tracks!.length != playlist.trackCount)
+                            playlist.tracks?.length != playlist.trackCount)
                           const ErrorScreen(),
                         ListenableBuilder(
                             listenable: playerBarState,
