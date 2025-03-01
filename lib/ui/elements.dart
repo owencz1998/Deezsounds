@@ -14,7 +14,7 @@ class LeadingIcon extends StatelessWidget {
       width: 42.0,
       height: 42.0,
       decoration: BoxDecoration(
-          color: (color ?? Theme.of(context).primaryColor).withOpacity(1.0),
+          color: (color ?? Theme.of(context).primaryColor),
           shape: BoxShape.circle),
       child: Icon(
         icon,

@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:custom_navigator/custom_navigator.dart';
+import 'package:deezer/ui/user_screen.dart';
 import 'package:lottie/lottie.dart';
 import 'package:deezer/fonts/alchemy_icons.dart';
-import 'package:deezer/ui/favorite_screen.dart';
+import 'package:deezer/ui/library_screen.dart';
 import 'package:deezer/ui/restartable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,7 +29,6 @@ import 'service/service_locator.dart';
 import 'settings.dart';
 import 'translations.i18n.dart';
 import 'ui/home_screen.dart';
-import 'ui/library.dart';
 import 'ui/login_screen.dart';
 import 'ui/player_bar.dart';
 import 'ui/updater.dart';
@@ -254,8 +254,8 @@ class _MainScreenState extends State<MainScreen>
   final List<Widget> _screens = [
     const HomeScreen(),
     const SearchScreen(),
-    const FavoriteScreen(),
     const LibraryScreen(),
+    const UserScreen(),
   ];
   Future<void>? _initialization;
   int _selected = 0;

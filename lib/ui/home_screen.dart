@@ -192,9 +192,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => SettingsScreen()));
                   },
-                  icon: Icon(
-                    AlchemyIcons.settings,
-                    color: Theme.of(context).textTheme.titleMedium?.color,
+                  icon: Align(
+                    alignment: Alignment.centerRight,
+                    child: Icon(
+                      AlchemyIcons.settings,
+                      color: Theme.of(context).textTheme.titleMedium?.color,
+                    ),
                   ),
                 ),
               ),

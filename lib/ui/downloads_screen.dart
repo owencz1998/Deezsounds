@@ -1,11 +1,16 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:deezer/fonts/alchemy_icons.dart';
+import 'package:deezer/service/audio_service.dart';
+import 'package:deezer/settings.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:deezer/main.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 
 import '../api/download.dart';
 import '../translations.i18n.dart';
@@ -137,84 +142,344 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                 style: const TextStyle(
                     fontSize: 24.0, fontWeight: FontWeight.bold),
               ),
-            Column(
-                children: List.generate(
-                    queued.length,
-                    (int i) => DownloadTile(
-                          queued[i],
-                          updateCallback: () => _load(),
-                        ))),
+
             if (queued.isNotEmpty)
-              ListTile(
-                title: Text('Clear queue'.i18n),
-                leading: const Icon(Icons.delete),
-                onTap: () async {
-                  await downloadManager.removeDownloads(DownloadState.NONE);
-                  await _load();
-                },
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.width * 0.02,
+                    horizontal: MediaQuery.of(context).size.width * 0.05),
+                child: Column(
+                  children: [
+                    Container(
+                      clipBehavior: Clip.hardEdge,
+                      decoration: ShapeDecoration(
+                        color: settings.theme == Themes.Light
+                            ? Colors.black.withAlpha(30)
+                            : Colors.white.withAlpha(30),
+                        shape: SmoothRectangleBorder(
+                          borderRadius: SmoothBorderRadius(
+                            cornerRadius: 25,
+                            cornerSmoothing: 0.6,
+                          ),
+                        ),
+                      ),
+                      child: ExpansionTile(
+                          initiallyExpanded: true,
+                          title: Text('Queue'),
+                          trailing: CircleAvatar(
+                            radius: 12,
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            child: Text(
+                              queued.length.toString(),
+                              style: TextStyle(
+                                  fontSize: 10, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.max,
+                              spacing: MediaQuery.of(context).size.width * 0.05,
+                              children: [
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.6,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(25),
+                                    onTap: () async {
+                                      await downloadManager
+                                          .removeDownloads(DownloadState.NONE);
+                                      await _load();
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.all(
+                                          MediaQuery.of(context).size.width *
+                                              0.01),
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 12.0, top: 4.0),
+                                              child: Icon(AlchemyIcons.trash,
+                                                  size: 20),
+                                            ),
+                                            Text(
+                                              'Clear queue',
+                                              style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.width * 0.02,
+                            ),
+                            ...List.generate(
+                              queued.length,
+                              (int i) => DownloadTile(
+                                queued[i],
+                                updateCallback: () => _load(),
+                              ),
+                            ),
+                          ]),
+                    ),
+                  ],
+                ),
               ),
 
-            //Failed
             if (failed.isNotEmpty)
-              Text(
-                'Failed'.i18n,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 24.0, fontWeight: FontWeight.bold),
-              ),
-            Column(
-                children: List.generate(
-                    failed.length,
-                    (int i) => DownloadTile(
-                          failed[i],
-                          updateCallback: () => _load(),
-                        ))),
-            //Restart failed
-            if (failed.isNotEmpty)
-              ListTile(
-                title: Text('Restart failed downloads'.i18n),
-                leading: const Icon(Icons.restore),
-                onTap: () async {
-                  await downloadManager.retryDownloads();
-                  await _load();
-                },
-              ),
-            if (failed.isNotEmpty)
-              ListTile(
-                title: Text('Clear failed'.i18n),
-                leading: const Icon(Icons.delete),
-                onTap: () async {
-                  await downloadManager.removeDownloads(DownloadState.ERROR);
-                  await downloadManager
-                      .removeDownloads(DownloadState.DEEZER_ERROR);
-                  await _load();
-                },
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.width * 0.02,
+                    horizontal: MediaQuery.of(context).size.width * 0.05),
+                child: Column(
+                  children: [
+                    Container(
+                      clipBehavior: Clip.hardEdge,
+                      decoration: ShapeDecoration(
+                        color: settings.theme == Themes.Light
+                            ? Colors.black.withAlpha(30)
+                            : Colors.white.withAlpha(30),
+                        shape: SmoothRectangleBorder(
+                          borderRadius: SmoothBorderRadius(
+                            cornerRadius: 25,
+                            cornerSmoothing: 0.6,
+                          ),
+                        ),
+                      ),
+                      child: ExpansionTile(
+                        title: Text('Failed downloads'),
+                        trailing: CircleAvatar(
+                          radius: 12,
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          child: Text(
+                            failed.length.toString(),
+                            style: TextStyle(
+                                fontSize: 10, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.max,
+                            spacing: MediaQuery.of(context).size.width * 0.05,
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width / 3,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(25),
+                                  onTap: () async {
+                                    await downloadManager.retryDownloads();
+                                    await _load();
+                                    downloadManager.start();
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.01),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 12.0, top: 4.0),
+                                            child: Icon(
+                                                AlchemyIcons.repeat_small,
+                                                size: 20),
+                                          ),
+                                          Text(
+                                            'Retry',
+                                            style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width / 3,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(25),
+                                  onTap: () async {
+                                    await downloadManager
+                                        .removeDownloads(DownloadState.ERROR);
+                                    await downloadManager.removeDownloads(
+                                        DownloadState.DEEZER_ERROR);
+                                    await _load();
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.01),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 12.0, top: 4.0),
+                                            child: Icon(AlchemyIcons.trash,
+                                                size: 20),
+                                          ),
+                                          Text(
+                                            'Clear',
+                                            style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.width * 0.02,
+                          ),
+                          ...List.generate(
+                              failed.length,
+                              (int i) => DownloadTile(
+                                    failed[i],
+                                    updateCallback: () => _load(),
+                                  ))
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
-            //Finished
             if (finished.isNotEmpty)
-              Text(
-                'Done'.i18n,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 24.0, fontWeight: FontWeight.bold),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.width * 0.02,
+                    horizontal: MediaQuery.of(context).size.width * 0.05),
+                child: Column(
+                  children: [
+                    Container(
+                      clipBehavior: Clip.hardEdge,
+                      decoration: ShapeDecoration(
+                        color: settings.theme == Themes.Light
+                            ? Colors.black.withAlpha(30)
+                            : Colors.white.withAlpha(30),
+                        shape: SmoothRectangleBorder(
+                          borderRadius: SmoothBorderRadius(
+                            cornerRadius: 25,
+                            cornerSmoothing: 0.6,
+                          ),
+                        ),
+                      ),
+                      child: ExpansionTile(
+                          title: Text('Downloaded tracks'),
+                          trailing: CircleAvatar(
+                            radius: 12,
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            child: Text(
+                              finished.length.toString(),
+                              style: TextStyle(
+                                  fontSize: 10, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.max,
+                              spacing: MediaQuery.of(context).size.width * 0.05,
+                              children: [
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.6,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(25),
+                                    onTap: () async {
+                                      await downloadManager.retryDownloads();
+                                      await _load();
+                                      downloadManager.start();
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.all(
+                                          MediaQuery.of(context).size.width *
+                                              0.01),
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 12.0, top: 4.0),
+                                              child: Icon(AlchemyIcons.trash,
+                                                  size: 20),
+                                            ),
+                                            Text(
+                                              'Clear history',
+                                              style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.width * 0.02,
+                            ),
+                            ...List.generate(
+                              finished.length,
+                              (int i) => DownloadTile(
+                                finished[i],
+                                updateCallback: () => _load(),
+                              ),
+                            ),
+                          ]),
+                    ),
+                  ],
+                ),
               ),
-            Column(
-                children: List.generate(
-                    finished.length,
-                    (int i) => DownloadTile(
-                          finished[i],
-                          updateCallback: () => _load(),
-                        ))),
-            if (finished.isNotEmpty)
-              ListTile(
-                title: Text('Clear downloads history'.i18n),
-                leading: const Icon(Icons.delete),
-                onTap: () async {
-                  await downloadManager.removeDownloads(DownloadState.DONE);
-                  await _load();
-                },
-              ),
+
             ListenableBuilder(
                 listenable: playerBarState,
                 builder: (BuildContext context, Widget? child) {
@@ -270,6 +535,13 @@ class DownloadTile extends StatelessWidget {
   }
 
   Future onClick(BuildContext context) async {
+    if (download.state != DownloadState.DOWNLOADING &&
+        download.state != DownloadState.POST) {
+      GetIt.I<AudioPlayerHandler>().playFromMediaId(download.trackId ?? '');
+    }
+  }
+
+  Future onHold(BuildContext context) async {
     if (download.state != DownloadState.DOWNLOADING &&
         download.state != DownloadState.POST) {
       showDialog(
@@ -336,12 +608,25 @@ class DownloadTile extends StatelessWidget {
           ),
           subtitle:
               Text(subtitle(), maxLines: 1, overflow: TextOverflow.ellipsis),
-          leading: CachedImage(
-            url: download.image!,
+          leading: Container(
             width: 48,
+            height: 48,
+            clipBehavior: Clip.hardEdge,
+            decoration: ShapeDecoration(
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 10,
+                  cornerSmoothing: 1,
+                ),
+              ),
+            ),
+            child: CachedImage(
+              url: download.image!,
+              width: 48,
+            ),
           ),
           onTap: () => onClick(context),
-          onLongPress: () => onClick(context),
+          onLongPress: () => onHold(context),
           trailing: trailing(),
         ),
         if (download.state == DownloadState.DOWNLOADING)

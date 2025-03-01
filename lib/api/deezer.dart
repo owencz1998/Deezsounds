@@ -122,7 +122,7 @@ class DeezerAPI {
         .catchError((e) {
       return http.Response('', 200);
     });
-    if (res.body == '') return Map();
+    if (res.body == '') return {};
     dynamic body = jsonDecode(res.body);
     //Grab SID
     if (method == 'deezer.getUserData' && res.headers['set-cookie'] != null) {

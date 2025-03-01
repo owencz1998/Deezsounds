@@ -6,7 +6,7 @@ import 'package:fluttericon/octicons_icons.dart';
 import 'package:get_it/get_it.dart';
 import 'package:deezer/settings.dart';
 import 'package:deezer/ui/details_screens.dart';
-import 'package:deezer/ui/favorite_screen.dart';
+import 'package:deezer/ui/library_screen.dart';
 import 'package:deezer/ui/menu.dart';
 import 'package:lottie/lottie.dart';
 import 'package:figma_squircle/figma_squircle.dart';
@@ -725,8 +725,10 @@ class ChannelTile extends StatelessWidget {
                     maxLines: 1,
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
-                    style:
-                        TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: _textColor()),
                   ),
                 ),
               ),

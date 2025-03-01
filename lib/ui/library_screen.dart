@@ -21,14 +21,14 @@ import '../api/download.dart';
 import '../settings.dart';
 import '../translations.i18n.dart';
 
-class FavoriteScreen extends StatefulWidget {
-  const FavoriteScreen({super.key});
+class LibraryScreen extends StatefulWidget {
+  const LibraryScreen({super.key});
 
   @override
-  State<FavoriteScreen> createState() => _FavoriteScreenState();
+  State<LibraryScreen> createState() => _LibraryScreenState();
 }
 
-class _FavoriteScreenState extends State<FavoriteScreen> {
+class _LibraryScreenState extends State<LibraryScreen> {
   String offlineTrackCount = '0';
   String? favoriteArtists = '0';
   String? favoriteAlbums = '0';

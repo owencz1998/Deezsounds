@@ -909,7 +909,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  const Icon(AlchemyIcons.rocket),
+                  const Icon(AlchemyIcons.embed),
                 ]),
             onTap: () => Navigator.push(
                 context,
@@ -918,7 +918,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             title: Text('Updates'.i18n),
-            leading: const Icon(AlchemyIcons.party),
+            leading: const Icon(AlchemyIcons.rocket),
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const UpdaterScreen())),
           ),
@@ -2232,7 +2232,8 @@ class _CreditsScreenState extends State<CreditsScreen> {
           ListTile(
             title: Text('Repository'.i18n),
             subtitle: Text('Source code, report issues there.'.i18n),
-            leading: const Icon(Icons.code, color: Colors.green, size: 36.0),
+            leading:
+                const Icon(AlchemyIcons.embed, color: Colors.green, size: 36.0),
             onTap: () {
               launchUrlString(
                   'https://github.com/PetitPrinc3/DefinitelyNotDeezer');

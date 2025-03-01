@@ -2272,7 +2272,6 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
   bool _isLoading = false;
   bool _isLoadingTracks = false;
   bool _error = false;
-  late Sorting _sort;
   final ScrollController _scrollController = ScrollController();
   final PageController _playlistController = PageController();
   int _currentPage = 0;
@@ -2288,7 +2287,6 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
     if ((playlist.tracks?.length ?? 0) < (playlist.trackCount ?? 0)) {
       playlist = await deezerAPI.fullPlaylist(playlist.id ?? '');
     }
-    setState(() => _sort = cache.sorts[index]);
   }
 
   Future _isLibrary() async {
@@ -2391,7 +2389,6 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
   @override
   void initState() {
     playlist = widget.playlist;
-    _sort = Sorting(sourceType: SortSourceTypes.PLAYLIST, id: playlist.id);
 
     _load();
 
