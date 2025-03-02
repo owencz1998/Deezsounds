@@ -57,6 +57,7 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 
 ## :building_construction: Upcoming features
 - Continue the Search page UI refont ;
+- Implement a profile edition screen ;
 - Implement a song catcher ;
 - Prefetch lyrics for tracks in queue ;
 - Implement LyricFind API to get lyrics and translations ;
