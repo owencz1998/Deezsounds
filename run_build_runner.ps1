@@ -5,8 +5,14 @@ $mainProjectDir = Get-Location
 function Invoke-BuildRunner {
     param (
         [string]$dir,
-        [string]$name
+        [string]$name,
+        [string]$repo
     )
+
+    if (!(Test-Path -Path $dir)) {
+        git clone $repo
+    }
+
     Write-Host "Processing $name at $dir" -ForegroundColor Cyan
     Set-Location $dir
 
@@ -26,15 +32,32 @@ function Invoke-BuildRunner {
     flutter clean
 }
 
-# Extract submodule paths from .gitmodules
-$submodulePaths = git config --file .gitmodules --name-only --get-regexp path | ForEach-Object {
-    git config --file .gitmodules --get $_
-} | Where-Object { $_ -notmatch "http" }
+# Extract submodule paths and repositories from .gitmodules
+$submodulePaths = @()
 
-# Run build_runner for each submodule
+# Get submodule names (paths)
+$submoduleNameKeys = git config --file .gitmodules --name-only --get-regexp submodule | ForEach-Object {
+    if ($_ -match "^submodule\.(.*?)\.path$") {
+        $Matches[1]
+    }
+} | Where-Object { $PSItem } # Filter out empty matches
+
+foreach ($submoduleName in $submoduleNameKeys) {
+    $submodulePath = git config --file .gitmodules --get "submodule.$submoduleName.path"
+    $submoduleRepo = git config --file .gitmodules --get "submodule.$submoduleName.url"
+
+    # Create custom object for each submodule
+    $submoduleObject = [PSCustomObject]@{
+        name = $submodulePath
+        repo = $submoduleRepo
+    }
+    $submodulePaths += $submoduleObject
+}
+
+# Run build_runner for each submodule (modified to use object properties)
 foreach ($submodule in $submodulePaths) {
-    $submodulePath = Join-Path -Path $mainProjectDir -ChildPath $submodule
-    Invoke-BuildRunner $submodulePath "submodule $submodule"
+    $submodulePath = Join-Path -Path $mainProjectDir -ChildPath $submodule.name
+    Invoke-BuildRunner $submodulePath "submodule $($submodule.name)" $submodule.repo
 }
 
 # Run build_runner for the main project

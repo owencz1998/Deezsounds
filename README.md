@@ -27,6 +27,10 @@
 
 This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD.  
 
+## :hammer_and_wrench: Compile from source
+
+Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yourself. 
+
 ## :camera_flash: Screenshots
 
 <p align="center">
@@ -72,6 +76,7 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 
 **Alchemy** was not developed for piracy, but educational and private use.
 You are responsible for how you use **Alchemy**.
+Using **Alchemy** may be illegal in your country.
 
 **Alchemy** uses both Deezer's public and internal API's, but is not endorsed, certified or otherwise approved in any way by Deezer.
 
@@ -79,4 +84,4 @@ The Deezer brand and name is the registered trademark of its respective owner.
 
 **Alchemy** has no partnership, sponsorship or endorsement with Deezer.
 
-By using **Alchemy** you do not abide by Deezer's [Terms of Service](https://www.deezer.com/legal/cgu)
+By using **Alchemy** you do not abide by Deezer's [Terms of Service](https://www.deezer.com/legal/cgu).
