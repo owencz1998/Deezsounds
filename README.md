@@ -57,11 +57,13 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 
 ## :building_construction: Upcoming features
 - Continue the Search page UI refont ;
+- Implement a song catcher ;
 - Prefetch lyrics for tracks in queue ;
 - Implement LyricFind API to get lyrics and translations ;
 - Add lyrics to the downloaded tracks.
 
 ## :lady_beetle: Bugs
+- Skipping tracks on the player screen is not as fluid as it used to be and can be choppy ;
 - Some home tiles are not and will not be implemented (Concerts, Did you know, Original videos, ...)
 - [Tell me !](https://github.com/PetitPrinc3/Deezer/issues)
 

@@ -13,8 +13,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:deezer/utils/connectivity.dart';
-import 'package:deezer/utils/env.dart';
+import 'package:alchemy/utils/connectivity.dart';
+import 'package:alchemy/utils/env.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:scrobblenaut/scrobblenaut.dart';
 

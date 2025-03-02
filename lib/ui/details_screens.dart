@@ -1,15 +1,15 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:deezer/ui/blind_test.dart';
+import 'package:alchemy/ui/blind_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
-import 'package:deezer/fonts/alchemy_icons.dart';
-import 'package:deezer/main.dart';
-import 'package:deezer/settings.dart';
-import 'package:deezer/utils/connectivity.dart';
-import 'package:deezer/utils/navigator_keys.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/main.dart';
+import 'package:alchemy/settings.dart';
+import 'package:alchemy/utils/connectivity.dart';
+import 'package:alchemy/utils/navigator_keys.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../api/cache.dart';

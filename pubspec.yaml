@@ -1,5 +1,5 @@
-name: deezer
-description: Deezer
+name: alchemy
+description: Alchemy
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.8.1
+version: 0.9.0
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -110,12 +110,14 @@ dependencies:
   url_launcher: ^6.2.2
   #version: ^3.0.2 Added contents in source directly for compatibility
   visibility_detector: ^0.4.0+2
-  wakelock_plus: ^1.2.4
+  wakelock_plus: ^1.2.10
   lottie: ^3.1.3
   liquid_progress_indicator_v2:
     path: ./liquid_progress_indicator_v2
   figma_squircle:
     path: ./figma_squircle
+  open_filex:
+    path: ./open_filex
 
 dev_dependencies:
   flutter_test:

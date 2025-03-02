@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:palette_generator/palette_generator.dart';
-import 'package:deezer/fonts/alchemy_icons.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 
 import '../service/audio_service.dart';

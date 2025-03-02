@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:deezer/ui/blind_test.dart';
-import 'package:deezer/ui/router.dart';
+import 'package:alchemy/ui/blind_test.dart';
+import 'package:alchemy/ui/router.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttericon/octicons_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:numberpicker/numberpicker.dart';
-import 'package:deezer/fonts/alchemy_icons.dart';
-import 'package:deezer/settings.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/settings.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';

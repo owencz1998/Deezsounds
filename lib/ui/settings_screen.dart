@@ -19,12 +19,12 @@ import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:deezer/api/definitions.dart';
-import 'package:deezer/api/download.dart';
-import 'package:deezer/ui/log_screen.dart';
+import 'package:alchemy/api/definitions.dart';
+import 'package:alchemy/api/download.dart';
+import 'package:alchemy/ui/log_screen.dart';
 import 'package:scrobblenaut/scrobblenaut.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:deezer/fonts/alchemy_icons.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 
 import '../api/importer.dart';

@@ -4,10 +4,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fluttericon/octicons_icons.dart';
 import 'package:get_it/get_it.dart';
-import 'package:deezer/settings.dart';
-import 'package:deezer/ui/details_screens.dart';
-import 'package:deezer/ui/library_screen.dart';
-import 'package:deezer/ui/menu.dart';
+import 'package:alchemy/settings.dart';
+import 'package:alchemy/ui/details_screens.dart';
+import 'package:alchemy/ui/library_screen.dart';
+import 'package:alchemy/ui/menu.dart';
 import 'package:lottie/lottie.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 

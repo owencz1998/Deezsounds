@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
-import 'package:deezer/fonts/alchemy_icons.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
 
 import '../api/deezer.dart';
 import '../api/definitions.dart';
@@ -241,6 +241,7 @@ class _LyricsScreenState extends State<LyricsScreen> {
                   return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Container(
+                          padding: EdgeInsets.all(4.0),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
                             color: (_currentIndex == i &&

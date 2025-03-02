@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:deezer/api/cache.dart';
+import 'package:alchemy/api/cache.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
-import 'package:deezer/api/download.dart';
+import 'package:alchemy/api/download.dart';
 import 'package:palette_generator/palette_generator.dart';
 
 import '../api/definitions.dart';
@@ -254,7 +254,7 @@ class DeezerAPI {
           type: type, id: uri.pathSegments[uri.pathSegments.length - 1]);
     }
     //Share URL
-    if (uri.host == 'deezer.page.link' || uri.host == 'www.deezer.page.link') {
+    if (uri.host == 'dzr.page.link' || uri.host == 'www.dzr.page.link') {
       http.BaseRequest request = http.Request('HEAD', Uri.parse(url));
       request.followRedirects = false;
       http.StreamedResponse response = await request.send();

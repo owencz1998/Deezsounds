@@ -5,8 +5,8 @@ import 'dart:ui';
 import 'package:async/async.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:deezer/fonts/alchemy_icons.dart';
-import 'package:deezer/utils/navigator_keys.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/utils/navigator_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -1063,8 +1063,8 @@ class _BigAlbumArtState extends State<BigAlbumArt> with WidgetsBindingObserver {
           controller: _pageController,
           onPageChanged: (int index) {
             if (_changeTrackOnPageChange) {
+              // Only trigger if the page change is caused by user swiping
               audioHandler.skipToQueueItem(index);
-              updateColor();
             }
           },
           children: _imageList,

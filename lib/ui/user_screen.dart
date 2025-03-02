@@ -1,12 +1,12 @@
-import 'package:deezer/api/cache.dart';
-import 'package:deezer/api/definitions.dart';
-import 'package:deezer/fonts/alchemy_icons.dart';
-import 'package:deezer/main.dart';
-import 'package:deezer/ui/cached_image.dart';
-import 'package:deezer/ui/downloads_screen.dart';
-import 'package:deezer/ui/elements.dart';
-import 'package:deezer/ui/library.dart';
-import 'package:deezer/ui/settings_screen.dart';
+import 'package:alchemy/api/cache.dart';
+import 'package:alchemy/api/definitions.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/main.dart';
+import 'package:alchemy/ui/cached_image.dart';
+import 'package:alchemy/ui/downloads_screen.dart';
+import 'package:alchemy/ui/elements.dart';
+import 'package:alchemy/ui/library.dart';
+import 'package:alchemy/ui/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

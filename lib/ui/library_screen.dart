@@ -1,16 +1,16 @@
 import 'dart:math';
 
-import 'package:deezer/service/audio_service.dart';
-import 'package:deezer/ui/cached_image.dart';
-import 'package:deezer/ui/downloads_screen.dart';
+import 'package:alchemy/service/audio_service.dart';
+import 'package:alchemy/ui/cached_image.dart';
+import 'package:alchemy/ui/downloads_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:deezer/fonts/alchemy_icons.dart';
-import 'package:deezer/main.dart';
-import 'package:deezer/ui/details_screens.dart';
-import 'package:deezer/ui/library.dart';
-import 'package:deezer/ui/menu.dart';
-import 'package:deezer/ui/tiles.dart';
-import 'package:deezer/utils/connectivity.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/main.dart';
+import 'package:alchemy/ui/details_screens.dart';
+import 'package:alchemy/ui/library.dart';
+import 'package:alchemy/ui/menu.dart';
+import 'package:alchemy/ui/tiles.dart';
+import 'package:alchemy/utils/connectivity.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:get_it/get_it.dart';
 

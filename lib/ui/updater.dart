@@ -7,14 +7,15 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_filex/open_filex.dart';
 import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:deezer/fonts/alchemy_icons.dart';
-import 'package:deezer/main.dart';
-import 'package:deezer/settings.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/main.dart';
+import 'package:alchemy/settings.dart';
 
 import '../api/cache.dart';
 import '../api/download.dart';
@@ -123,6 +124,8 @@ class _UpdaterScreenState extends State<UpdaterScreen> {
       //Pipe
       await res.stream.pipe(fileSink);
       fileSink.close();
+
+      OpenFilex.open(path);
 
       setState(() {
         _buttonEnabled = true;

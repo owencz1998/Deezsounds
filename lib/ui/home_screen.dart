@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:deezer/api/cache.dart';
-import 'package:deezer/ui/blind_test.dart';
-import 'package:deezer/ui/cached_image.dart';
-import 'package:deezer/ui/card_carousel.dart';
+import 'package:alchemy/api/cache.dart';
+import 'package:alchemy/ui/blind_test.dart';
+import 'package:alchemy/ui/cached_image.dart';
+import 'package:alchemy/ui/card_carousel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get_it/get_it.dart';
-import 'package:deezer/fonts/alchemy_icons.dart';
-import 'package:deezer/main.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/main.dart';
 import 'package:logging/logging.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 

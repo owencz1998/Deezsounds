@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:deezer/fonts/alchemy_icons.dart';
-import 'package:deezer/service/audio_service.dart';
-import 'package:deezer/settings.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/service/audio_service.dart';
+import 'package:alchemy/settings.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:deezer/main.dart';
+import 'package:alchemy/main.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 
 import '../api/download.dart';
