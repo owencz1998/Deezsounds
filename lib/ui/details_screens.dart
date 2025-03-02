@@ -216,7 +216,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                                       colors: [
                                                                         Theme.of(context)
                                                                             .scaffoldBackgroundColor
-                                                                            .withOpacity(.6),
+                                                                            .withAlpha(150),
                                                                         Colors
                                                                             .transparent
                                                                       ],
@@ -390,11 +390,11 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                                   BoxDecoration(
                                                                 color: Colors
                                                                     .white
-                                                                    .withOpacity(
+                                                                    .withAlpha(
                                                                         _currentPage ==
                                                                                 i
-                                                                            ? 1
-                                                                            : .6),
+                                                                            ? 255
+                                                                            : 150),
                                                                 border: Border.all(
                                                                     color: Colors
                                                                         .transparent),
@@ -642,12 +642,12 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                                   Theme.of(
                                                                           context)
                                                                       .scaffoldBackgroundColor
-                                                                      .withOpacity(
-                                                                          .6),
+                                                                      .withAlpha(
+                                                                          150),
                                                                   Theme.of(
                                                                           context)
                                                                       .scaffoldBackgroundColor
-                                                                      .withOpacity(
+                                                                      .withAlpha(
                                                                           0)
                                                                 ],
                                                                 begin: Alignment
@@ -677,8 +677,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                                 Theme.of(
                                                                         context)
                                                                     .scaffoldBackgroundColor
-                                                                    .withOpacity(
-                                                                        .6),
+                                                                    .withAlpha(
+                                                                        150),
                                                                 Colors
                                                                     .transparent
                                                               ],
@@ -857,11 +857,11 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                                       height: 4.0,
                                                       decoration: BoxDecoration(
                                                         color: Colors.white
-                                                            .withOpacity(
+                                                            .withAlpha(
                                                                 _currentPage ==
                                                                         i
-                                                                    ? 1
-                                                                    : .6),
+                                                                    ? 255
+                                                                    : 150),
                                                         border: Border.all(
                                                             color: Colors
                                                                 .transparent),
@@ -1659,7 +1659,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                             colors: [
                                               Theme.of(context)
                                                   .scaffoldBackgroundColor
-                                                  .withOpacity(.6),
+                                                  .withAlpha(150),
                                               Theme.of(context)
                                                   .scaffoldBackgroundColor
                                                   .withAlpha(0)
@@ -1679,7 +1679,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                               colors: [
                                                 Theme.of(context)
                                                     .scaffoldBackgroundColor
-                                                    .withOpacity(.6),
+                                                    .withAlpha(150),
                                                 Theme.of(context)
                                                     .scaffoldBackgroundColor
                                                     .withAlpha(0)
@@ -2526,8 +2526,8 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                                       Theme.of(
                                                                               context)
                                                                           .scaffoldBackgroundColor
-                                                                          .withOpacity(
-                                                                              .6),
+                                                                          .withAlpha(
+                                                                              150),
                                                                       Colors
                                                                           .transparent
                                                                     ],
@@ -2674,11 +2674,11 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                                 BoxDecoration(
                                                               color: Colors
                                                                   .white
-                                                                  .withOpacity(
+                                                                  .withAlpha(
                                                                       _currentPage ==
                                                                               i
-                                                                          ? 1
-                                                                          : .6),
+                                                                          ? 255
+                                                                          : 150),
                                                               border: Border.all(
                                                                   color: Colors
                                                                       .transparent),
@@ -3022,8 +3022,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                           colors: [
                                                             Theme.of(context)
                                                                 .scaffoldBackgroundColor
-                                                                .withOpacity(
-                                                                    .6),
+                                                                .withAlpha(150),
                                                             Theme.of(context)
                                                                 .scaffoldBackgroundColor
                                                                 .withAlpha(0)
@@ -3053,12 +3052,12 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                                   Theme.of(
                                                                           context)
                                                                       .scaffoldBackgroundColor
-                                                                      .withOpacity(
-                                                                          .6),
+                                                                      .withAlpha(
+                                                                          150),
                                                                   Theme.of(
                                                                           context)
                                                                       .scaffoldBackgroundColor
-                                                                      .withOpacity(
+                                                                      .withAlpha(
                                                                           0)
                                                                 ],
                                                                 begin: Alignment
@@ -3218,10 +3217,10 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                                     height: 4.0,
                                                     decoration: BoxDecoration(
                                                       color: Colors.white
-                                                          .withOpacity(
+                                                          .withAlpha(
                                                               _currentPage == i
-                                                                  ? 1
-                                                                  : .6),
+                                                                  ? 255
+                                                                  : 150),
                                                       border: Border.all(
                                                           color: Colors
                                                               .transparent),

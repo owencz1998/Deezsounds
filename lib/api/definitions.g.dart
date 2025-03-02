@@ -276,8 +276,8 @@ LyricsFull _$LyricsFullFromJson(Map<String, dynamic> json) => LyricsFull(
       unsyncedLyrics: json['unsyncedLyrics'] as String?,
       isExplicit: json['isExplicit'] as bool?,
       copyright: json['copyright'] as String?,
-    )..provider =
-        $enumDecodeNullable(_$LyricsProviderEnumMap, json['provider']);
+      provider: $enumDecodeNullable(_$LyricsProviderEnumMap, json['provider']),
+    );
 
 Map<String, dynamic> _$LyricsFullToJson(LyricsFull instance) =>
     <String, dynamic>{

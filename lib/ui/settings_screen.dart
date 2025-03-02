@@ -25,6 +25,7 @@ import 'package:deezer/ui/log_screen.dart';
 import 'package:scrobblenaut/scrobblenaut.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:deezer/fonts/alchemy_icons.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 
 import '../api/importer.dart';
 import '../ui/importer_screen.dart';
@@ -679,7 +680,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 .maxFinite, // Set width to maximum to allow list to expand
                             child: ReorderableListView(
                               shrinkWrap: true,
-                              onReorder: (int oldIndex, int newIndex) {
+                              onReorder: (int oldIndex, int newIndex) async {
                                 if (oldIndex == newIndex) return;
                                 String provider =
                                     settings.lyricsProviders.removeAt(oldIndex);
@@ -688,14 +689,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     .insert(newIndex, provider);
                                 setState(() {
                                   settings.lyricsProviders;
+                                  settings.save();
                                 });
                               },
                               children: List.generate(
                                   settings.lyricsProviders.length, (int i) {
                                 String provider = settings.lyricsProviders[i];
                                 return ListTile(
-                                  contentPadding: EdgeInsets.zero,
+                                  contentPadding: EdgeInsets.all(4),
                                   visualDensity: VisualDensity.compact,
+                                  shape: SmoothRectangleBorder(
+                                    borderRadius: SmoothBorderRadius(
+                                      cornerRadius: 10,
+                                      cornerSmoothing: 0.4,
+                                    ),
+                                  ),
                                   key: Key(provider),
                                   leading: SizedBox(
                                     width: 30,
@@ -727,7 +735,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   trailing: provider == 'DEEZER'
                                       ? Text('')
                                       : provider == 'LRCLIB'
-                                          ? Text('')
+                                          ? IconButton(
+                                              onPressed: () {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return StatefulBuilder(
+                                                          builder: (context,
+                                                              setState) {
+                                                        return AlertDialog(
+                                                          title: Text(
+                                                              'Advanced LRCLib search'
+                                                                  .i18n),
+                                                          content: ListTile(
+                                                            title: Text(
+                                                                'Toggle advanced search'),
+                                                            subtitle: Text(
+                                                                'This will perform multiple api queries to try to get more accurate results.'),
+                                                            trailing: Switch(
+                                                              value: settings
+                                                                  .advancedLRCLib,
+                                                              onChanged: (bool
+                                                                  v) async {
+                                                                setState(() =>
+                                                                    settings.advancedLRCLib =
+                                                                        v);
+                                                                await settings
+                                                                    .save();
+                                                                return;
+                                                              },
+                                                            ),
+                                                          ),
+                                                        );
+                                                      });
+                                                    });
+                                              },
+                                              icon: Icon(AlchemyIcons.settings))
                                           : provider == 'LYRICFIND'
                                               ? IconButton(
                                                   onPressed: () {},

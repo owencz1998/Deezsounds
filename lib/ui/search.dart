@@ -67,7 +67,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   String? _query;
   bool _online = true;
-  bool _loading = false;
+  //bool _loading = false;
   final TextEditingController _controller = TextEditingController();
   final FocusNode _keyboardListenerFocusNode = FocusNode();
   final FocusNode _textFieldFocusNode = FocusNode();
@@ -83,7 +83,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     //URL
     if (_query != null && _query!.startsWith('http')) {
-      setState(() => _loading = true);
+      //setState(() => _loading = true);
       try {
         await openScreenByURL(_query!);
       } catch (e) {
@@ -91,7 +91,7 @@ class _SearchScreenState extends State<SearchScreen> {
           print(e);
         }
       }
-      setState(() => _loading = false);
+      //setState(() => _loading = false);
       return;
     }
 
@@ -104,9 +104,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void _load() async {
     if (mounted) {
-      setState(() {
-        _loading = true;
-      });
+      //setState(() {_loading = true;});
     }
 
     bool netStatus = await isConnected();
@@ -114,7 +112,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (mounted) {
       setState(() {
         _online = netStatus;
-        _loading = false;
+        //_loading = false;
       });
     }
   }

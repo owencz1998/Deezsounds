@@ -84,6 +84,7 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
               ?.map((e) => e as String)
               .toList() ??
           ['DEEZER', 'LRCLIB', 'LYRICFIND']
+      ..advancedLRCLib = json['advancedLRCLib'] as bool? ?? false
       ..lyricfindKey = json['lyricfindKey'] as String? ?? ''
       ..lastFMUsername = json['lastFMUsername'] as String?
       ..lastFMPassword = json['lastFMPassword'] as String?
@@ -133,6 +134,7 @@ Map<String, dynamic> _$SettingsToJson(Settings instance) => <String, dynamic>{
       'proxyAddress': instance.proxyAddress,
       'blindTestType': _$BlindTestTypeEnumMap[instance.blindTestType]!,
       'lyricsProviders': instance.lyricsProviders,
+      'advancedLRCLib': instance.advancedLRCLib,
       'lyricfindKey': instance.lyricfindKey,
       'lastFMUsername': instance.lastFMUsername,
       'lastFMPassword': instance.lastFMPassword,

@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    if (cache.userName == '' || cache.userPicture == ImageDetails()) {
+    if (cache.userName == '' || cache.userPicture == {}) {
       _load();
     } else {
       if (mounted) {

@@ -744,7 +744,7 @@ class DownloadManager {
     for (var fs in offlineStat) {
       offlineSize += (await fs.stat()).size;
     }
-    //Return in list, //TODO: Make into class in future
+    //Return in list
     return ([
       trackCount.toString(),
       albumCount.toString(),

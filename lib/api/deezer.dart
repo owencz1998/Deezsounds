@@ -81,22 +81,30 @@ class DeezerAPI {
     }
   }
 
-  Future<String> getTrackPreview(String trackId) async {
-    //Generate URL
-    Uri uri = Uri.https('api.deezer.com', 'track/$trackId');
-    //Post
-    http.Response res = await http.get(uri).catchError((e) {
-      return http.Response('', 200);
-    });
-
-    if (res.body == '') return '';
-
+  Future<String> getTrackIsrc(String trackId) async {
     try {
-      if (jsonDecode(res.body)['preview'] != '') {
-        return jsonDecode(res.body)['preview'];
-      }
+      //Generate URL
+      Uri uri = Uri.https('api.deezer.com', 'track/$trackId');
+      //Post
+      http.Response res = await http.get(uri).catchError((e) {
+        return http.Response('', 200);
+      });
 
-      String isrc = jsonDecode(res.body)['isrc'];
+      if (res.body == '') return '';
+
+      if (jsonDecode(res.body)['isrc'] != '') {
+        return jsonDecode(res.body)['isrc'];
+      } else {
+        return '';
+      }
+    } catch (e) {
+      return '';
+    }
+  }
+
+  Future<String> getTrackPreview(String trackId) async {
+    try {
+      String isrc = await getTrackIsrc(trackId);
       dynamic data = await deezerAPI.callPublicApi('track/isrc:$isrc');
       return data['preview'];
     } catch (e) {
@@ -551,6 +559,7 @@ class DeezerAPI {
 
         if (lyricsFromPipeApi.errorMessage == null &&
             lyricsFromPipeApi.isLoaded()) {
+          lyricsFromPipeApi.provider = LyricsProvider.DEEZER;
           return lyricsFromPipeApi as LyricsFull;
         }
 
@@ -559,17 +568,63 @@ class DeezerAPI {
 
         if (lyricsFromLegacy.errorMessage == null &&
             lyricsFromLegacy.isLoaded()) {
+          lyricsFromLegacy.provider = LyricsProvider.DEEZER;
           return lyricsFromLegacy as LyricsFull;
         }
       } else if (provider == 'LRCLIB') {
-        http.Response res = await http.get(Uri.parse(
-            'https://lrclib.net/api/get?artist_name=' +
-                (track.artists?[0].name ?? '') +
-                '&track_name=' +
-                (track.title ?? '')));
+        http.Response res = http.Response('', 404);
+
+        if (settings.advancedLRCLib) {
+          res = await http.get(Uri.parse(
+              'https://lrclib.net/api/get?artist_name=${(track.artists?[0].name ?? '')}&track_name=${(track.title ?? '')}&duration=${track.duration?.inSeconds.toString()}'));
+          if (res.statusCode == 404) {
+            String isrc = await getTrackIsrc(track.id ?? '');
+            Map<String, dynamic> trackData = await deezerAPI
+                .callPublicApi('track/isrc:$isrc') as Map<String, dynamic>;
+            if (trackData == {}) {
+              Logger.root.info(
+                  'ISRC fetch failed for track ${track.id}. Reverting to simple LRCLib fetch.');
+              res = await http.get(Uri.parse(
+                  'https://lrclib.net/api/get?artist_name=' +
+                      (track.artists?[0].name ?? '') +
+                      '&track_name=' +
+                      (track.title ?? '')));
+            } else {
+              res = await http.get(Uri.parse(
+                  'https://lrclib.net/api/get?artist_name=${(trackData['artist']?['name'] ?? '')}&track_name=${(trackData['title_short'] ?? trackData['title'] ?? '')}&album_name=${(trackData['album']?['title'] ?? '')}&duration=${(trackData['duration'].toString())}'));
+              if (res.statusCode == 404) {
+                res = await http.get(Uri.parse(
+                    'https://lrclib.net/api/get?artist_name=${(trackData['artist']?['name'] ?? '')}&track_name=${(trackData['title_short'] ?? trackData['title'] ?? '')}&duration=${(trackData['duration'].toString())}'));
+                if (res.statusCode == 404) {
+                  res = await http.get(Uri.parse(
+                      'https://lrclib.net/api/get?artist_name=${(trackData['artist']?['name'] ?? '')}&track_name=${(trackData['title_short'] ?? trackData['title'] ?? '')}'));
+                  if (res.statusCode == 404) {
+                    Logger.root.info(
+                        'Advanced LRCLib api fetch failed for ${track.id}.');
+                  }
+                } else {
+                  Logger.root.info(
+                      'Got results for ${track.id} wit title, artist and duration.');
+                }
+              } else {
+                Logger.root.info(
+                    'Got results for ${track.id} wit title, artist, album and duration.');
+              }
+            }
+          } else {
+            Logger.root.info('Got immediate results for track ${track.id}.');
+          }
+        } else {
+          res = await http.get(Uri.parse(
+              'https://lrclib.net/api/get?artist_name=' +
+                  (track.artists?[0].name ?? '') +
+                  '&track_name=' +
+                  (track.title ?? '')));
+        }
+
         Map<String, dynamic> data = jsonDecode(utf8.decode(res.bodyBytes));
 
-        if (data['statusCode'] != 404) {
+        if (res.statusCode != 404) {
           List<SynchronizedLyric> synchronizedLyrics = [];
           List<String> synchronizedLines =
               (data['syncedLyrics'] ?? '').split('\n');
@@ -596,6 +651,7 @@ class DeezerAPI {
             syncedLyrics: synchronizedLyrics,
             unsyncedLyrics: data['plainLyrics'],
             provider: LyricsProvider.LRCLIB,
+            isExplicit: track.explicit,
           );
           return lrclyrics;
         }

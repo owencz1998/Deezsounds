@@ -15,10 +15,10 @@ import '../translations.i18n.dart';
 import '../ui/error.dart';
 
 class LyricsScreen extends StatefulWidget {
-  final Lyrics? lyrics;
+  final Lyrics? parentLyrics;
   final Track track;
 
-  const LyricsScreen({this.lyrics, required this.track, super.key});
+  const LyricsScreen({this.parentLyrics, required this.track, super.key});
 
   @override
   _LyricsScreenState createState() => _LyricsScreenState();
@@ -54,8 +54,8 @@ class _LyricsScreenState extends State<LyricsScreen> {
   }
 
   Future _load() async {
-    if (widget.lyrics?.isLoaded() == true) {
-      _updateLyricsState(widget.lyrics!);
+    if (widget.parentLyrics?.isLoaded() == true) {
+      _updateLyricsState(widget.parentLyrics!);
       return;
     }
 
@@ -103,12 +103,14 @@ class _LyricsScreenState extends State<LyricsScreen> {
         progress = [
           progress[1],
           min(
-              GetIt.I<AudioPlayerHandler>()
-                      .playbackState
-                      .value
-                      .position
-                      .inSeconds /
-                  (lyrics?.syncedLyrics?.first.offset?.inSeconds ?? 1),
+              (lyrics?.syncedLyrics?.first.offset?.inSeconds ?? 0) == 0
+                  ? 0
+                  : GetIt.I<AudioPlayerHandler>()
+                          .playbackState
+                          .value
+                          .position
+                          .inSeconds /
+                      (lyrics?.syncedLyrics?.first.offset?.inSeconds ?? 1),
               1)
         ];
         if (progress == [1, 1] || progress[0] > progress[1]) timer.cancel();
@@ -199,40 +201,40 @@ class _LyricsScreenState extends State<LyricsScreen> {
                     children: [CircularProgressIndicator()],
                   ),
                 ),
-
-              SizedBox(
-                height: MediaQuery.of(context).size.height / 2 - height / 2,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Stack(
-                    children: [
-                      SizedBox(
-                        width: 84,
-                        height: 84,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Icon(AlchemyIcons.microphone),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 84,
-                        height: 84,
-                        child: TweenAnimationBuilder<double>(
-                          tween: Tween(begin: progress[0], end: progress[1]),
-                          duration: Duration(milliseconds: 350),
-                          builder: (context, value, _) =>
-                              CircularProgressIndicator(
-                            value: value,
-                            strokeWidth: 1,
-                            color:
-                                Theme.of(context).textTheme.bodyMedium?.color,
+              if (lyrics?.isSynced() ?? false)
+                SizedBox(
+                  height: MediaQuery.of(context).size.height / 2 - height / 2,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Stack(
+                      children: [
+                        SizedBox(
+                          width: 84,
+                          height: 84,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Icon(AlchemyIcons.microphone),
                           ),
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          width: 84,
+                          height: 84,
+                          child: TweenAnimationBuilder<double>(
+                            tween: Tween(begin: progress[0], end: progress[1]),
+                            duration: Duration(milliseconds: 350),
+                            builder: (context, value, _) =>
+                                CircularProgressIndicator(
+                              value: value,
+                              strokeWidth: 1,
+                              color:
+                                  Theme.of(context).textTheme.bodyMedium?.color,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
               // Synced Lyrics
               if (lyrics != null && lyrics!.syncedLyrics?.isNotEmpty == true)
                 ...List.generate(lyrics!.syncedLyrics!.length, (i) {
@@ -291,7 +293,9 @@ class _LyricsScreenState extends State<LyricsScreen> {
                   ),
                 ),
               Container(
-                height: MediaQuery.of(context).size.height / 2 - height / 2,
+                height: lyrics?.isSynced() ?? false
+                    ? MediaQuery.of(context).size.height / 2 - height / 2
+                    : 8,
               ),
             ],
           ),
@@ -355,11 +359,24 @@ class _LyricsScreenState extends State<LyricsScreen> {
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 6.0),
                         child: IconButton(
-                            onPressed: () {},
-                            icon: Icon(
-                              AlchemyIcons.heart,
-                              color: Colors.white.withOpacity(0),
-                            )),
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return StatefulBuilder(
+                                        builder: (context, setState) {
+                                      return AlertDialog(
+                                        title: Text('About these lyrics'.i18n),
+                                        content: Text(
+                                          'These lyrics are provided by ${lyrics?.provider == LyricsProvider.DEEZER ? 'Deezzer' : lyrics?.provider == LyricsProvider.LRCLIB ? 'LRCLib' : lyrics?.provider == LyricsProvider.LYRICFIND ? 'LyricFind' : ''}.\n You can change your prefered lyric provider in your settings.'
+                                              .i18n,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      );
+                                    });
+                                  });
+                            },
+                            icon: Icon(AlchemyIcons.information)),
                       ),
                     ]),
               ),

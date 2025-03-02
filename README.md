@@ -25,11 +25,7 @@
 - Import your playlists from Spotify ;
 - Customize themes, accent colors and more.
 
-This app builds upon ReFreezer by leveraging Deezer's public and internal APIs.  
-For more details, see the [Legal](#balance_scale-disclaimer--legal) section. 
-
 This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD.  
-
 
 ## :camera_flash: Screenshots
 
@@ -55,15 +51,17 @@ This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer)
 </p>
 
 ## :star2: Credits
-- Built upon [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by **@DJDoubleD**.
+- Built upon [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD ;
+- Lyrics provided by [LRCLIB](https://github.com/tranxuanthang/lrclib) by @tranxuanthang ;
 - Design inspired by [Mallari Kishor's Spotify Redesign](https://www.behance.net/gallery/194018249/Spotify-App-Redesign).
 
 ## :building_construction: Upcoming features
-- Find another source for lyrics
-- Redesign the Home page
+- Continue the Search page UI refont ;
+- Prefetch lyrics for tracks in queue ;
+- Implement LyricFind API to get lyrics and translations ;
+- Add lyrics to the downloaded tracks.
 
 ## :lady_beetle: Bugs
-- Lyrics are not available
 - Some home tiles are not and will not be implemented (Concerts, Did you know, Original videos, ...)
 - [Tell me !](https://github.com/PetitPrinc3/Deezer/issues)
 

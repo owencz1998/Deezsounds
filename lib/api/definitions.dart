@@ -1137,8 +1137,8 @@ class DeezerChannel {
               : LogoDetails.fromPrivateJson(json['logo_image']));
 
   //JSON
-  static _colorToJson(Color? c) => c?.value;
-  static _colorFromJson(int? v) => Color(v ?? Colors.blue.value);
+  static _colorToJson(Color? c) => c?.toARGB32();
+  static _colorFromJson(int? v) => Color(v ?? Colors.blue.toARGB32());
   factory DeezerChannel.fromJson(Map<String, dynamic> json) =>
       _$DeezerChannelFromJson(json);
   Map<String, dynamic> toJson() => _$DeezerChannelToJson(this);

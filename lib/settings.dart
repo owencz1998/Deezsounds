@@ -121,7 +121,7 @@ class Settings {
   static const bgColor = Color(0xFF0D0D28);
   static const secondaryText = Color(0xFFA9A6AA);
 
-  static _colorToJson(Color c) => c.value;
+  static _colorToJson(Color c) => c.toARGB32();
   static _colorFromJson(int? v) => v == null ? Colors.lightBlue : Color(v);
 
   @JsonKey(defaultValue: false)
@@ -142,6 +142,9 @@ class Settings {
 
   @JsonKey(defaultValue: ['DEEZER', 'LRCLIB', 'LYRICFIND'])
   List<String> lyricsProviders = ['DEEZER', 'LRCLIB', 'LYRICFIND'];
+
+  @JsonKey(defaultValue: false)
+  bool advancedLRCLib = false;
 
   @JsonKey(defaultValue: '')
   String? lyricfindKey;

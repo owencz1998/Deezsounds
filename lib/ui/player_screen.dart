@@ -208,11 +208,7 @@ class _PlayerScreenHorizontalState extends State<PlayerScreenHorizontal> {
             width: ScreenUtil().setWidth(160),
             child: Stack(
               children: <Widget>[
-                BigAlbumArt(() {
-                  setState(() {
-                    updateColor;
-                  });
-                }),
+                BigAlbumArt(),
               ],
             ),
           ),
@@ -356,11 +352,7 @@ class _PlayerScreenVerticalState extends State<PlayerScreenVertical> {
                 .setHeight(MediaQuery.of(context).size.height * 0.35),
             child: Stack(
               children: <Widget>[
-                BigAlbumArt(() {
-                  setState(() {
-                    updateColor;
-                  });
-                }),
+                BigAlbumArt(),
               ],
             ),
           ),
@@ -572,7 +564,7 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
   Track track =
       Track.fromMediaItem(GetIt.I<AudioPlayerHandler>().mediaItem.value!);
   bool isEnabled = false;
-  Lyrics? trackLyrics;
+  LyricsFull? trackLyrics;
   AudioPlayerHandler audioHandler = GetIt.I<AudioPlayerHandler>();
 
   void _loadLyrics() async {
@@ -581,16 +573,32 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
         LyricsFull newLyrics = await deezerAPI.lyrics(track);
         if (mounted && newLyrics.id != null) {
           Logger.root.info('Found lyrics for ${track.id} : ${newLyrics.id}');
-          setState(() {
-            isEnabled = true;
-            trackLyrics = newLyrics;
-            audioHandler.mediaItem.value?.extras
-                ?.addAll({'lyrics': jsonEncode(newLyrics.toJson())});
-          });
+          if (mounted) {
+            setState(() {
+              isEnabled = true;
+              trackLyrics = newLyrics;
+              audioHandler.mediaItem.value?.extras
+                  ?.addAll({'lyrics': jsonEncode(newLyrics.toJson())});
+            });
+          }
         }
       } catch (e) {
         //No lyrics available.
-        Logger.root.info(e);
+        Logger.root
+            .info('An error occured while loading lyrics for ${track.id} : $e');
+      }
+    } else {
+      try {
+        if (mounted) {
+          setState(() {
+            trackLyrics = LyricsFull.fromJson(
+                jsonDecode(audioHandler.mediaItem.value?.extras?['lyrics']));
+          });
+        }
+      } catch (e) {
+        //Lyrics bug
+        Logger.root
+            .info('An error occured while loading lyrics for ${track.id} : $e');
       }
     }
   }
@@ -639,7 +647,7 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
                 await Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => LyricsScreen(
                           track: track,
-                          lyrics: trackLyrics,
+                          parentLyrics: trackLyrics,
                         )));
 
                 if (widget.afterOnPressed != null) {
@@ -926,8 +934,7 @@ class _PlaybackControlsState extends State<PlaybackControls> {
 }
 
 class BigAlbumArt extends StatefulWidget {
-  Function onSwipe;
-  BigAlbumArt(this.onSwipe, {super.key});
+  const BigAlbumArt({super.key});
 
   @override
   _BigAlbumArtState createState() => _BigAlbumArtState();
@@ -1057,7 +1064,7 @@ class _BigAlbumArtState extends State<BigAlbumArt> with WidgetsBindingObserver {
           onPageChanged: (int index) {
             if (_changeTrackOnPageChange) {
               audioHandler.skipToQueueItem(index);
-              widget.onSwipe();
+              updateColor();
             }
           },
           children: _imageList,

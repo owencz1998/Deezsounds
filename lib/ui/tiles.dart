@@ -842,7 +842,7 @@ class ShowEpisodeTile extends StatelessWidget {
                       .textTheme
                       .titleMedium
                       ?.color
-                      ?.withOpacity(0.9)),
+                      ?.withAlpha(230)),
             ),
           ),
           Padding(
@@ -860,7 +860,7 @@ class ShowEpisodeTile extends StatelessWidget {
                           .textTheme
                           .titleMedium
                           ?.color
-                          ?.withOpacity(0.6)),
+                          ?.withAlpha(150)),
                 ),
               ],
             ),
