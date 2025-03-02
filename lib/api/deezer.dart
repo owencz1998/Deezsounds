@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deezer/api/cache.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:deezer/api/download.dart';
+import 'package:palette_generator/palette_generator.dart';
 
 import '../api/definitions.dart';
 import '../api/spotify.dart';
@@ -212,6 +214,13 @@ class DeezerAPI {
                 data['results']['USER']['USER_PICTURE'],
                 type: 'user')
             .toJson();
+        cache.userEmail = data['results']['USER']['EMAIL'];
+        cache.userColor = (await PaletteGenerator.fromImageProvider(
+                CachedNetworkImageProvider(
+                    ImageDetails.fromJson(cache.userPicture).fullUrl ?? '')))
+            .dominantColor
+            ?.color
+            .toARGB32();
         cache.save();
 
         return true;
@@ -534,25 +543,86 @@ class DeezerAPI {
   }
 
   //Get lyrics by track id
-  Future<Lyrics> lyrics(String trackId) async {
-    // First try to get lyrics from pipe API
-    Lyrics lyricsFromPipeApi = await lyricsFull(trackId);
+  Future<LyricsFull> lyrics(Track track) async {
+    for (String provider in settings.lyricsProviders) {
+      if (provider == 'DEEZER') {
+        // First try to get lyrics from pipe API
+        Lyrics lyricsFromPipeApi = await lyricsFull(track.id ?? '');
 
-    if (lyricsFromPipeApi.errorMessage == null &&
-        lyricsFromPipeApi.isLoaded()) {
-      return lyricsFromPipeApi;
-    }
+        if (lyricsFromPipeApi.errorMessage == null &&
+            lyricsFromPipeApi.isLoaded()) {
+          return lyricsFromPipeApi as LyricsFull;
+        }
 
-    // Fallback to get lyrics from legacy GW api
-    Lyrics lyricsFromLegacy = await lyricsLegacy(trackId);
+        // Fallback to get lyrics from legacy GW api
+        Lyrics lyricsFromLegacy = await lyricsLegacy(track.id ?? '');
 
-    if (lyricsFromLegacy.errorMessage == null && lyricsFromLegacy.isLoaded()) {
-      return lyricsFromLegacy;
+        if (lyricsFromLegacy.errorMessage == null &&
+            lyricsFromLegacy.isLoaded()) {
+          return lyricsFromLegacy as LyricsFull;
+        }
+      } else if (provider == 'LRCLIB') {
+        http.Response res = await http.get(Uri.parse(
+            'https://lrclib.net/api/get?artist_name=' +
+                (track.artists?[0].name ?? '') +
+                '&track_name=' +
+                (track.title ?? '')));
+        Map<String, dynamic> data = jsonDecode(utf8.decode(res.bodyBytes));
+
+        if (data['statusCode'] != 404) {
+          List<SynchronizedLyric> synchronizedLyrics = [];
+          List<String> synchronizedLines =
+              (data['syncedLyrics'] ?? '').split('\n');
+
+          for (int i = 0; i < synchronizedLines.length; i++) {
+            List<String> line = synchronizedLines[i].split(' ');
+            List<String> offset = line
+                .removeAt(0)
+                .replaceAll('[', '')
+                .replaceAll(']', '')
+                .split(':');
+            String lyric = line.join(' ');
+            synchronizedLyrics.add(
+              SynchronizedLyric(
+                  offset: Duration(
+                      minutes: int.parse(offset.first),
+                      milliseconds: (double.parse(offset.last) * 1000).round()),
+                  text: lyric),
+            );
+          }
+
+          LyricsFull lrclyrics = LyricsFull(
+            id: data['id'].toString(),
+            syncedLyrics: synchronizedLyrics,
+            unsyncedLyrics: data['plainLyrics'],
+            provider: LyricsProvider.LRCLIB,
+          );
+          return lrclyrics;
+        }
+      } else if (provider == 'LYRICFIND') {
+/*
+        if (settings.lyricfindKey != null) {
+          http.Response res = await http.get(Uri.parse(
+              'https://api.lyricfind.com/lyric.do?apikey=${settings.lyricfindKey}&territory=${settings.deezerCountry}&lrckey=&reqtype=default&trackid=isrc:&format=lrconly,clean&output=json' +
+                  (track.artists?[0].name ?? '') +
+                  '&track_name=' +
+                  (track.title ?? '')));
+          Map<String, dynamic> data = jsonDecode(res.body);
+
+          return LyricsFull(
+            id: data['id'],
+            syncedLyrics: data['syncedLyrics'],
+            unsyncedLyrics: data['plainLyrics'],
+            provider: LyricsProvider.LYRICFIND,
+          );
+        }
+*/
+      }
     }
 
     // No lyrics found, prefer to use pipe api error message
     //return lyricsFromPipeApi;
-    return Lyrics();
+    return LyricsFull();
   }
 
   //Get lyrics by track id from legacy GW api

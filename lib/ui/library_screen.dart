@@ -191,11 +191,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 trailing: SizedBox(
                   height: 60,
                   width: 60,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.05),
+                  child: Align(
                     alignment: Alignment.centerRight,
                     child: IconButton(
+                      splashRadius: 20,
+                      alignment: Alignment.center,
                       onPressed: () {
                         List<Track> trackList = List.from(tracks);
                         trackList.shuffle();

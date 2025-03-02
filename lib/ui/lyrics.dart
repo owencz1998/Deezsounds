@@ -16,9 +16,9 @@ import '../ui/error.dart';
 
 class LyricsScreen extends StatefulWidget {
   final Lyrics? lyrics;
-  final String trackId;
+  final Track track;
 
-  const LyricsScreen({this.lyrics, required this.trackId, super.key});
+  const LyricsScreen({this.lyrics, required this.track, super.key});
 
   @override
   _LyricsScreenState createState() => _LyricsScreenState();
@@ -49,7 +49,7 @@ class _LyricsScreenState extends State<LyricsScreen> {
 
     //Track change = exit lyrics
     _mediaItemSub = GetIt.I<AudioPlayerHandler>().mediaItem.listen((event) {
-      if (event?.id != widget.trackId) Navigator.of(context).pop();
+      if (event?.id != widget.track.id) Navigator.of(context).pop();
     });
   }
 
@@ -60,7 +60,7 @@ class _LyricsScreenState extends State<LyricsScreen> {
     }
 
     try {
-      Lyrics l = await deezerAPI.lyrics(widget.trackId);
+      Lyrics l = await deezerAPI.lyrics(widget.track);
       _updateLyricsState(l);
     } catch (e) {
       _timer?.cancel();
@@ -83,7 +83,7 @@ class _LyricsScreenState extends State<LyricsScreen> {
 
     if (lyrics.errorMessage != null) {
       Logger.root.warning(
-          'Error loading lyrics for track id ${widget.trackId}: ${lyrics.errorMessage}');
+          'Error loading lyrics for track id ${widget.track.id}: ${lyrics.errorMessage}');
     }
 
     setState(() {
@@ -241,8 +241,9 @@ class _LyricsScreenState extends State<LyricsScreen> {
                       child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
-                            color: (_currentIndex == i)
-                                ? Colors.grey.withOpacity(0.25)
+                            color: (_currentIndex == i &&
+                                    lyrics!.syncedLyrics![i].text != '')
+                                ? Colors.grey.withAlpha(75)
                                 : Colors.transparent,
                           ),
                           height: height,

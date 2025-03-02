@@ -699,6 +699,7 @@ class Lyrics {
   String? unsyncedLyrics;
   bool? isExplicit;
   String? copyright;
+  LyricsProvider? provider;
 
   Lyrics({
     this.id,
@@ -708,6 +709,7 @@ class Lyrics {
     this.errorMessage,
     this.isExplicit,
     this.copyright,
+    this.provider,
   });
 
   static error(String? message) => Lyrics(
@@ -770,6 +772,7 @@ class LyricsFull extends Lyrics {
     super.unsyncedLyrics,
     super.isExplicit,
     super.copyright,
+    super.provider,
   });
 
   factory LyricsFull.fromPrivateJson(Map<dynamic, dynamic> json) {
@@ -1180,6 +1183,8 @@ enum HomePageSectionType { FLOW, MAIN, OTHER }
 enum RepeatType { NONE, LIST, TRACK }
 
 enum DeezerLinkType { TRACK, ALBUM, ARTIST, PLAYLIST, GAME }
+
+enum LyricsProvider { DEEZER, LRCLIB, LYRICFIND }
 
 class DeezerLinkResponse {
   DeezerLinkType? type;

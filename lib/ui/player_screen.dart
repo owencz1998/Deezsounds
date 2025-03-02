@@ -206,9 +206,13 @@ class _PlayerScreenHorizontalState extends State<PlayerScreenHorizontal> {
           padding: const EdgeInsets.fromLTRB(4, 0, 4, 2),
           child: SizedBox(
             width: ScreenUtil().setWidth(160),
-            child: const Stack(
+            child: Stack(
               children: <Widget>[
-                BigAlbumArt(),
+                BigAlbumArt(() {
+                  setState(() {
+                    updateColor;
+                  });
+                }),
               ],
             ),
           ),
@@ -350,9 +354,13 @@ class _PlayerScreenVerticalState extends State<PlayerScreenVertical> {
           child: SizedBox(
             height: ScreenUtil()
                 .setHeight(MediaQuery.of(context).size.height * 0.35),
-            child: const Stack(
+            child: Stack(
               children: <Widget>[
-                BigAlbumArt(),
+                BigAlbumArt(() {
+                  setState(() {
+                    updateColor;
+                  });
+                }),
               ],
             ),
           ),
@@ -570,8 +578,9 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
   void _loadLyrics() async {
     if (!isEnabled) {
       try {
-        LyricsFull newLyrics = await deezerAPI.lyrics(track.id!) as LyricsFull;
+        LyricsFull newLyrics = await deezerAPI.lyrics(track);
         if (mounted && newLyrics.id != null) {
+          Logger.root.info('Found lyrics for ${track.id} : ${newLyrics.id}');
           setState(() {
             isEnabled = true;
             trackLyrics = newLyrics;
@@ -581,6 +590,7 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
         }
       } catch (e) {
         //No lyrics available.
+        Logger.root.info(e);
       }
     }
   }
@@ -593,7 +603,6 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
       isEnabled = (track.lyrics?.id ?? '0') != '0';
     });
 
-    Logger.root.info(track.lyrics?.id, isEnabled);
     _loadLyrics();
 
     audioHandler.mediaItem.listen((event) {
@@ -617,7 +626,7 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
       child: IconButton(
         icon: Icon(
           //Icons.lyrics,
-          AlchemyIcons.microphone,
+          AlchemyIcons.microphone_show,
           size: ScreenUtil().setWidth(widget.width),
           semanticLabel: 'Lyrics'.i18n,
         ),
@@ -629,7 +638,7 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
 
                 await Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => LyricsScreen(
-                          trackId: track.id!,
+                          track: track,
                           lyrics: trackLyrics,
                         )));
 
@@ -917,7 +926,8 @@ class _PlaybackControlsState extends State<PlaybackControls> {
 }
 
 class BigAlbumArt extends StatefulWidget {
-  const BigAlbumArt({super.key});
+  Function onSwipe;
+  BigAlbumArt(this.onSwipe, {super.key});
 
   @override
   _BigAlbumArtState createState() => _BigAlbumArtState();
@@ -1046,8 +1056,8 @@ class _BigAlbumArtState extends State<BigAlbumArt> with WidgetsBindingObserver {
           controller: _pageController,
           onPageChanged: (int index) {
             if (_changeTrackOnPageChange) {
-              // Only trigger if the page change is caused by user swiping
               audioHandler.skipToQueueItem(index);
+              widget.onSwipe();
             }
           },
           children: _imageList,

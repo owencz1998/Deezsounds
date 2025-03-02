@@ -1,6 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deezer/api/cache.dart';
-import 'package:deezer/api/deezer.dart';
 import 'package:deezer/api/definitions.dart';
 import 'package:deezer/fonts/alchemy_icons.dart';
 import 'package:deezer/main.dart';
@@ -11,7 +9,6 @@ import 'package:deezer/ui/library.dart';
 import 'package:deezer/ui/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:palette_generator/palette_generator.dart';
 
 class UserScreen extends StatefulWidget {
   const UserScreen({super.key});
@@ -21,33 +18,17 @@ class UserScreen extends StatefulWidget {
 }
 
 class _UserScreenState extends State<UserScreen> {
-  Color? gradientColor;
-  String? userEmail;
-
-  void _setColor() async {
-    PaletteGenerator palette = await PaletteGenerator.fromImageProvider(
-        CachedNetworkImageProvider(
-            ImageDetails.fromJson(cache.userPicture).fullUrl ?? ''));
-    setState(() {
-      gradientColor = palette.dominantColor?.color;
-      SystemChrome.setSystemUIOverlayStyle(
-          SystemUiOverlayStyle(statusBarColor: gradientColor));
-    });
-  }
-
-  void _getUser() async {
-    Map<dynamic, dynamic> userData =
-        await deezerAPI.callGwApi('deezer.getUserData');
-    setState(() {
-      userEmail = userData['results']['USER']['EMAIL'];
-    });
-  }
+  Color? gradientColor =
+      cache.userColor != null ? Color(cache.userColor ?? 0) : null;
+  String? userEmail = cache.userEmail;
 
   @override
   void initState() {
     super.initState();
-    _setColor();
-    _getUser();
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor:
+            cache.userColor != null ? Color(cache.userColor ?? 0) : null));
   }
 
   @override

@@ -27,8 +27,14 @@ class Cache {
   @JsonKey(defaultValue: '')
   String userName = '';
 
+  @JsonKey(defaultValue: '')
+  String userEmail = '';
+
   @JsonKey(defaultValue: {})
   Map<String, dynamic> userPicture = ImageDetails().toJson();
+
+  @JsonKey(defaultValue: null)
+  int? userColor;
 
   //ID's of tracks that are in library
   List<String>? libraryTracks = [];

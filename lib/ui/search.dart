@@ -217,11 +217,11 @@ class _SearchScreenState extends State<SearchScreen> {
                 trailing: SizedBox(
                   height: 60,
                   width: 60,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.05),
+                  child: Align(
                     alignment: Alignment.centerRight,
                     child: IconButton(
+                      splashRadius: 20,
+                      alignment: Alignment.center,
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => SettingsScreen()));
@@ -233,7 +233,10 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(
-                    16.0, MediaQuery.of(context).size.width * 0.05, 16.0, 12.0),
+                    MediaQuery.of(context).size.width * 0.05,
+                    MediaQuery.of(context).size.width * 0.05,
+                    MediaQuery.of(context).size.width * 0.05,
+                    12.0),
                 child: Row(
                   children: <Widget>[
                     Expanded(

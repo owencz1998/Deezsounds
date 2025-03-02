@@ -140,6 +140,12 @@ class Settings {
   @JsonKey(defaultValue: BlindTestType.DEEZER)
   BlindTestType blindTestType = BlindTestType.DEEZER;
 
+  @JsonKey(defaultValue: ['DEEZER', 'LRCLIB', 'LYRICFIND'])
+  List<String> lyricsProviders = ['DEEZER', 'LRCLIB', 'LYRICFIND'];
+
+  @JsonKey(defaultValue: '')
+  String? lyricfindKey;
+
   //LastFM
   @JsonKey(defaultValue: null)
   String? lastFMUsername;

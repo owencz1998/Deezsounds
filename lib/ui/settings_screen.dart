@@ -659,6 +659,100 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
           ListTile(
+            title: Text('Lyrics'.i18n),
+            subtitle: Text('Choose your lyrics provider.'.i18n),
+            leading: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(AlchemyIcons.microphone_show),
+                ]),
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return StatefulBuilder(builder: (context, setState) {
+                      return AlertDialog(
+                        title: Text('Choose providers prefered order :'.i18n),
+                        content: SizedBox(
+                            // Wrap ListView with SizedBox to control its size
+                            width: double
+                                .maxFinite, // Set width to maximum to allow list to expand
+                            child: ReorderableListView(
+                              shrinkWrap: true,
+                              onReorder: (int oldIndex, int newIndex) {
+                                if (oldIndex == newIndex) return;
+                                String provider =
+                                    settings.lyricsProviders.removeAt(oldIndex);
+                                if (newIndex > oldIndex) newIndex -= 1;
+                                settings.lyricsProviders
+                                    .insert(newIndex, provider);
+                                setState(() {
+                                  settings.lyricsProviders;
+                                });
+                              },
+                              children: List.generate(
+                                  settings.lyricsProviders.length, (int i) {
+                                String provider = settings.lyricsProviders[i];
+                                return ListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  visualDensity: VisualDensity.compact,
+                                  key: Key(provider),
+                                  leading: SizedBox(
+                                    width: 30,
+                                    height: 30,
+                                    child: Image.asset(provider == 'DEEZER'
+                                        ? 'assets/deezer.png'
+                                        : provider == 'LRCLIB'
+                                            ? 'assets/lrclib.png'
+                                            : provider == 'LYRICFIND'
+                                                ? 'assets/lyricfind.png'
+                                                : ''),
+                                  ),
+                                  title: provider == 'DEEZER'
+                                      ? Text('Deezer official API')
+                                      : provider == 'LRCLIB'
+                                          ? Text('LRCLIB, an OpenSource API')
+                                          : provider == 'LYRICFIND'
+                                              ? Text('The LyricFind API')
+                                              : Text(''),
+                                  subtitle: provider == 'DEEZER'
+                                      ? Text('Works for premium users only.')
+                                      : provider == 'LRCLIB'
+                                          ? Text(
+                                              'Mostly accurate results with synced and plain lyrics.')
+                                          : provider == 'LYRICFIND'
+                                              ? Text(
+                                                  'Mother of all lyrics API. Requires a private key.')
+                                              : Text(''),
+                                  trailing: provider == 'DEEZER'
+                                      ? Text('')
+                                      : provider == 'LRCLIB'
+                                          ? Text('')
+                                          : provider == 'LYRICFIND'
+                                              ? IconButton(
+                                                  onPressed: () {},
+                                                  icon: Icon(
+                                                      AlchemyIcons.settings))
+                                              : Text(''),
+                                  enabled: provider != 'LYRICFIND',
+                                  onTap: () {
+                                    setState(() {
+                                      settings.lyricsProviders = [
+                                        'DEEZER',
+                                        'LRCLIB',
+                                        'LYRICFIND'
+                                      ];
+                                    });
+                                  },
+                                );
+                              }),
+                            )),
+                      );
+                    });
+                  });
+            },
+          ),
+          ListTile(
             title: Text('Import'.i18n),
             leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

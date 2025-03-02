@@ -155,6 +155,8 @@ flutter:
     - assets/chrome.png
     - assets/token.png
     - assets/deezer.png
+    - assets/lrclib.png
+    - assets/lyricfind.png
     - assets/animations/bubbles.json
     - assets/animations/logo_closing.json
     - assets/animations/welcome_waves.json
