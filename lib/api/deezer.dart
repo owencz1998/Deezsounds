@@ -622,9 +622,8 @@ class DeezerAPI {
                   (track.title ?? '')));
         }
 
-        Map<String, dynamic> data = jsonDecode(utf8.decode(res.bodyBytes));
-
         if (res.statusCode != 404) {
+          Map<String, dynamic> data = jsonDecode(utf8.decode(res.bodyBytes));
           List<SynchronizedLyric> synchronizedLyrics = [];
           List<String> synchronizedLines =
               (data['syncedLyrics'] ?? '').split('\n');

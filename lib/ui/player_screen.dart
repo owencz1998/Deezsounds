@@ -331,6 +331,32 @@ class PlayerScreenVertical extends StatefulWidget {
 
 class _PlayerScreenVerticalState extends State<PlayerScreenVertical> {
   final GlobalKey iconButtonKey = GlobalKey();
+  StreamSubscription? _mediaItemSub;
+  AudioPlayerHandler audioPlayerHandler = GetIt.I<AudioPlayerHandler>();
+  String? mediaItemId;
+
+  @override
+  void initState() {
+    if (mounted) {
+      setState(() {
+        mediaItemId = audioPlayerHandler.mediaItem.value?.id;
+      });
+    }
+    _mediaItemSub = audioPlayerHandler.mediaItem.listen((event) {
+      if (mounted) {
+        setState(() {
+          mediaItemId = audioPlayerHandler.mediaItem.value?.id;
+        });
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _mediaItemSub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -433,8 +459,11 @@ class _PlayerScreenVerticalState extends State<PlayerScreenVertical> {
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              LyricsIconButton(ScreenUtil().setSp(25) * 0.6,
-                  afterOnPressed: updateColor),
+              LyricsIconButton(
+                ScreenUtil().setSp(25) * 0.6,
+                afterOnPressed: updateColor,
+                key: mediaItemId != null ? Key(mediaItemId!) : null,
+              ),
               IconButton(
                 key: iconButtonKey,
                 icon: Icon(
@@ -572,7 +601,8 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
       try {
         LyricsFull newLyrics = await deezerAPI.lyrics(track);
         if (mounted && newLyrics.id != null) {
-          Logger.root.info('Found lyrics for ${track.id} : ${newLyrics.id}');
+          Logger.root.info(
+              'LyricsIconButton: Found lyrics for ${track.id} : ${newLyrics.id}');
           if (mounted) {
             setState(() {
               isEnabled = true;
@@ -584,8 +614,8 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
         }
       } catch (e) {
         //No lyrics available.
-        Logger.root
-            .info('An error occured while loading lyrics for ${track.id} : $e');
+        Logger.root.info(
+            'LyricsIconButton: An error occured while loading lyrics for ${track.id} : $e');
       }
     } else {
       try {
@@ -597,8 +627,8 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
         }
       } catch (e) {
         //Lyrics bug
-        Logger.root
-            .info('An error occured while loading lyrics for ${track.id} : $e');
+        Logger.root.info(
+            'LyricsIconButton: An error occured while loading lyrics for ${track.id} : $e');
       }
     }
   }
@@ -607,22 +637,13 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
   void initState() {
     super.initState();
 
+    Logger.root.info('LyricsIconButton: Building for ${track.title}');
+
     setState(() {
       isEnabled = (track.lyrics?.id ?? '0') != '0';
     });
 
     _loadLyrics();
-
-    audioHandler.mediaItem.listen((event) {
-      if (mounted) {
-        setState(() {
-          track = Track.fromMediaItem(
-              GetIt.I<AudioPlayerHandler>().mediaItem.value!);
-          isEnabled = (track.lyrics?.id ?? '0') != '0';
-        });
-      }
-      _loadLyrics();
-    });
   }
 
   @override
