@@ -353,19 +353,19 @@ Map<String, dynamic> _$SmartTrackListToJson(SmartTrackList instance) =>
     };
 
 HomePage _$HomePageFromJson(Map<String, dynamic> json) => HomePage(
+      flowSection: json['flowSection'] == null
+          ? null
+          : HomePageSection.fromJson(
+              json['flowSection'] as Map<String, dynamic>),
+      mainSection: json['mainSection'] == null
+          ? null
+          : HomePageSection.fromJson(
+              json['mainSection'] as Map<String, dynamic>),
       sections: (json['sections'] as List<dynamic>?)
               ?.map((e) => HomePageSection.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-    )
-      ..flowSection = json['flowSection'] == null
-          ? null
-          : HomePageSection.fromJson(
-              json['flowSection'] as Map<String, dynamic>)
-      ..mainSection = json['mainSection'] == null
-          ? null
-          : HomePageSection.fromJson(
-              json['mainSection'] as Map<String, dynamic>);
+    );
 
 Map<String, dynamic> _$HomePageToJson(HomePage instance) => <String, dynamic>{
       'flowSection': instance.flowSection,
@@ -490,18 +490,26 @@ const _$SortSourceTypesEnumMap = {
 
 Show _$ShowFromJson(Map<String, dynamic> json) => Show(
       name: json['name'] as String?,
+      authors: json['authors'] as String?,
       description: json['description'] as String?,
       art: json['art'] == null
           ? null
           : ImageDetails.fromJson(json['art'] as Map<String, dynamic>),
       id: json['id'] as String?,
+      fans: (json['fans'] as num?)?.toInt(),
+      isExplicit: json['isExplicit'] as bool?,
+      isLibrary: json['isLibrary'] as bool?,
     );
 
 Map<String, dynamic> _$ShowToJson(Show instance) => <String, dynamic>{
       'name': instance.name,
       'description': instance.description,
+      'authors': instance.authors,
       'art': instance.art,
       'id': instance.id,
+      'fans': instance.fans,
+      'isExplicit': instance.isExplicit,
+      'isLibrary': instance.isLibrary,
     };
 
 ShowEpisode _$ShowEpisodeFromJson(Map<String, dynamic> json) => ShowEpisode(
@@ -513,6 +521,10 @@ ShowEpisode _$ShowEpisodeFromJson(Map<String, dynamic> json) => ShowEpisode(
           ? null
           : Duration(microseconds: (json['duration'] as num).toInt()),
       publishedDate: json['publishedDate'] as String?,
+      episodeCover: json['episodeCover'] == null
+          ? null
+          : ImageDetails.fromJson(json['episodeCover'] as Map<String, dynamic>),
+      isExplicit: json['isExplicit'] as bool?,
       show: json['show'] == null
           ? null
           : Show.fromJson(json['show'] as Map<String, dynamic>),
@@ -526,5 +538,7 @@ Map<String, dynamic> _$ShowEpisodeToJson(ShowEpisode instance) =>
       'url': instance.url,
       'duration': instance.duration?.inMicroseconds,
       'publishedDate': instance.publishedDate,
+      'episodeCover': instance.episodeCover,
+      'isExplicit': instance.isExplicit,
       'show': instance.show,
     };

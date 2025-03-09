@@ -63,7 +63,11 @@ Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yours
 - Continue the Search page UI refont ;
 - Implement a profile edition screen ;
 - Implement a song catcher ;
+- Implement notifications and notification settings ;
+- Enhance the podcast detail screen ;
+- Make dedicated podcast sections ;
 - Prefetch lyrics for tracks in queue ;
+- Make a create playlist from queue option ;
 - Implement LyricFind API to get lyrics and translations ;
 - Add lyrics to the downloaded tracks.
 

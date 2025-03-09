@@ -1,3 +1,4 @@
+import 'package:alchemy/ui/catcher_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:alchemy/settings.dart';
 import 'package:alchemy/ui/cached_image.dart';
@@ -12,6 +13,7 @@ import 'package:get_it/get_it.dart';
 import 'package:alchemy/fonts/alchemy_icons.dart';
 import 'package:alchemy/main.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:logging/logging.dart';
 
 import '../api/cache.dart';
 import '../api/deezer.dart';
@@ -67,7 +69,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   String? _query;
   bool _online = true;
-  //bool _loading = false;
+  bool _loading = false;
   final TextEditingController _controller = TextEditingController();
   final FocusNode _keyboardListenerFocusNode = FocusNode();
   final FocusNode _textFieldFocusNode = FocusNode();
@@ -83,7 +85,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     //URL
     if (_query != null && _query!.startsWith('http')) {
-      //setState(() => _loading = true);
+      setState(() => _loading = true);
       try {
         await openScreenByURL(_query!);
       } catch (e) {
@@ -91,7 +93,7 @@ class _SearchScreenState extends State<SearchScreen> {
           print(e);
         }
       }
-      //setState(() => _loading = false);
+      setState(() => _loading = false);
       return;
     }
 
@@ -230,11 +232,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(
-                    MediaQuery.of(context).size.width * 0.05,
-                    MediaQuery.of(context).size.width * 0.05,
-                    MediaQuery.of(context).size.width * 0.05,
-                    12.0),
+                padding: EdgeInsets.all(
+                  MediaQuery.of(context).size.width * 0.05,
+                ),
                 child: Row(
                   children: <Widget>[
                     Expanded(
@@ -347,6 +347,58 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
                   ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.05),
+                child: SizedBox(
+                  height: 84,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () {
+                      Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(
+                              builder: (context) => CatcherScreen()));
+                    },
+                    child: Container(
+                      clipBehavior: Clip.hardEdge,
+                      decoration: ShapeDecoration(
+                          shape: SmoothRectangleBorder(
+                            borderRadius: SmoothBorderRadius(
+                              cornerRadius: 20,
+                              cornerSmoothing: 0.4,
+                            ),
+                            side: BorderSide(
+                                color: settings.primaryColor, width: 1.5),
+                          ),
+                          color: settings.primaryColor.withAlpha(100)),
+                      alignment: Alignment.centerLeft,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12.0),
+                        //visualDensity: VisualDensity.compact,
+                        leading: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              AlchemyIcons.wave,
+                              size: 32,
+                            ),
+                          ],
+                        ),
+                        title: Text(
+                          'What is playing ?',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 14),
+                        ),
+                        subtitle: Text(
+                          'Identify the music playing around you.',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
               if (_showCards && !_online)
@@ -627,10 +679,11 @@ class SearchResultsScreen extends StatelessWidget {
   const SearchResultsScreen(this.query, {super.key, this.offline});
 
   Future _search() async {
-    if (offline ?? true) {
+    if (offline ?? false) {
       return await downloadManager.search(query);
     }
-    return await deezerAPI.search(query);
+    SearchResults sr = await deezerAPI.search(query);
+    return sr;
   }
 
   @override
@@ -930,7 +983,7 @@ class SearchResultsScreen extends StatelessWidget {
                     onTap: () async {
                       //Load entire show, then play
                       List<ShowEpisode> episodes =
-                          await deezerAPI.allShowEpisodes(e.show!.id ?? '');
+                          await deezerAPI.showEpisodes(e.show!.id ?? '');
                       await GetIt.I<AudioPlayerHandler>().playShowEpisode(
                           e.show!, episodes,
                           index: episodes.indexWhere((ep) => e.id == ep.id));
@@ -1132,7 +1185,7 @@ class EpisodeListScreen extends StatelessWidget {
               onTap: () async {
                 //Load entire show, then play
                 List<ShowEpisode> episodes =
-                    await deezerAPI.allShowEpisodes(e.show!.id ?? '');
+                    await deezerAPI.showEpisodes(e.show!.id ?? '');
                 await GetIt.I<AudioPlayerHandler>().playShowEpisode(
                     e.show!, episodes,
                     index: episodes.indexWhere((ep) => e.id == ep.id));

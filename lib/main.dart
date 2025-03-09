@@ -95,7 +95,7 @@ void main() async {
 
   await prepareRun();
 
-  runApp(const Restartable(child: ReFreezerApp()));
+  runApp(const Restartable(child: AlchemyApp()));
 }
 
 Future<void> prepareRun() async {
@@ -105,14 +105,14 @@ Future<void> prepareRun() async {
   cache = await Cache.load();
 }
 
-class ReFreezerApp extends StatefulWidget {
-  const ReFreezerApp({super.key});
+class AlchemyApp extends StatefulWidget {
+  const AlchemyApp({super.key});
 
   @override
-  _ReFreezerAppState createState() => _ReFreezerAppState();
+  _AlchemyAppState createState() => _AlchemyAppState();
 }
 
-class _ReFreezerAppState extends State<ReFreezerApp> {
+class _AlchemyAppState extends State<AlchemyApp> {
   @override
   void initState() {
     //Make update theme global
@@ -134,7 +134,7 @@ class _ReFreezerAppState extends State<ReFreezerApp> {
       systemNavigationBarColor: settings.themeData.bottomAppBarTheme.color,
       systemNavigationBarIconBrightness:
           settings.isDark ? Brightness.light : Brightness.dark,
-      statusBarColor: settings.themeData.scaffoldBackgroundColor,
+      statusBarColor: Colors.transparent,
     ));
     settings.save();
   }
@@ -478,7 +478,7 @@ class _MainScreenState extends State<MainScreen>
     Color scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Theme.of(context).scaffoldBackgroundColor,
+      statusBarColor: Colors.transparent,
       systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor,
     ));
 
@@ -529,7 +529,7 @@ class _MainScreenState extends State<MainScreen>
 
                                       SystemChrome.setSystemUIOverlayStyle(
                                           SystemUiOverlayStyle(
-                                        statusBarColor: scaffoldBackgroundColor,
+                                        statusBarColor: Colors.transparent,
                                       ));
                                     },
                                     selectedItemColor:
@@ -646,8 +646,7 @@ class _MainScreenState extends State<MainScreen>
 
                                           SystemChrome.setSystemUIOverlayStyle(
                                               SystemUiOverlayStyle(
-                                            statusBarColor:
-                                                scaffoldBackgroundColor,
+                                            statusBarColor: Colors.transparent,
                                           ));
                                         },
                                         selectedIconTheme: IconThemeData(

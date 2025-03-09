@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:alchemy/fonts/alchemy_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttericon/octicons_icons.dart';
 import 'package:get_it/get_it.dart';
@@ -10,6 +11,7 @@ import 'package:alchemy/ui/library_screen.dart';
 import 'package:alchemy/ui/menu.dart';
 import 'package:lottie/lottie.dart';
 import 'package:figma_squircle/figma_squircle.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../api/deezer.dart';
 import '../api/definitions.dart';
@@ -41,11 +43,6 @@ class _TrackTileState extends State<TrackTile> {
   PlayingState nowPlaying = PlayingState.NONE;
   bool nowDownloading = false;
   double downloadProgress = 0;
-
-  /*bool get nowPlaying {
-    if (GetIt.I<AudioPlayerHandler>().mediaItem.value == null) return false;
-    return GetIt.I<AudioPlayerHandler>().mediaItem.value!.id == widget.track.id;
-  }*/
 
   @override
   void initState() {
@@ -151,10 +148,20 @@ class _TrackTileState extends State<TrackTile> {
         ),
         leading: Stack(
           children: [
-            CachedImage(
-              url: widget.track.albumArt?.thumb ?? '',
-              width: 48,
-              rounded: true,
+            Container(
+              clipBehavior: Clip.hardEdge,
+              decoration: ShapeDecoration(
+                shape: SmoothRectangleBorder(
+                  borderRadius: SmoothBorderRadius(
+                    cornerRadius: 10,
+                    cornerSmoothing: 0.6,
+                  ),
+                ),
+              ),
+              child: CachedImage(
+                url: widget.track.albumArt?.thumb ?? '',
+                width: 48,
+              ),
             ),
             if (nowPlaying == PlayingState.PLAYING)
               Container(
@@ -228,6 +235,54 @@ class _TrackTileState extends State<TrackTile> {
   }
 }
 
+class NotificationTile extends StatelessWidget {
+  final DeezerNotification notification;
+
+  const NotificationTile(this.notification, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          leading: Container(
+            clipBehavior: Clip.hardEdge,
+            decoration: ShapeDecoration(
+              shape: SmoothRectangleBorder(
+                borderRadius: SmoothBorderRadius(
+                  cornerRadius: 10,
+                  cornerSmoothing: 0.6,
+                ),
+              ),
+            ),
+            child: CachedImage(
+              url: notification.picture?.thumb ?? '',
+              width: 48,
+            ),
+          ),
+          title: Text(
+            notification.title ?? '',
+            maxLines: 1,
+            overflow: TextOverflow.clip,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(
+            notification.subtitle ?? '',
+            maxLines: 1,
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+          child: Text(notification.footer ?? ''),
+        ),
+        Divider()
+      ],
+    );
+  }
+}
+
 class SimpleTrackTile extends StatelessWidget {
   final Track track;
   final Playlist? playlist;
@@ -241,11 +296,19 @@ class SimpleTrackTile extends StatelessWidget {
       dense: true,
       minVerticalPadding: 0,
       visualDensity: VisualDensity.compact,
-      leading: CachedImage(
-        url: track.albumArt?.full ?? '',
-        rounded: true,
-        height: 48,
-        width: 48,
+      leading: Container(
+        clipBehavior: Clip.hardEdge,
+        decoration: ShapeDecoration(
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 10,
+              cornerSmoothing: 0.6,
+            ),
+          ),
+        ),
+        child: CachedImage(
+          url: track.albumArt?.full ?? '',
+        ),
       ),
       title: Text(track.title ?? '',
           maxLines: 1,
@@ -749,34 +812,47 @@ class ShowCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      onLongPress: onHold,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CachedImage(
-              url: show.art?.thumb ?? '',
-              width: 128.0,
-              height: 128.0,
-              rounded: true,
-            ),
+    return SizedBox(
+        width: 140,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(25),
+          onTap: onTap,
+          onLongPress: onHold,
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(4),
+                child: Container(
+                  clipBehavior: Clip.hardEdge,
+                  decoration: ShapeDecoration(
+                    shape: SmoothRectangleBorder(
+                      borderRadius: SmoothBorderRadius(
+                        cornerRadius: 25,
+                        cornerSmoothing: 0.6,
+                      ),
+                    ),
+                  ),
+                  child: CachedImage(
+                    url: show.art?.thumb ?? '',
+                    width: 130,
+                    height: 130,
+                    rounded: true,
+                  ),
+                ),
+              ),
+              Container(height: 2.0),
+              SizedBox(
+                child: Text(
+                  show.name ?? '',
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 14.0),
+                ),
+              ),
+            ],
           ),
-          SizedBox(
-            width: 144.0,
-            child: Text(
-              show.name ?? '',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14.0),
-            ),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }
 
@@ -810,7 +886,7 @@ class ShowTile extends StatelessWidget {
   }
 }
 
-class ShowEpisodeTile extends StatelessWidget {
+class ShowEpisodeTile extends StatefulWidget {
   final ShowEpisode episode;
   final VoidCallback? onTap;
   final VoidCallback? onHold;
@@ -820,23 +896,266 @@ class ShowEpisodeTile extends StatelessWidget {
       {super.key, this.onTap, this.onHold, this.trailing});
 
   @override
+  _ShowEpisodeTileState createState() => _ShowEpisodeTileState();
+}
+
+class _ShowEpisodeTileState extends State<ShowEpisodeTile> {
+  StreamSubscription? _mediaItemSub;
+  StreamSubscription? _stateSub;
+  StreamSubscription? _downloadItemSub;
+  bool _isOffline = false;
+  PlayingState nowPlaying = PlayingState.NONE;
+  bool nowDownloading = false;
+  double downloadProgress = 0;
+
+  @override
+  void initState() {
+    //Listen to media item changes, update text color if currently playing
+    _mediaItemSub = GetIt.I<AudioPlayerHandler>().mediaItem.listen((item) {
+      if (widget.episode.id == item?.id) {
+        if (mounted) {
+          setState(() {
+            nowPlaying =
+                GetIt.I<AudioPlayerHandler>().playbackState.value.playing
+                    ? PlayingState.PLAYING
+                    : PlayingState.PAUSED;
+            _stateSub =
+                GetIt.I<AudioPlayerHandler>().playbackState.listen((state) {
+              if (mounted) {
+                setState(() {
+                  nowPlaying = state.playing
+                      ? PlayingState.PLAYING
+                      : PlayingState.PAUSED;
+                });
+              }
+            });
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _stateSub?.cancel();
+            nowPlaying = PlayingState.NONE;
+          });
+        }
+      }
+    });
+    /*//Check if offline
+    downloadManager.checkOffline(track: widget.episode).then((b) {
+      if (mounted) {
+        setState(() => _isOffline = b || (widget.track.offline ?? false));
+      }
+    });
+*/
+    //Listen to download change to drop progress indicator
+    _downloadItemSub = downloadManager.serviceEvents.stream.listen((e) async {
+      List<Download> downloads = await downloadManager.getDownloads();
+
+      if (e['action'] == 'onProgress' && mounted) {
+        setState(() {
+          for (Map su in e['data']) {
+            downloads
+                .firstWhere((d) => d.id == su['id'], orElse: () => Download())
+                .updateFromJson(su);
+          }
+        });
+      }
+
+      for (int i = 0; i < downloads.length; i++) {
+        if (downloads[i].trackId == widget.episode.id) {
+          if (downloads[i].state != DownloadState.DONE) {
+            if (mounted) {
+              setState(() {
+                nowDownloading = true;
+                downloadProgress = downloads[i].progress;
+              });
+            }
+          } else {
+            if (mounted) {
+              setState(() {
+                nowDownloading = false;
+                _isOffline = true;
+              });
+            }
+          }
+        }
+      }
+    });
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _mediaItemSub?.cancel();
+    _downloadItemSub?.cancel();
+    _stateSub?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return InkWell(
-      onLongPress: onHold,
-      onTap: onTap,
+      onLongPress: widget.onHold,
+      onTap: widget.onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
-            title: Text(episode.title ?? '', maxLines: 2),
-            trailing: trailing,
+            dense: true,
+            title: Text(
+              widget.episode.title ?? '',
+              maxLines: 2,
+              overflow: TextOverflow.clip,
+              style: TextStyle(
+                  fontWeight:
+                      nowPlaying != PlayingState.NONE ? FontWeight.bold : null),
+            ),
+            leading: Stack(
+              children: [
+                CachedImage(
+                  url: widget.episode.episodeCover?.full ?? '',
+                  width: 48,
+                  rounded: true,
+                ),
+                if (nowPlaying == PlayingState.PLAYING)
+                  Container(
+                    width: 48,
+                    height: 48,
+                    color: Colors.black.withAlpha(30),
+                    child: Center(
+                        child: Lottie.asset(
+                            'assets/animations/playing_wave.json',
+                            repeat: true,
+                            frameRate: FrameRate(60),
+                            fit: BoxFit.cover,
+                            width: 40,
+                            height: 40)),
+                  ),
+                if (nowPlaying == PlayingState.PAUSED)
+                  Container(
+                    width: 48,
+                    height: 48,
+                    color: Colors.black.withAlpha(30),
+                    child: Center(
+                        child: Lottie.asset(
+                            'assets/animations/pausing_wave.json',
+                            repeat: false,
+                            frameRate: FrameRate(60),
+                            fit: BoxFit.cover,
+                            width: 40,
+                            height: 40)),
+                  ),
+              ],
+            ),
+            onTap: widget.onTap,
+            onLongPress: widget.onHold,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_isOffline)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 2.0),
+                    child: Icon(
+                      Octicons.primitive_dot,
+                      color: Colors.green,
+                      size: 12.0,
+                    ),
+                  ),
+                if (widget.episode.isExplicit ?? false)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 2.0),
+                    child: Icon(AlchemyIcons.explicit),
+                  ),
+                IconButton(
+                    onPressed: () => showModalBottomSheet(
+                          backgroundColor: Colors.transparent,
+                          useRootNavigator: true,
+                          isScrollControlled: true,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return DraggableScrollableSheet(
+                              initialChildSize: 0.3,
+                              minChildSize: 0.3,
+                              maxChildSize: 0.9,
+                              expand: false,
+                              builder:
+                                  (context, ScrollController scrollController) {
+                                return Container(
+                                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                                  clipBehavior: Clip.hardEdge,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    border:
+                                        Border.all(color: Colors.transparent),
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(18),
+                                      topRight: Radius.circular(18),
+                                    ),
+                                  ),
+                                  // Use ListView instead of SingleChildScrollView for scrollable content
+                                  child: ListView(
+                                    controller:
+                                        scrollController, // Important: Connect ScrollController
+                                    children: [
+                                      ListTile(
+                                        leading: Container(
+                                          clipBehavior: Clip.hardEdge,
+                                          decoration: ShapeDecoration(
+                                            shape: SmoothRectangleBorder(
+                                              borderRadius: SmoothBorderRadius(
+                                                cornerRadius: 10,
+                                                cornerSmoothing: 0.6,
+                                              ),
+                                            ),
+                                          ),
+                                          child: CachedImage(
+                                            url: widget.episode.episodeCover
+                                                    ?.full ??
+                                                '',
+                                          ),
+                                        ),
+                                        title: Text(widget.episode.title ?? ''),
+                                        subtitle: Text(
+                                            widget.episode.durationString +
+                                                ' | ' +
+                                                (widget.episode.publishedDate ??
+                                                    '')),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.all(16.0),
+                                        child: Text(
+                                            widget.episode.description ?? ''),
+                                      ),
+                                      ListTile(
+                                        title: Text('Share'.i18n),
+                                        leading: const Icon(Icons.share),
+                                        onTap: () async {
+                                          Share.share(
+                                              'https://deezer.com/episode/${widget.episode.id}');
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                    icon: Icon(AlchemyIcons.more_vert)),
+                widget.trailing ?? const SizedBox(width: 0, height: 0)
+              ],
+            ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             child: Text(
-              episode.description ?? '',
+              widget.episode.description ?? '',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.justify,
               style: TextStyle(
                   color: Theme.of(context)
                       .textTheme
@@ -846,12 +1165,12 @@ class ShowEpisodeTile extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8.0, 0, 0),
+            padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
                 Text(
-                  '${episode.publishedDate} | ${episode.durationString}',
+                  '${widget.episode.publishedDate} ● ${widget.episode.durationString}',
                   textAlign: TextAlign.left,
                   style: TextStyle(
                       fontSize: 12.0,

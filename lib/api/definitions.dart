@@ -885,7 +885,7 @@ class HomePage {
   HomePageSection? mainSection;
   List<HomePageSection> sections;
 
-  HomePage({this.sections = const []});
+  HomePage({this.flowSection, this.mainSection, this.sections = const []});
 
   //Save/Load
   Future<String> _getPath() async {
@@ -935,6 +935,14 @@ class HomePage {
   factory HomePage.fromJson(Map<String, dynamic> json) =>
       _$HomePageFromJson(json);
   Map<String, dynamic> toJson() => _$HomePageToJson(this);
+
+  /*
+  Map<String, dynamic> toJson() => {
+        'flowSection': flowSection?.toJson(),
+        'mainSection': mainSection?.toJson(),
+        'sections': sections.map((HomePageSection h) => h.toJson()),
+      };
+      */
 }
 
 @JsonSerializable()
@@ -985,11 +993,14 @@ class HomePageSection {
         return null;
     }
 
-    if (json['section_id']
-        .toString()
-        .contains('content_source=playlists_content-source_user-suggested')) {
+    if (json['section_id'].toString().contains(
+            'content_source=playlists_content-source_user-suggested') ||
+        json['section_id']
+            .toString()
+            .contains('content_source=user-suggested')) {
       hps.type = HomePageSectionType.MAIN;
-    } else if (json['section_id'].toString().contains('content_source=flow')) {
+    } else if (json['section_id'].toString().contains('content_source=flow') ||
+        json['section_id'].toString().contains('section_content=flow')) {
       hps.type = HomePageSectionType.FLOW;
     } else {
       hps.type = HomePageSectionType.OTHER;
@@ -1009,6 +1020,36 @@ class HomePageSection {
   static _homePageItemFromJson(json) =>
       json.map<HomePageItem>((d) => HomePageItem.fromJson(d)).toList();
   static _homePageItemToJson(items) => items.map((i) => i.toJson()).toList();
+}
+
+class DeezerNotification {
+  String? id;
+  String? title;
+  String? subtitle;
+  String? footer;
+  bool? read;
+  ImageDetails? picture;
+  Function? redirect;
+
+  DeezerNotification(
+      {this.id,
+      this.title,
+      this.subtitle,
+      this.footer,
+      this.read,
+      this.picture,
+      this.redirect});
+
+  factory DeezerNotification.fromJson(Map<dynamic, dynamic> json) =>
+      DeezerNotification(
+        id: json['id'],
+        title: json['title'],
+        subtitle: json['subtitle'],
+        footer: json['footer'],
+        read: json['read'],
+        picture: ImageDetails.fromPrivateString(json['picture']['md5'],
+            type: 'cover'),
+      );
 }
 
 class HomePageItem {
@@ -1263,15 +1304,30 @@ class Sorting {
 class Show {
   String? name;
   String? description;
+  String? authors;
   ImageDetails? art;
   String? id;
+  int? fans;
+  bool? isExplicit;
+  bool? isLibrary;
 
-  Show({this.name, this.description, this.art, this.id});
+  Show(
+      {this.name,
+      this.authors,
+      this.description,
+      this.art,
+      this.id,
+      this.fans,
+      this.isExplicit,
+      this.isLibrary});
 
   //JSON
   factory Show.fromPrivateJson(Map<dynamic, dynamic> json) => Show(
       id: json['SHOW_ID'],
       name: json['SHOW_NAME'],
+      authors: json['LABEL_NAME'],
+      fans: json['NB_FAN'],
+      isExplicit: json['SHOW_IS_EXPLICIT'] == '1',
       art: ImageDetails.fromPrivateString(json['SHOW_ART_MD5'], type: 'talk'),
       description: json['SHOW_DESCRIPTION']);
 
@@ -1287,6 +1343,8 @@ class ShowEpisode {
   String? url;
   Duration? duration;
   String? publishedDate;
+  ImageDetails? episodeCover;
+  bool? isExplicit;
   //Might not be fully available
   Show? show;
 
@@ -1297,6 +1355,8 @@ class ShowEpisode {
       this.url,
       this.duration,
       this.publishedDate,
+      this.episodeCover,
+      this.isExplicit,
       this.show});
 
   String get durationString =>
@@ -1317,7 +1377,7 @@ class ShowEpisode {
       },
       displayDescription: description,
       duration: duration,
-      artUri: Uri.parse(show.art?.full ?? ''),
+      artUri: Uri.parse(episodeCover?.full ?? ''),
     );
   }
 
@@ -1334,13 +1394,22 @@ class ShowEpisode {
   //JSON
   factory ShowEpisode.fromPrivateJson(Map<dynamic, dynamic> json) =>
       ShowEpisode(
-          id: json['EPISODE_ID'],
-          title: json['EPISODE_TITLE'],
-          description: json['EPISODE_DESCRIPTION'],
-          url: json['EPISODE_DIRECT_STREAM_URL'],
-          duration: Duration(seconds: int.parse(json['DURATION'].toString())),
-          publishedDate: json['EPISODE_PUBLISHED_TIMESTAMP'],
-          show: Show.fromPrivateJson(json));
+        id: json['EPISODE_ID'],
+        title: json['EPISODE_TITLE'],
+        description: json['EPISODE_DESCRIPTION'],
+        url: json['EPISODE_DIRECT_STREAM_URL'],
+        duration: Duration(seconds: int.parse(json['DURATION'].toString())),
+        publishedDate: DateTime.parse(json['EPISODE_PUBLISHED_TIMESTAMP'])
+                    .year ==
+                DateTime.now().year
+            ? DateFormat('MMM d')
+                .format(DateTime.parse(json['EPISODE_PUBLISHED_TIMESTAMP']))
+            : DateFormat('MMM d, y')
+                .format(DateTime.parse(json['EPISODE_PUBLISHED_TIMESTAMP'])),
+        episodeCover: ImageDetails.fromPrivateString(json['EPISODE_IMAGE_MD5'],
+            type: 'talk'),
+        isExplicit: json['SHOW_IS_EXPLICIT'] == '0' ? false : true,
+      );
 
   factory ShowEpisode.fromJson(Map<String, dynamic> json) =>
       _$ShowEpisodeFromJson(json);

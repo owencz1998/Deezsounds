@@ -194,6 +194,20 @@ class DeezerAPI {
     return body;
   }
 
+  Future<List<DeezerNotification>> getNotifications() async {
+    Map<dynamic, dynamic> data = await deezerAPI.callGwApi('notification.list');
+    if (data['results']['data'] == null) {
+      return [];
+    } else {
+      List<DeezerNotification> notifications = [];
+      for (int i = 0; i < data['results']['data'].length; i++) {
+        notifications
+            .add(DeezerNotification.fromJson(data['results']['data'][i]));
+      }
+      return notifications;
+    }
+  }
+
   //Wrapper so it can be globally awaited
   Future<bool> authorize() async {
     return await (_authorizing ??= rawAuthorize().then((success) {
@@ -625,33 +639,37 @@ class DeezerAPI {
         if (res.statusCode != 404) {
           Map<String, dynamic> data = jsonDecode(utf8.decode(res.bodyBytes));
           List<SynchronizedLyric> synchronizedLyrics = [];
-          List<String> synchronizedLines =
-              (data['syncedLyrics'] ?? '').split('\n');
 
-          for (int i = 0; i < synchronizedLines.length; i++) {
-            List<String> line = synchronizedLines[i].split(' ');
-            List<String> offset = line
-                .removeAt(0)
-                .replaceAll('[', '')
-                .replaceAll(']', '')
-                .split(':');
-            String lyric = line.join(' ');
-            synchronizedLyrics.add(
-              SynchronizedLyric(
-                  offset: Duration(
-                      minutes: int.parse(offset.first),
-                      milliseconds: (double.parse(offset.last) * 1000).round()),
-                  text: lyric),
-            );
+          if (data['syncedLyrics'] != null) {
+            List<String> synchronizedLines = (data['syncedLyrics']).split('\n');
+            for (int i = 0; i < synchronizedLines.length; i++) {
+              List<String> line = synchronizedLines[i].split(' ');
+              List<String> offset = line
+                  .removeAt(0)
+                  .replaceAll('[', '')
+                  .replaceAll(']', '')
+                  .split(':');
+              String lyric = line.join(' ');
+              synchronizedLyrics.add(
+                SynchronizedLyric(
+                    offset: Duration(
+                        minutes: int.parse(offset.first),
+                        milliseconds:
+                            (double.parse(offset.last) * 1000).round()),
+                    text: lyric),
+              );
+            }
           }
 
           LyricsFull lrclyrics = LyricsFull(
             id: data['id'].toString(),
-            syncedLyrics: synchronizedLyrics,
+            syncedLyrics:
+                synchronizedLyrics.isNotEmpty ? synchronizedLyrics : null,
             unsyncedLyrics: data['plainLyrics'],
             provider: LyricsProvider.LRCLIB,
             isExplicit: track.explicit,
           );
+
           return lrclyrics;
         }
       } else if (provider == 'LYRICFIND') {
@@ -963,17 +981,31 @@ class DeezerAPI {
         .toList();
   }
 
-  Future<List<ShowEpisode>> allShowEpisodes(String showId) async {
+  Future<List<ShowEpisode>> showEpisodes(String showId, {int page = 0}) async {
     Map data = await callGwApi('deezer.pageShow', params: {
       'country': settings.deezerCountry,
       'lang': settings.deezerLanguage,
       'nb': 1000,
       'show_id': showId,
-      'start': 0,
+      'start': page * 1000,
       'user_id': int.parse(deezerAPI.userId ?? ''),
     });
     return data['results']['EPISODES']['data']
         .map<ShowEpisode>((e) => ShowEpisode.fromPrivateJson(e))
+        .toList();
+  }
+
+  Future<List<Show>> getShows() async {
+    Map<String, dynamic> data = await callGwApi('deezer.pageProfile', params: {
+      'user_id': userId,
+      'tab': 'podcasts',
+      'nb': 10000,
+    });
+
+    if (data['results']['TAB']['shows']['data'] == null) return [];
+
+    return data['results']['TAB']['shows']['data']
+        .map<Show>((e) => Show.fromPrivateJson(e))
         .toList();
   }
 }

@@ -147,6 +147,19 @@ class _UserScreenState extends State<UserScreen> {
             ListTile(
               contentPadding: EdgeInsets.symmetric(
                   horizontal: MediaQuery.of(context).size.width * 0.05),
+              leading: Icon(AlchemyIcons.podcast),
+              title: Text('Your podcasts'),
+              trailing: Icon(AlchemyIcons.chevron_end),
+              onTap: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => LibraryShows()));
+                SystemChrome.setSystemUIOverlayStyle(
+                    SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+              },
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * 0.05),
               leading: Icon(AlchemyIcons.arrow_time),
               title: Text('Your history'),
               trailing: Icon(AlchemyIcons.chevron_end),

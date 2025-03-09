@@ -625,6 +625,76 @@ class _AlbumListState extends State<AlbumList> {
   }
 }
 
+class LibraryShows extends StatefulWidget {
+  const LibraryShows({super.key});
+
+  @override
+  _LibraryShowsState createState() => _LibraryShowsState();
+}
+
+class _LibraryShowsState extends State<LibraryShows> {
+  final ScrollController _scrollController = ScrollController();
+  List<Show> libraryShows = [];
+
+  void _loadShows() async {
+    //List<Show> offlineShows = await downloadManager.getOfflineShows();
+    if (await isConnected()) {
+      List<Show> onlineShows = await deezerAPI.getShows();
+
+      if (mounted) {
+        setState(() {
+          libraryShows.addAll(onlineShows);
+        });
+      }
+    } else {
+//      return offlineShows
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadShows();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: FreezerAppBar(
+          'Podcasts'.i18n,
+        ),
+        body: DraggableScrollbar.rrect(
+          controller: _scrollController,
+          backgroundColor: Theme.of(context).primaryColor,
+          child: ListView(
+            controller: _scrollController,
+            children: <Widget>[
+              Container(height: 8.0),
+              ...List.generate(
+                  libraryShows.length,
+                  (int i) => ShowTile(
+                        libraryShows[i],
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  ShowScreen(libraryShows[i])));
+                        },
+                      )),
+              ListenableBuilder(
+                  listenable: playerBarState,
+                  builder: (BuildContext context, Widget? child) {
+                    return AnimatedPadding(
+                      duration: Duration(milliseconds: 200),
+                      padding: EdgeInsets.only(
+                          bottom: playerBarState.state ? 80 : 0),
+                    );
+                  }),
+            ],
+          ),
+        ));
+  }
+}
+
 class LibraryArtists extends StatefulWidget {
   const LibraryArtists({super.key});
 

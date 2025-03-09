@@ -5,6 +5,7 @@ import 'package:alchemy/api/cache.dart';
 import 'package:alchemy/ui/blind_test.dart';
 import 'package:alchemy/ui/cached_image.dart';
 import 'package:alchemy/ui/card_carousel.dart';
+import 'package:alchemy/ui/notification_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -46,6 +47,9 @@ class _HomeScreenState extends State<HomeScreen> {
   String displayName = '';
   String imageUrl = '';
 
+  List<DeezerNotification>? notifications;
+  bool hasNewNotifications = false;
+
   void _load() async {
     if (mounted) {
       setState(() {
@@ -61,6 +65,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ImageDetails.fromJson(cache.userPicture).thumbUrl ??
             '';
         _isLoading = false;
+      });
+    }
+
+    List<DeezerNotification> noti = await deezerAPI.getNotifications();
+    if (mounted) {
+      Logger.root.info(noti);
+      setState(() {
+        notifications = noti;
+        hasNewNotifications =
+            noti.any((DeezerNotification n) => n.read == false);
       });
     }
   }
@@ -190,12 +204,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 trailing: IconButton(
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => SettingsScreen()));
+                        builder: (context) =>
+                            NotificationScreen(notifications ?? [])));
                   },
                   icon: Align(
                     alignment: Alignment.centerRight,
                     child: Icon(
-                      AlchemyIcons.settings,
+                      hasNewNotifications
+                          ? AlchemyIcons.bell_active
+                          : AlchemyIcons.bell,
                       color: Theme.of(context).textTheme.titleMedium?.color,
                     ),
                   ),
@@ -264,6 +281,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   void _loadHomePage() async {
+    Logger.root.info('home^p');
     //Load local
     try {
       HomePage hp = await HomePage().load();
@@ -287,6 +305,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
         print(e);
       }
     }
+
+    Logger.root.info(_homePage?.toJson());
   }
 
   void _load() {
@@ -487,6 +507,8 @@ class HomepageRowSection extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: List.generate((section.items?.length ?? 0) + 1, (j) {
                 //Has more items
                 if (j == (section.items?.length ?? 0)) {

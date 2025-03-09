@@ -196,6 +196,33 @@ class PlayerScreenHorizontal extends StatefulWidget {
 }
 
 class _PlayerScreenHorizontalState extends State<PlayerScreenHorizontal> {
+  StreamSubscription? _mediaItemSub;
+  AudioPlayerHandler audioPlayerHandler = GetIt.I<AudioPlayerHandler>();
+  String? mediaItemId;
+
+  @override
+  void initState() {
+    if (mounted) {
+      setState(() {
+        mediaItemId = audioPlayerHandler.mediaItem.value?.id;
+      });
+    }
+    _mediaItemSub = audioPlayerHandler.mediaItem.listen((event) {
+      if (mounted) {
+        setState(() {
+          mediaItemId = audioPlayerHandler.mediaItem.value?.id;
+        });
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _mediaItemSub?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -287,7 +314,11 @@ class _PlayerScreenHorizontalState extends State<PlayerScreenHorizontal> {
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        LyricsIconButton(12, afterOnPressed: updateColor),
+                        LyricsIconButton(
+                          12,
+                          afterOnPressed: updateColor,
+                          key: mediaItemId != null ? Key(mediaItemId!) : null,
+                        ),
                         IconButton(
                           icon: Icon(
                             AlchemyIcons.download,
@@ -636,8 +667,6 @@ class _LyricsIconButtonState extends State<LyricsIconButton> {
   @override
   void initState() {
     super.initState();
-
-    Logger.root.info('LyricsIconButton: Building for ${track.title}');
 
     setState(() {
       isEnabled = (track.lyrics?.id ?? '0') != '0';
@@ -1253,8 +1282,8 @@ class QueueScreen extends StatefulWidget {
 
 class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
   AudioPlayerHandler audioHandler = GetIt.I<AudioPlayerHandler>();
-  late StreamSubscription _queueStateSub;
-  late ScrollController _scrollController;
+  StreamSubscription? _queueStateSub;
+  ScrollController? _scrollController;
 
   @override
   void initState() {
@@ -1263,7 +1292,7 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
     final currentIndex = audioHandler.queueState.queueIndex ?? 0;
     if (currentIndex > 0) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollController.animateTo(
+        _scrollController?.animateTo(
           currentIndex * 62.0, // Estimated TrackTile height
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
@@ -1274,8 +1303,8 @@ class _QueueScreenState extends State<QueueScreen> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    _queueStateSub.cancel();
-    _scrollController.dispose();
+    _queueStateSub?.cancel();
+    _scrollController?.dispose();
     super.dispose();
   }
 
