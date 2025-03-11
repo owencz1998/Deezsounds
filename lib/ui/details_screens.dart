@@ -617,6 +617,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                                         url: album.art?.fullUrl ??
                                             album.art?.thumbUrl ??
                                             'assets/cover.jpg',
+                                        height:
+                                            MediaQuery.of(context).size.width,
                                         width:
                                             MediaQuery.of(context).size.width,
                                         fullThumb: true,
@@ -767,8 +769,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                           ),
                           SliverToBoxAdapter(
                             child: Padding(
-                                padding:
-                                    EdgeInsets.fromLTRB(4.0, 16.0, 4.0, 4.0),
+                                padding: EdgeInsets.all(4.0),
                                 child: ListTile(
                                   title: Text(
                                     album.title ?? '',
@@ -906,26 +907,29 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                           SliverToBoxAdapter(
                             child: const FreezerDivider(),
                           ),
-                          ...List.generate((album.tracks?.length ?? 0), (i) {
-                            Track t = (album.tracks ?? [])[i];
-                            return SliverToBoxAdapter(
-                              child: TrackTile(
-                                t,
-                                onTap: () {
-                                  Playlist p = Playlist(
-                                      title: album.title,
-                                      id: album.id,
-                                      tracks: album.tracks);
-                                  GetIt.I<AudioPlayerHandler>()
-                                      .playFromPlaylist(p, t.id ?? '');
-                                },
-                                onHold: () {
-                                  MenuSheet m = MenuSheet();
-                                  m.defaultTrackMenu(t, context: context);
-                                },
-                              ),
-                            );
-                          }),
+                          SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (BuildContext context, int index) {
+                                Track t = (album.tracks ?? [])[index];
+                                return TrackTile(
+                                  t,
+                                  onTap: () {
+                                    Playlist p = Playlist(
+                                        title: album.title,
+                                        id: album.id,
+                                        tracks: album.tracks);
+                                    GetIt.I<AudioPlayerHandler>()
+                                        .playFromPlaylist(p, t.id ?? '');
+                                  },
+                                  onHold: () {
+                                    MenuSheet m = MenuSheet();
+                                    m.defaultTrackMenu(t, context: context);
+                                  },
+                                );
+                              },
+                              childCount: (album.tracks?.length ?? 0),
+                            ),
+                          ),
                           if (_isLoading)
                             SliverToBoxAdapter(
                               child: Padding(
@@ -1570,6 +1574,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                               children: [
                                 CachedImage(
                                   url: artist.picture?.full ?? '',
+                                  height: MediaQuery.of(context).size.width,
                                   width: MediaQuery.of(context).size.width,
                                   fullThumb: true,
                                 ),
@@ -1754,30 +1759,26 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                         SliverToBoxAdapter(
                           child: Container(height: 4.0),
                         ),
-                        ...List.generate(3, (i) {
-                          if (artist.topTracks.length <= i) {
-                            return const SliverToBoxAdapter(
-                              child: SizedBox(
-                                height: 0,
-                                width: 0,
-                              ),
-                            );
-                          }
-                          Track t = artist.topTracks[i];
-                          return SliverToBoxAdapter(
-                            child: TrackTile(
-                              t,
-                              onTap: () {
-                                GetIt.I<AudioPlayerHandler>().playFromTopTracks(
-                                    artist.topTracks, t.id!, artist);
-                              },
-                              onHold: () {
-                                MenuSheet mi = MenuSheet();
-                                mi.defaultTrackMenu(t, context: context);
-                              },
-                            ),
-                          );
-                        }),
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              Track t = artist.topTracks[index];
+                              return TrackTile(
+                                t,
+                                onTap: () {
+                                  GetIt.I<AudioPlayerHandler>()
+                                      .playFromTopTracks(
+                                          artist.topTracks, t.id!, artist);
+                                },
+                                onHold: () {
+                                  MenuSheet mi = MenuSheet();
+                                  mi.defaultTrackMenu(t, context: context);
+                                },
+                              );
+                            },
+                            childCount: artist.topTracks.length,
+                          ),
+                        ),
                         SliverToBoxAdapter(
                           child: Container(
                             margin: EdgeInsets.symmetric(
@@ -2912,6 +2913,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                 children: [
                                   CachedImage(
                                     url: playlist.image?.full ?? '',
+                                    height: MediaQuery.of(context).size.width,
                                     width: MediaQuery.of(context).size.width,
                                     fullThumb: true,
                                   ),
@@ -3104,7 +3106,7 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                       ),
                       SliverToBoxAdapter(
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(4.0, 16.0, 4.0, 4.0),
+                          padding: EdgeInsets.all(4.0),
                           child: ListTile(
                             title: Text(
                               playlist.title ?? '',
@@ -3286,10 +3288,11 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                       const SliverToBoxAdapter(
                         child: FreezerDivider(),
                       ),
-                      ...List.generate(playlist.tracks?.length ?? 0, (i) {
-                        Track t = playlist.tracks?[i] ?? Track();
-                        return SliverToBoxAdapter(
-                          child: TrackTile(
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                          Track t = playlist.tracks?[index] ?? Track();
+                          return TrackTile(
                             t,
                             onTap: () async {
                               (playlist.trackCount != playlist.tracks?.length &&
@@ -3347,9 +3350,9 @@ class _PlaylistDetailsState extends State<PlaylistDetails> {
                                         }
                                       : null);
                             },
-                          ),
-                        );
-                      }),
+                          );
+                        }, childCount: playlist.tracks?.length ?? 0),
+                      ),
                       if (_isLoadingTracks)
                         SliverToBoxAdapter(
                           child: Padding(
@@ -3912,6 +3915,7 @@ class _ShowScreenState extends State<ShowScreen> {
                               children: [
                                 CachedImage(
                                   url: _show.art?.full ?? '',
+                                  height: MediaQuery.of(context).size.width,
                                   width: MediaQuery.of(context).size.width,
                                   fullThumb: true,
                                 ),
@@ -3975,7 +3979,7 @@ class _ShowScreenState extends State<ShowScreen> {
                         ),
                         SliverToBoxAdapter(
                           child: Padding(
-                            padding: EdgeInsets.fromLTRB(4.0, 16.0, 4.0, 4.0),
+                            padding: EdgeInsets.all(4.0),
                             child: ListTile(
                               title: Text(
                                 _show.name ?? '',
@@ -4187,20 +4191,20 @@ class _ShowScreenState extends State<ShowScreen> {
                         SliverToBoxAdapter(
                           child: const FreezerDivider(),
                         ),
-                        ...List.generate(_episodes.length, (i) {
-                          ShowEpisode e = _episodes[i];
-
-                          return SliverToBoxAdapter(
-                            child: ShowEpisodeTile(
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                              (BuildContext context, int index) {
+                            ShowEpisode e = _episodes[index];
+                            return ShowEpisodeTile(
                               e,
                               onTap: () async {
                                 await GetIt.I<AudioPlayerHandler>()
                                     .playShowEpisode(_show, _episodes,
-                                        index: i);
+                                        index: index);
                               },
-                            ),
-                          );
-                        }),
+                            );
+                          }, childCount: _episodes.length),
+                        ),
                         if (_isLoadingTracks)
                           SliverToBoxAdapter(
                             child: Padding(

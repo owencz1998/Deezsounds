@@ -1,6 +1,7 @@
 import 'package:alchemy/fonts/alchemy_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logging/logging.dart';
 
 import '../settings.dart';
 
@@ -177,7 +178,8 @@ class _DetailedAppBarState extends State<DetailedAppBar> {
               : null,
         ),
       ),
-      expandedHeight: widget.expandedHeight - 24,
+      expandedHeight:
+          widget.expandedHeight - MediaQuery.of(context).padding.top,
       iconTheme: Theme.of(context).iconTheme,
       actions: [
         IconButton(
@@ -189,7 +191,7 @@ class _DetailedAppBarState extends State<DetailedAppBar> {
         collapseMode: CollapseMode.parallax,
         background: SizedBox(
           width: double.infinity,
-          height: widget.expandedHeight,
+          height: widget.expandedHeight - MediaQuery.of(context).padding.top,
           child: Stack(
             children: [
               PageView(

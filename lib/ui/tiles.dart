@@ -352,9 +352,20 @@ class AlbumTile extends StatelessWidget {
         album.artistString ?? '',
         maxLines: 1,
       ),
-      leading: CachedImage(
-        url: album.art?.thumb ?? '',
-        width: 48,
+      leading: Container(
+        clipBehavior: Clip.hardEdge,
+        decoration: ShapeDecoration(
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 10,
+              cornerSmoothing: 0.6,
+            ),
+          ),
+        ),
+        child: CachedImage(
+          url: album.art?.thumb ?? '',
+          width: 48,
+        ),
       ),
       onTap: onTap,
       onLongPress: onHold,
@@ -443,9 +454,20 @@ class PlaylistTile extends StatelessWidget {
         subtitle,
         maxLines: 1,
       ),
-      leading: CachedImage(
-        url: playlist.image?.thumb ?? '',
-        width: 48,
+      leading: Container(
+        clipBehavior: Clip.hardEdge,
+        decoration: ShapeDecoration(
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 10,
+              cornerSmoothing: 0.6,
+            ),
+          ),
+        ),
+        child: CachedImage(
+          url: playlist.image?.thumb ?? '',
+          width: 48,
+        ),
       ),
       onTap: onTap,
       onLongPress: onHold,
@@ -878,9 +900,20 @@ class ShowTile extends StatelessWidget {
       ),
       onTap: onTap,
       onLongPress: onHold,
-      leading: CachedImage(
-        url: show.art?.thumb ?? '',
-        width: 48,
+      leading: Container(
+        clipBehavior: Clip.hardEdge,
+        decoration: ShapeDecoration(
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 10,
+              cornerSmoothing: 0.6,
+            ),
+          ),
+        ),
+        child: CachedImage(
+          url: show.art?.thumb ?? '',
+          width: 48,
+        ),
       ),
     );
   }
@@ -1067,84 +1100,88 @@ class _ShowEpisodeTileState extends State<ShowEpisodeTile> {
                     padding: EdgeInsets.symmetric(horizontal: 2.0),
                     child: Icon(AlchemyIcons.explicit),
                   ),
-                IconButton(
-                    onPressed: () => showModalBottomSheet(
-                          backgroundColor: Colors.transparent,
-                          useRootNavigator: true,
-                          isScrollControlled: true,
-                          context: context,
-                          builder: (BuildContext context) {
-                            return DraggableScrollableSheet(
-                              initialChildSize: 0.3,
-                              minChildSize: 0.3,
-                              maxChildSize: 0.9,
-                              expand: false,
-                              builder:
-                                  (context, ScrollController scrollController) {
-                                return Container(
-                                  padding: EdgeInsets.symmetric(vertical: 12.0),
-                                  clipBehavior: Clip.hardEdge,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    border:
-                                        Border.all(color: Colors.transparent),
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(18),
-                                      topRight: Radius.circular(18),
-                                    ),
-                                  ),
-                                  // Use ListView instead of SingleChildScrollView for scrollable content
-                                  child: ListView(
-                                    controller:
-                                        scrollController, // Important: Connect ScrollController
-                                    children: [
-                                      ListTile(
-                                        leading: Container(
-                                          clipBehavior: Clip.hardEdge,
-                                          decoration: ShapeDecoration(
-                                            shape: SmoothRectangleBorder(
-                                              borderRadius: SmoothBorderRadius(
-                                                cornerRadius: 10,
-                                                cornerSmoothing: 0.6,
+                widget.trailing ??
+                    IconButton(
+                        onPressed: () => showModalBottomSheet(
+                              backgroundColor: Colors.transparent,
+                              useRootNavigator: true,
+                              isScrollControlled: true,
+                              context: context,
+                              builder: (BuildContext context) {
+                                return DraggableScrollableSheet(
+                                  initialChildSize: 0.3,
+                                  minChildSize: 0.3,
+                                  maxChildSize: 0.9,
+                                  expand: false,
+                                  builder: (context,
+                                      ScrollController scrollController) {
+                                    return Container(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 12.0),
+                                      clipBehavior: Clip.hardEdge,
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                        border: Border.all(
+                                            color: Colors.transparent),
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(18),
+                                          topRight: Radius.circular(18),
+                                        ),
+                                      ),
+                                      // Use ListView instead of SingleChildScrollView for scrollable content
+                                      child: ListView(
+                                        controller:
+                                            scrollController, // Important: Connect ScrollController
+                                        children: [
+                                          ListTile(
+                                            leading: Container(
+                                              clipBehavior: Clip.hardEdge,
+                                              decoration: ShapeDecoration(
+                                                shape: SmoothRectangleBorder(
+                                                  borderRadius:
+                                                      SmoothBorderRadius(
+                                                    cornerRadius: 10,
+                                                    cornerSmoothing: 0.6,
+                                                  ),
+                                                ),
+                                              ),
+                                              child: CachedImage(
+                                                url: widget.episode.episodeCover
+                                                        ?.full ??
+                                                    '',
                                               ),
                                             ),
-                                          ),
-                                          child: CachedImage(
-                                            url: widget.episode.episodeCover
-                                                    ?.full ??
-                                                '',
-                                          ),
-                                        ),
-                                        title: Text(widget.episode.title ?? ''),
-                                        subtitle: Text(
-                                            widget.episode.durationString +
+                                            title: Text(
+                                                widget.episode.title ?? ''),
+                                            subtitle: Text(widget
+                                                    .episode.durationString +
                                                 ' | ' +
                                                 (widget.episode.publishedDate ??
                                                     '')),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.all(16.0),
+                                            child: Text(
+                                                widget.episode.description ??
+                                                    ''),
+                                          ),
+                                          ListTile(
+                                            title: Text('Share'.i18n),
+                                            leading: const Icon(Icons.share),
+                                            onTap: () async {
+                                              Share.share(
+                                                  'https://deezer.com/episode/${widget.episode.id}');
+                                            },
+                                          ),
+                                        ],
                                       ),
-                                      Padding(
-                                        padding: EdgeInsets.all(16.0),
-                                        child: Text(
-                                            widget.episode.description ?? ''),
-                                      ),
-                                      ListTile(
-                                        title: Text('Share'.i18n),
-                                        leading: const Icon(Icons.share),
-                                        onTap: () async {
-                                          Share.share(
-                                              'https://deezer.com/episode/${widget.episode.id}');
-                                        },
-                                      ),
-                                    ],
-                                  ),
+                                    );
+                                  },
                                 );
                               },
-                            );
-                          },
-                        ),
-                    icon: Icon(AlchemyIcons.more_vert)),
-                widget.trailing ?? const SizedBox(width: 0, height: 0)
+                            ),
+                        icon: Icon(AlchemyIcons.more_vert)),
               ],
             ),
           ),

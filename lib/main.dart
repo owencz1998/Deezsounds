@@ -475,8 +475,6 @@ class _MainScreenState extends State<MainScreen>
     FocusNode screenFocusNode = FocusNode(); // for CustomNavigator
     screenFocusNode.requestFocus();
 
-    Color scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
-
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor,

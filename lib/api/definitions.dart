@@ -670,25 +670,26 @@ class SearchResults {
 
   factory SearchResults.fromPrivateJson(Map<dynamic, dynamic> json) =>
       SearchResults(
-          tracks: json['TRACK']['data']
-              .map<Track>((dynamic data) => Track.fromPrivateJson(data))
-              .toList(),
-          albums: json['ALBUM']['data']
-              .map<Album>((dynamic data) => Album.fromPrivateJson(data))
-              .toList(),
-          artists: json['ARTIST']['data']
-              .map<Artist>((dynamic data) => Artist.fromPrivateJson(data))
-              .toList(),
-          playlists: json['PLAYLIST']['data']
-              .map<Playlist>((dynamic data) => Playlist.fromPrivateJson(data))
-              .toList(),
-          shows: json['SHOW']['data']
-              .map<Show>((dynamic data) => Show.fromPrivateJson(data))
-              .toList(),
-          episodes: json['EPISODE']['data']
-              .map<ShowEpisode>(
-                  (dynamic data) => ShowEpisode.fromPrivateJson(data))
-              .toList());
+        tracks: json['TRACK']['data']
+            .map<Track>((dynamic data) => Track.fromPrivateJson(data))
+            .toList(),
+        albums: json['ALBUM']['data']
+            .map<Album>((dynamic data) => Album.fromPrivateJson(data))
+            .toList(),
+        artists: json['ARTIST']['data']
+            .map<Artist>((dynamic data) => Artist.fromPrivateJson(data))
+            .toList(),
+        playlists: json['PLAYLIST']['data']
+            .map<Playlist>((dynamic data) => Playlist.fromPrivateJson(data))
+            .toList(),
+        shows: json['SHOW']['data']
+            .map<Show>((dynamic data) => Show.fromPrivateJson(data))
+            .toList(),
+        episodes: json['EPISODE']['data']
+            .map<ShowEpisode>(
+                (dynamic data) => ShowEpisode.fromPrivateJson(data))
+            .toList(),
+      );
 }
 
 class Lyrics {
@@ -905,7 +906,8 @@ class HomePage {
 
   Future<HomePage> load() async {
     String path = await _getPath();
-    Map<String, dynamic> data = jsonDecode(await File(path).readAsString());
+    String jsonString = await File(path).readAsString();
+    Map<String, dynamic> data = jsonDecode(jsonString);
     return HomePage.fromJson(data);
   }
 
@@ -1040,7 +1042,7 @@ class DeezerNotification {
       this.picture,
       this.redirect});
 
-  factory DeezerNotification.fromJson(Map<dynamic, dynamic> json) =>
+  factory DeezerNotification.fromPrivateJson(Map<dynamic, dynamic> json) =>
       DeezerNotification(
         id: json['id'],
         title: json['title'],
@@ -1128,8 +1130,7 @@ class HomePageItem {
             type: HomePageItemType.ALBUM, value: Album.fromJson(json['value']));
       case 'SHOW':
         return HomePageItem(
-            type: HomePageItemType.SHOW,
-            value: Show.fromPrivateJson(json['value']));
+            type: HomePageItemType.SHOW, value: Show.fromJson(json['value']));
       default:
         return HomePageItem();
     }
@@ -1322,14 +1323,19 @@ class Show {
       this.isLibrary});
 
   //JSON
-  factory Show.fromPrivateJson(Map<dynamic, dynamic> json) => Show(
-      id: json['SHOW_ID'],
-      name: json['SHOW_NAME'],
-      authors: json['LABEL_NAME'],
-      fans: json['NB_FAN'],
-      isExplicit: json['SHOW_IS_EXPLICIT'] == '1',
-      art: ImageDetails.fromPrivateString(json['SHOW_ART_MD5'], type: 'talk'),
-      description: json['SHOW_DESCRIPTION']);
+  factory Show.fromPrivateJson(Map<dynamic, dynamic> json) {
+    if (json['SHOW_ART_MD5'] == null) Logger.root.info(json);
+    return Show(
+        id: json['SHOW_ID'],
+        name: json['SHOW_NAME'],
+        authors: json['LABEL_NAME'],
+        fans: json['NB_FAN'],
+        isExplicit: json['SHOW_IS_EXPLICIT'] == '1',
+        art: json['SHOW_ART_MD5'] != null
+            ? ImageDetails.fromPrivateString(json['SHOW_ART_MD5'], type: 'talk')
+            : null,
+        description: json['SHOW_DESCRIPTION']);
+  }
 
   factory Show.fromJson(Map<String, dynamic> json) => _$ShowFromJson(json);
   Map<String, dynamic> toJson() => _$ShowToJson(this);
@@ -1406,8 +1412,10 @@ class ShowEpisode {
                 .format(DateTime.parse(json['EPISODE_PUBLISHED_TIMESTAMP']))
             : DateFormat('MMM d, y')
                 .format(DateTime.parse(json['EPISODE_PUBLISHED_TIMESTAMP'])),
-        episodeCover: ImageDetails.fromPrivateString(json['EPISODE_IMAGE_MD5'],
-            type: 'talk'),
+        episodeCover: json['EPISODE_IMAGE_MD5'] != null
+            ? ImageDetails.fromPrivateString(json['EPISODE_IMAGE_MD5'],
+                type: 'talk')
+            : null,
         isExplicit: json['SHOW_IS_EXPLICIT'] == '0' ? false : true,
       );
 

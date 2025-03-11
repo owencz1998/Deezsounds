@@ -201,8 +201,8 @@ class DeezerAPI {
     } else {
       List<DeezerNotification> notifications = [];
       for (int i = 0; i < data['results']['data'].length; i++) {
-        notifications
-            .add(DeezerNotification.fromJson(data['results']['data'][i]));
+        notifications.add(
+            DeezerNotification.fromPrivateJson(data['results']['data'][i]));
       }
       return notifications;
     }

@@ -24,7 +24,6 @@ import '../ui/elements.dart';
 import '../ui/error.dart';
 import '../ui/menu.dart';
 import 'details_screens.dart';
-import 'settings_screen.dart';
 import 'tiles.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -35,14 +34,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ScrollController _scrollController = ScrollController();
-  final double _minScrollOffset = 0.0;
-  final double _maxScrollOffset = 250;
-
-  double _userPictureSize = 60.0;
-  double _subtitleOffset = 0.0;
-  bool _subtitleVisible = true;
-
   bool _isLoading = false;
   String displayName = '';
   String imageUrl = '';
@@ -92,151 +83,89 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
     super.initState();
-    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.hasClients) {
-      double offset = _scrollController.offset;
-      double size = 0.0;
-      double minSize = 35.0;
-      double maxSize = 60.0;
-
-      if (offset < _minScrollOffset) {
-        size = maxSize;
-      } else if (offset > _maxScrollOffset) {
-        size = minSize;
-      } else {
-        double shrinkFactor =
-            (maxSize - minSize) / (_maxScrollOffset - _minScrollOffset);
-        size = maxSize - offset * shrinkFactor;
-      }
-
-      double newSubtitleOffset = -offset * 2.0;
-
-      setState(() {
-        _subtitleVisible = offset < _maxScrollOffset;
-        _userPictureSize = size;
-        _subtitleOffset = newSubtitleOffset;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        controller: _scrollController,
+      body: ListView(
         scrollDirection: Axis.vertical,
-        slivers: [
-          SliverAppBar(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            collapsedHeight: 62,
-            pinned: true,
-            title: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4),
-              child: ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: ClipRRect(
-                  // Use ClipRRect for rounded corners
-                  borderRadius: BorderRadius.circular(
-                      _userPictureSize), // Apply rounded corners
-                  child: FittedBox(
-                    // Use FittedBox to control image fitting
-                    fit: BoxFit
-                        .contain, // Use BoxFit.contain to prevent cropping
-                    child: SizedBox(
-                      // Ensure CachedImage has specific size for FittedBox to work
-                      width: _userPictureSize,
-                      height: _userPictureSize,
-                      child: _isLoading
-                          ? Center(
-                              child: CircularProgressIndicator(),
-                            )
-                          : imageUrl == ''
-                              ? Container(
-                                  decoration: ShapeDecoration(
-                                      shape: CircleBorder(),
-                                      color: settings.theme == Themes.Light
-                                          ? Colors.black.withAlpha(30)
-                                          : Colors.white.withAlpha(30)),
-                                  child: Center(
-                                    child: Text(
-                                      displayName != '' ? displayName[0] : '',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: _userPictureSize / 2),
-                                    ),
-                                  ),
-                                )
-                              : CachedImage(
-                                  // Now CachedImage is inside FittedBox and ClipRRect
-                                  url: imageUrl,
-                                ),
-                    ),
-                  ),
-                ),
-                title: Text(
-                  'Hi $displayName',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                subtitle: _subtitleVisible
-                    ? Container(
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(),
-                        child: Transform.translate(
-                          offset: Offset(_subtitleOffset, 0),
-                          child: Text(
-                            'Welcome back !',
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500),
-                          ),
+        children: [
+          Padding(padding: EdgeInsets.only(top: 4.0)),
+          ListTile(
+            contentPadding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.05),
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(60),
+              child: Container(
+                width: 60,
+                height: 60,
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: _isLoading
+                      ? CircularProgressIndicator()
+                      : CachedImage(
+                          url: ImageDetails.fromJson(cache.userPicture)
+                                  .fullUrl ??
+                              '',
+                          circular: true,
                         ),
-                      )
-                    : null,
-                trailing: IconButton(
+                ),
+              ),
+            ),
+            title: Text(
+              'Hi $displayName',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              'Welcome back !',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+            trailing: SizedBox(
+              height: 60,
+              width: 60,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  splashRadius: 20,
+                  alignment: Alignment.center,
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) =>
                             NotificationScreen(notifications ?? [])));
                   },
-                  icon: Align(
-                    alignment: Alignment.centerRight,
-                    child: Icon(
-                      hasNewNotifications
-                          ? AlchemyIcons.bell_active
-                          : AlchemyIcons.bell,
-                      color: Theme.of(context).textTheme.titleMedium?.color,
-                    ),
+                  icon: Icon(
+                    hasNewNotifications
+                        ? AlchemyIcons.bell_active
+                        : AlchemyIcons.bell,
+                    color: Theme.of(context).textTheme.titleMedium?.color,
                   ),
                 ),
               ),
             ),
           ),
-          SliverToBoxAdapter(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Flexible(
-                    child: ListenableBuilder(
-                        listenable: playerBarState,
-                        builder: (BuildContext context, Widget? child) {
-                          return AnimatedPadding(
-                            duration: Duration(milliseconds: 200),
-                            padding: EdgeInsets.only(
-                                bottom: playerBarState.state ? 80 : 0),
-                            child: HomePageScreen(),
-                          );
-                        })),
-              ],
-            ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Flexible(
+                  child: ListenableBuilder(
+                      listenable: playerBarState,
+                      builder: (BuildContext context, Widget? child) {
+                        return AnimatedPadding(
+                          duration: Duration(milliseconds: 200),
+                          padding: EdgeInsets.only(
+                              bottom: playerBarState.state ? 80 : 0),
+                          child: HomePageScreen(),
+                        );
+                      })),
+            ],
           ),
         ],
       ),
@@ -281,7 +210,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   void _loadHomePage() async {
-    Logger.root.info('home^p');
     //Load local
     try {
       HomePage hp = await HomePage().load();
@@ -305,8 +233,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
         print(e);
       }
     }
-
-    Logger.root.info(_homePage?.toJson());
   }
 
   void _load() {

@@ -35,7 +35,7 @@ class _NotificationScreen extends State<NotificationScreen> {
     }
   }
 
-  void _readAll() async {}
+  //void _readAll() async {}
 
   @override
   void initState() {

@@ -1,4 +1,3 @@
-import 'package:alchemy/api/definitions.dart';
 import 'package:alchemy/fonts/alchemy_icons.dart';
 import 'package:alchemy/ui/settings_screen.dart';
 import 'package:awesome_ripple_animation/awesome_ripple_animation.dart';
@@ -24,19 +23,24 @@ class _CatcherScreen extends State<CatcherScreen> {
       body: Stack(
         children: [
           Center(
-            child: RippleAnimation(
-              size: MediaQuery.of(context).size,
-              minRadius: 64,
-              repeat: true,
-              color: Theme.of(context).primaryColor,
-              child: SizedBox(
-                height: MediaQuery.of(context).size.width * 0.2,
-                width: MediaQuery.of(context).size.width * 0.2,
-                child: Container(
-                  clipBehavior: Clip.hardEdge,
-                  decoration: ShapeDecoration(
-                      shape: CircleBorder(),
-                      color: Theme.of(context).scaffoldBackgroundColor),
+            child: Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).size.height / 4),
+              child: RippleAnimation(
+                size: Size(MediaQuery.of(context).size.width * 0.7,
+                    MediaQuery.of(context).size.width * 0.7),
+                minRadius: 64,
+                repeat: true,
+                color: Theme.of(context).primaryColor,
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.width * 0.2,
+                  width: MediaQuery.of(context).size.width * 0.2,
+                  child: Container(
+                    clipBehavior: Clip.hardEdge,
+                    decoration: ShapeDecoration(
+                        shape: CircleBorder(),
+                        color: Theme.of(context).scaffoldBackgroundColor),
+                  ),
                 ),
               ),
             ),

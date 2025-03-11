@@ -13,7 +13,6 @@ import 'package:get_it/get_it.dart';
 import 'package:alchemy/fonts/alchemy_icons.dart';
 import 'package:alchemy/main.dart';
 import 'package:figma_squircle/figma_squircle.dart';
-import 'package:logging/logging.dart';
 
 import '../api/cache.dart';
 import '../api/deezer.dart';
@@ -69,7 +68,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   String? _query;
   bool _online = true;
-  bool _loading = false;
+  //bool _loading = false;
   final TextEditingController _controller = TextEditingController();
   final FocusNode _keyboardListenerFocusNode = FocusNode();
   final FocusNode _textFieldFocusNode = FocusNode();
@@ -85,7 +84,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     //URL
     if (_query != null && _query!.startsWith('http')) {
-      setState(() => _loading = true);
+      //setState(() => _loading = true);
       try {
         await openScreenByURL(_query!);
       } catch (e) {
@@ -93,7 +92,7 @@ class _SearchScreenState extends State<SearchScreen> {
           print(e);
         }
       }
-      setState(() => _loading = false);
+      //setState(() => _loading = false);
       return;
     }
 
