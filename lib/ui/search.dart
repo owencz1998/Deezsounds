@@ -981,11 +981,14 @@ class SearchResultsScreen extends StatelessWidget {
                     ),
                     onTap: () async {
                       //Load entire show, then play
-                      List<ShowEpisode> episodes =
-                          await deezerAPI.showEpisodes(e.show!.id ?? '');
+                      Show show = await deezerAPI.show(e.show?.id ?? '');
                       await GetIt.I<AudioPlayerHandler>().playShowEpisode(
-                          e.show!, episodes,
-                          index: episodes.indexWhere((ep) => e.id == ep.id));
+                        show,
+                        show.episodes ?? [],
+                        index: show.episodes?.indexWhere(
+                                (ShowEpisode ep) => e.id == ep.id) ??
+                            0,
+                      );
                     },
                   );
                 }),
@@ -1183,11 +1186,14 @@ class EpisodeListScreen extends StatelessWidget {
               ),
               onTap: () async {
                 //Load entire show, then play
-                List<ShowEpisode> episodes =
-                    await deezerAPI.showEpisodes(e.show!.id ?? '');
+                Show show = await deezerAPI.show(e.show?.id ?? '');
                 await GetIt.I<AudioPlayerHandler>().playShowEpisode(
-                    e.show!, episodes,
-                    index: episodes.indexWhere((ep) => e.id == ep.id));
+                  show,
+                  show.episodes ?? [],
+                  index: show.episodes
+                          ?.indexWhere((ShowEpisode ep) => e.id == ep.id) ??
+                      0,
+                );
               },
             );
           },

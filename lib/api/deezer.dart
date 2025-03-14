@@ -981,21 +981,31 @@ class DeezerAPI {
         .toList();
   }
 
-  Future<List<ShowEpisode>> showEpisodes(String showId, {int page = 0}) async {
-    Map data = await callGwApi('deezer.pageShow', params: {
+  Future<Show> show(String showId, {int page = 0, int nb = 1000}) async {
+    Map<String, dynamic> data = await callGwApi('deezer.pageShow', params: {
       'country': settings.deezerCountry,
       'lang': settings.deezerLanguage,
-      'nb': 1000,
+      'nb': nb,
       'show_id': showId,
-      'start': page * 1000,
+      'start': page * nb,
       'user_id': int.parse(deezerAPI.userId ?? ''),
     });
-    return data['results']['EPISODES']['data']
-        .map<ShowEpisode>((e) => ShowEpisode.fromPrivateJson(e))
-        .toList();
+    if (data['results']?['DATA'] == null) return Show();
+    Show show = Show.fromPrivateJson(data['results']['DATA'],
+        epsJson: data['results']['EPISODES']);
+    return show;
   }
 
-  Future<List<Show>> getShows() async {
+  Future<ShowEpisode> showEpisode(String episodeId) async {
+    Map<String, dynamic> data =
+        await callGwApi('episode.getData', params: {'episode_id': episodeId});
+    if (data['results'] == null) {
+      return ShowEpisode();
+    }
+    return ShowEpisode.fromPrivateJson(data['results']);
+  }
+
+  Future<List<Show>> getUserShows() async {
     Map<String, dynamic> data = await callGwApi('deezer.pageProfile', params: {
       'user_id': userId,
       'tab': 'podcasts',

@@ -48,13 +48,7 @@ class DownloadManager {
   }
 
   Future init() async {
-    //Remove old DB
-    File oldDbFile = File(p.join((await getDatabasesPath()), 'offline.db'));
-    if (await oldDbFile.exists()) {
-      await oldDbFile.delete();
-    }
-
-    String dbPath = p.join((await getDatabasesPath()), 'offline2.db');
+    String dbPath = p.join((await getDatabasesPath()), 'offline.db');
     //Open db
     db = await openDatabase(dbPath, version: 1,
         onCreate: (Database db, int version) async {
@@ -68,6 +62,10 @@ class DownloadManager {
         id TEXT PRIMARY KEY, name TEXT, albums TEXT, topTracks TEXT, picture TEXT, fans INTEGER, albumCount INTEGER, offline INTEGER, library INTEGER, radio INTEGER)''');
       b.execute('''CREATE TABLE Playlists (
         id TEXT PRIMARY KEY, title TEXT, tracks TEXT, image TEXT, duration INTEGER, userId TEXT, userName TEXT, fans INTEGER, library INTEGER, description TEXT)''');
+      b.execute('''CREATE TABLE Shows (
+        id TEXT PRIMARY KEY, name TEXT, authors TEXT, description TEXT, fans INTEGER, isExplicit INTEGER, isLibrary INTEGER, offline INTEGER, art TEXT)''');
+      b.execute('''CREATE TABLE Episodes (
+        id TEXT PRIMARY KEY, title TEXT, description TEXT, url TEXT, duration INTEGER, publishedDate TEXT, episodeCover TEXT, isExplicit INTEGER, offline INTEGER, showId TEXT)''');
       await b.commit();
     });
 
@@ -101,7 +99,7 @@ class DownloadManager {
       String path = p.join(offlinePath!, track.id);
       File trackFile = File(path);
       if (await trackFile.exists()) {
-        String newPath = _generatePath(track, false);
+        String newPath = _generatePath(track.id!, false);
         await trackFile.copy(newPath);
       }
       Fluttertoast.showToast(
@@ -131,6 +129,33 @@ class DownloadManager {
             conflictAlgorithm: ConflictAlgorithm.ignore);
       }
     }
+    return batch;
+  }
+
+  //Insert track and metadata to DB
+  Future _addShowToDB(Batch batch, Show show, bool overwriteShow) async {
+    batch.insert('Shows', show.toSQL(off: true),
+        conflictAlgorithm: overwriteShow
+            ? ConflictAlgorithm.replace
+            : ConflictAlgorithm.ignore);
+    return batch;
+  }
+
+  //Insert track and metadata to DB
+  Future _addShowEpisodeToDB(
+      Batch batch, ShowEpisode episode, bool overwriteShow,
+      {Show? show}) async {
+    batch.insert('Episodes', episode.toSQL(off: true),
+        conflictAlgorithm: overwriteShow
+            ? ConflictAlgorithm.replace
+            : ConflictAlgorithm.ignore);
+    Show s =
+        show ?? await deezerAPI.show(episode.show?.id ?? '', page: 0, nb: 0);
+    s.episodes?.add(episode);
+    batch.insert('Shows', s.toSQL(off: true),
+        conflictAlgorithm: overwriteShow
+            ? ConflictAlgorithm.replace
+            : ConflictAlgorithm.ignore);
     return batch;
   }
 
@@ -275,10 +300,45 @@ class DownloadManager {
     }
 
     //Get path
-    String path = _generatePath(track, private, isSingleton: isSingleton);
+    String path = _generatePath(track.id!, private, isSingleton: isSingleton);
     if (!(await File(path).exists())) {
       await platform.invokeMethod('addDownloads', [
         await Download.jsonFromTrack(track, path,
+            private: private, quality: quality)
+      ]);
+    }
+    await start();
+    return true;
+  }
+
+  Future<bool> addOfflineEpisode(ShowEpisode episode,
+      {private = true, isSingleton = false, Show? show}) async {
+    //Permission
+    if (!private && !(await checkPermission())) return false;
+
+    //Ask for quality
+    AudioQuality? quality;
+    if (!private && settings.downloadQuality == AudioQuality.ASK) {
+      quality = await qualitySelect();
+      if (quality == null) return false;
+    }
+
+    //Add to DB
+    if (private) {
+      Batch b = db!.batch();
+      b = await _addShowEpisodeToDB(b, episode, true, show: show);
+      await b.commit();
+
+      //Cache art
+      DefaultCacheManager().getSingleFile(episode.episodeCover?.thumb ?? '');
+      DefaultCacheManager().getSingleFile(episode.episodeCover?.full ?? '');
+    }
+
+    //Get path
+    String path = _generatePath(episode.id!, private, isSingleton: isSingleton);
+    if (!(await File(path).exists())) {
+      await platform.invokeMethod('addEpisodeDownload', [
+        await Download.jsonFromEpisode(episode, path,
             private: private, quality: quality)
       ]);
     }
@@ -320,7 +380,7 @@ class DownloadManager {
     //Create downloads
     List<Map> out = [];
     for (Track t in (album.tracks ?? [])) {
-      String tPath = _generatePath(t, private);
+      String tPath = _generatePath(t.id!, private);
       if (!(await File(tPath).exists())) {
         out.add(await Download.jsonFromTrack(t, tPath,
             private: private, quality: quality));
@@ -368,7 +428,7 @@ class DownloadManager {
     for (int i = 0; i < (playlist.tracks?.length ?? 0); i++) {
       Track t = playlist.tracks![i];
       String tPath = _generatePath(
-        t,
+        t.id!,
         private,
         playlistName: playlist.title,
         playlistTrackNumber: i,
@@ -415,7 +475,7 @@ class DownloadManager {
       for (int i = 0; i < toDowload.length; i++) {
         Track t = toDowload[i];
         String tPath = _generatePath(
-          t,
+          t.id!,
           true,
           playlistName: playlist.title,
           playlistTrackNumber: i,
@@ -526,6 +586,27 @@ class DownloadManager {
     album.artists = artists;
 
     return album;
+  }
+
+  //Get all offline shows
+  Future<List<Show>> getOfflineShows() async {
+    List rawShows = await db!.query('Shows', where: 'offline == 1');
+    List<Show> out = [];
+    //Load each show
+    for (Map rawShow in rawShows) {
+      var offlineShow = Show.fromSQL(rawShow);
+      if (offlineShow.id != null) out.add(offlineShow);
+    }
+    return out;
+  }
+
+  //Get offline album with meta
+  Future<List<ShowEpisode?>> getOfflineEpisodes(String showId) async {
+    List rawShows =
+        await db!.query('Episodes', where: 'showId == ?', whereArgs: [showId]);
+    if (rawShows.isEmpty) return [];
+    Show show = Show.fromSQL(rawShows[0]);
+    return [];
   }
 
   //Get offline artist METADATA, not tracks
@@ -682,13 +763,14 @@ class DownloadManager {
   }
 
   //Generate track download path
-  String _generatePath(Track track, bool private,
+  String _generatePath(String id, bool private,
       {String? playlistName,
       int? playlistTrackNumber,
+      int? diskNumber,
       bool isSingleton = false}) {
     String path;
     if (private) {
-      path = p.join(offlinePath!, track.id);
+      path = p.join(offlinePath!, id);
     } else {
       //Download path
       path = settings.downloadPath ?? '';
@@ -702,8 +784,8 @@ class DownloadManager {
       //Album folder / with disk number
       if (settings.albumFolder) {
         if (settings.albumDiscFolder) {
-          path = p.join(path,
-              '%album%' + ' - Disk ' + (track.diskNumber ?? 1).toString());
+          path = p.join(
+              path, '%album%' + ' - Disk ' + (diskNumber ?? 1).toString());
         } else {
           path = p.join(path, '%album%');
         }
@@ -883,6 +965,19 @@ class Download {
       'title': t.title,
       'path': path,
       'image': t.albumArt?.thumb
+    };
+  }
+
+  static Future<Map> jsonFromEpisode(ShowEpisode e, String path,
+      {private = true, AudioQuality? quality}) async {
+    return {
+      'private': private,
+      'episodeId': e.id,
+      'showId': e.show?.id,
+      'url': e.url,
+      'title': e.title,
+      'path': path,
+      'image': e.episodeCover?.thumb
     };
   }
 }

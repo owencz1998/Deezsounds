@@ -33,9 +33,24 @@ class _NotificationScreen extends State<NotificationScreen> {
         _isLoading = false;
       });
     }
+
+    _readAll();
   }
 
-  //void _readAll() async {}
+  void _readAll() async {
+    List<String?> notificationId = List.generate(
+            widget.notifications.length,
+            (int i) => (widget.notifications[i].read ?? true)
+                ? null
+                : widget.notifications[i].id)
+        .where((String? s) => s != null)
+        .toList();
+
+    if (notificationId.isNotEmpty) {
+      await deezerAPI.callGwApi('notification.markAsRead',
+          params: {'notif_ids': notificationId});
+    }
+  }
 
   @override
   void initState() {
@@ -43,6 +58,7 @@ class _NotificationScreen extends State<NotificationScreen> {
       setState(() {
         notifications = widget.notifications;
       });
+      _readAll();
     } else {
       _load();
     }

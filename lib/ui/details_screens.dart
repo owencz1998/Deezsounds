@@ -10,6 +10,7 @@ import 'package:alchemy/fonts/alchemy_icons.dart';
 import 'package:alchemy/main.dart';
 import 'package:alchemy/settings.dart';
 import 'package:alchemy/utils/connectivity.dart';
+import 'package:logging/logging.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../api/cache.dart';
@@ -3470,20 +3471,21 @@ class _ShowScreenState extends State<ShowScreen> {
 
     // Initial load if no tracks
     if (_episodes.isEmpty) {
-      List<ShowEpisode> e;
+      Show s;
       try {
-        e = await deezerAPI.showEpisodes(_show.id!);
+        s = await deezerAPI.show(_show.id!);
       } catch (e) {
         if (mounted) {
           setState(() {
             _isLoading = false;
             _error = true;
+            Logger.root.info('err: $e');
           });
         }
         return;
       }
       setState(() {
-        _episodes = e;
+        _episodes = s.episodes ?? [];
         _isLoading = false;
       });
     }
@@ -3536,13 +3538,13 @@ class _ShowScreenState extends State<ShowScreen> {
     setState(() => _isLoadingTracks = true);
     int pos = _episodes.length;
     //Get another page of tracks
-    List<ShowEpisode> eps;
+    Show show;
     try {
-      eps = await deezerAPI.showEpisodes(_show.id ?? '',
-          page: (pos / 1000).round());
+      show = await deezerAPI.show(_show.id ?? '', page: (pos / 1000).round());
     } catch (e) {
       if (mounted) {
         setState(() {
+          Logger.root.info(e);
           _error = true;
           _isLoadingTracks = false;
         });
@@ -3551,7 +3553,7 @@ class _ShowScreenState extends State<ShowScreen> {
     }
 
     setState(() {
-      _episodes.addAll(eps);
+      _episodes.addAll(show.episodes ?? []);
       _isLoadingTracks = false;
     });
   }

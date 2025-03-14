@@ -64,8 +64,8 @@ Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yours
 - Implement a profile edition screen ;
 - Implement a song catcher ;
 - Create notification settings ;
-- Make dedicated podcast sections ;
-- Add shows/episodes entries to the download database ;
+- Implement notificationtile onTap redirections ;
+- Download episode functionality ;
 - Prefetch lyrics for tracks in queue ;
 - Make a create playlist from queue option ;
 - Implement LyricFind API to get lyrics and translations ;

@@ -639,7 +639,7 @@ class _LibraryShowsState extends State<LibraryShows> {
   void _loadShows() async {
     //List<Show> offlineShows = await downloadManager.getOfflineShows();
     if (await isConnected()) {
-      List<Show> onlineShows = await deezerAPI.getShows();
+      List<Show> onlineShows = await deezerAPI.getUserShows();
 
       if (mounted) {
         setState(() {

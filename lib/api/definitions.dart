@@ -1311,31 +1311,60 @@ class Show {
   int? fans;
   bool? isExplicit;
   bool? isLibrary;
+  List<ShowEpisode>? episodes;
 
-  Show(
-      {this.name,
-      this.authors,
-      this.description,
-      this.art,
-      this.id,
-      this.fans,
-      this.isExplicit,
-      this.isLibrary});
+  Show({
+    this.name,
+    this.authors,
+    this.description,
+    this.art,
+    this.id,
+    this.fans,
+    this.isExplicit,
+    this.isLibrary,
+    this.episodes,
+  });
 
   //JSON
-  factory Show.fromPrivateJson(Map<dynamic, dynamic> json) {
-    if (json['SHOW_ART_MD5'] == null) Logger.root.info(json);
-    return Show(
-        id: json['SHOW_ID'],
-        name: json['SHOW_NAME'],
-        authors: json['LABEL_NAME'],
-        fans: json['NB_FAN'],
-        isExplicit: json['SHOW_IS_EXPLICIT'] == '1',
-        art: json['SHOW_ART_MD5'] != null
-            ? ImageDetails.fromPrivateString(json['SHOW_ART_MD5'], type: 'talk')
-            : null,
-        description: json['SHOW_DESCRIPTION']);
-  }
+  factory Show.fromPrivateJson(Map<dynamic, dynamic> json,
+          {Map<dynamic, dynamic>? epsJson}) =>
+      Show(
+          id: json['SHOW_ID'],
+          name: json['SHOW_NAME'],
+          authors: json['LABEL_NAME'],
+          fans: json['NB_FAN'],
+          isExplicit: json['SHOW_IS_EXPLICIT'] == '1',
+          art: json['SHOW_ART_MD5'] != null
+              ? ImageDetails.fromPrivateString(json['SHOW_ART_MD5'],
+                  type: 'talk')
+              : null,
+          description: json['SHOW_DESCRIPTION'],
+          episodes: (epsJson?['data'] ?? [])
+              .map<ShowEpisode>((e) => ShowEpisode.fromPrivateJson(e))
+              .toList());
+
+  factory Show.fromSQL(data) => Show(
+        id: data['id'],
+        name: data['name'],
+        authors: data['authors'],
+        description: data['description'],
+        fans: data['fans'],
+        isExplicit: data['isExplicit'] == 1,
+        isLibrary: data['isLibrary'] == 1,
+        art: ImageDetails(fullUrl: data['art']),
+      );
+
+  Map<String, dynamic> toSQL({off = false}) => {
+        'id': id,
+        'name': name,
+        'authors': authors,
+        'description': description,
+        'fans': fans,
+        'isExplicit': (isExplicit ?? false) ? 1 : 0,
+        'isLibrary': (isLibrary ?? false) ? 1 : 0,
+        'offline': off ? 1 : 0,
+        'art': art?.fullUrl,
+      };
 
   factory Show.fromJson(Map<String, dynamic> json) => _$ShowFromJson(json);
   Map<String, dynamic> toJson() => _$ShowToJson(this);
@@ -1351,19 +1380,42 @@ class ShowEpisode {
   String? publishedDate;
   ImageDetails? episodeCover;
   bool? isExplicit;
-  //Might not be fully available
   Show? show;
 
-  ShowEpisode(
-      {this.id,
-      this.title,
-      this.description,
-      this.url,
-      this.duration,
-      this.publishedDate,
-      this.episodeCover,
-      this.isExplicit,
-      this.show});
+  ShowEpisode({
+    this.id,
+    this.title,
+    this.description,
+    this.url,
+    this.duration,
+    this.publishedDate,
+    this.episodeCover,
+    this.isExplicit,
+    this.show,
+  });
+
+  factory ShowEpisode.fromSQL(data) => ShowEpisode(
+      id: data['id'],
+      title: data['title'],
+      description: data['description'],
+      url: data['url'],
+      duration: Duration(seconds: data['duration']),
+      publishedDate: data['publishedDate'],
+      episodeCover: data['episodeCover'],
+      isExplicit: data['isExplicit'],
+      show: Show(id: data['showId']));
+
+  Map<String, dynamic> toSQL({off = false}) => {
+        'id': id,
+        'title': title,
+        'description': description,
+        'url': url,
+        'duration': duration?.inSeconds,
+        'publishedDate': publishedDate,
+        'episodeCover': episodeCover?.fullUrl,
+        'isExplicit': (isExplicit ?? false) ? 1 : 0,
+        'showId': show?.id ?? '',
+      };
 
   String get durationString =>
       "${duration?.inMinutes}:${duration?.inSeconds.remainder(60).toString().padLeft(2, '0')}";
@@ -1389,35 +1441,36 @@ class ShowEpisode {
 
   factory ShowEpisode.fromMediaItem(MediaItem mi) {
     return ShowEpisode(
-        id: mi.id,
-        title: mi.title,
-        description: mi.displayDescription,
-        url: mi.extras?['showUrl'],
-        duration: mi.duration,
-        show: Show.fromJson(jsonDecode(mi.extras?['show'] ?? '')));
+      id: mi.id,
+      title: mi.title,
+      description: mi.displayDescription,
+      url: mi.extras?['showUrl'],
+      duration: mi.duration,
+    );
   }
 
   //JSON
-  factory ShowEpisode.fromPrivateJson(Map<dynamic, dynamic> json) =>
+  factory ShowEpisode.fromPrivateJson(Map<dynamic, dynamic> json,
+          {Show? show}) =>
       ShowEpisode(
-        id: json['EPISODE_ID'],
-        title: json['EPISODE_TITLE'],
-        description: json['EPISODE_DESCRIPTION'],
-        url: json['EPISODE_DIRECT_STREAM_URL'],
-        duration: Duration(seconds: int.parse(json['DURATION'].toString())),
-        publishedDate: DateTime.parse(json['EPISODE_PUBLISHED_TIMESTAMP'])
-                    .year ==
-                DateTime.now().year
-            ? DateFormat('MMM d')
-                .format(DateTime.parse(json['EPISODE_PUBLISHED_TIMESTAMP']))
-            : DateFormat('MMM d, y')
-                .format(DateTime.parse(json['EPISODE_PUBLISHED_TIMESTAMP'])),
-        episodeCover: json['EPISODE_IMAGE_MD5'] != null
-            ? ImageDetails.fromPrivateString(json['EPISODE_IMAGE_MD5'],
-                type: 'talk')
-            : null,
-        isExplicit: json['SHOW_IS_EXPLICIT'] == '0' ? false : true,
-      );
+          id: json['EPISODE_ID'],
+          title: json['EPISODE_TITLE'],
+          description: json['EPISODE_DESCRIPTION'],
+          url: json['EPISODE_DIRECT_STREAM_URL'],
+          duration: Duration(seconds: int.parse(json['DURATION'].toString())),
+          publishedDate: DateTime.parse(json['EPISODE_PUBLISHED_TIMESTAMP'])
+                      .year ==
+                  DateTime.now().year
+              ? DateFormat('MMM d')
+                  .format(DateTime.parse(json['EPISODE_PUBLISHED_TIMESTAMP']))
+              : DateFormat('MMM d, y')
+                  .format(DateTime.parse(json['EPISODE_PUBLISHED_TIMESTAMP'])),
+          episodeCover: json['EPISODE_IMAGE_MD5'] != null
+              ? ImageDetails.fromPrivateString(json['EPISODE_IMAGE_MD5'],
+                  type: 'talk')
+              : null,
+          isExplicit: json['SHOW_IS_EXPLICIT'] == '0' ? false : true,
+          show: Show(id: json['SHOW_ID']));
 
   factory ShowEpisode.fromJson(Map<String, dynamic> json) =>
       _$ShowEpisodeFromJson(json);

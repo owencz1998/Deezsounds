@@ -29,7 +29,7 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class _LibraryScreenState extends State<LibraryScreen> {
-  String offlineTrackCount = '0';
+  String? favoriteShows = '0';
   String? favoriteArtists = '0';
   String? favoriteAlbums = '0';
   Playlist? topPlaylist;
@@ -69,7 +69,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
         downloadManager.getOfflinePlaylist(cache.favoritesPlaylistId);
     final offlinePlaylistsFuture = downloadManager.getOfflinePlaylists();
     final offlineAlbumsFuture = downloadManager.getOfflineAlbums();
-    final snapDataFuture = downloadManager.getStats();
+    final offlinePodcastsFuture = downloadManager.getOfflineShows();
     final onlineFutures = isOnline
         ? [
             deezerAPI.fullPlaylist(cache.favoritesPlaylistId),
@@ -77,20 +77,20 @@ class _LibraryScreenState extends State<LibraryScreen> {
             deezerAPI.getArtists(),
             deezerAPI.getAlbums(),
             deezerAPI.smartTrackList('annual-top'),
+            deezerAPI.getUserShows(),
           ]
         : [];
 
     final results = await Future.wait<Object?>([
       // Explicit type parameter <Object?>
-      snapDataFuture,
+      offlinePodcastsFuture,
       favPlaylistFuture,
       offlinePlaylistsFuture,
       offlineAlbumsFuture,
       ...onlineFutures,
     ]);
 
-    List<String> snapData = results[0] as List<String>;
-
+    List<Show> shows = results[0] as List<Show>;
     Playlist? favPlaylist = results[1] as Playlist?;
     List<Playlist> playlists = results[2] as List<Playlist>;
     List<Album> albums = results[3] as List<Album>;
@@ -104,6 +104,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
         isOnline && results.length > 7 ? results[7] as List<Album> : null;
     SmartTrackList? topTracks =
         isOnline && results.length > 8 ? results[8] as SmartTrackList? : null;
+    List<Show>? userShows =
+        isOnline && results.length > 9 ? results[9] as List<Show> : null;
 
     if (mounted) {
       setState(() {
@@ -140,7 +142,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
         _playlists = onlinePlaylists ?? playlists;
         _loading = false;
         cache.favoritePlaylists = _playlists ?? cache.favoritePlaylists;
-        offlineTrackCount = snapData[0];
+        favoriteShows = userShows?.length.toString() ?? shows.length.toString();
         favoriteArtists = userArtists?.length.toString();
         favoriteAlbums =
             userAlbums?.length.toString() ?? albums.length.toString();
@@ -225,16 +227,20 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         children: [
                           Expanded(
                             child: LibraryGridItem(
-                              title: 'Downloads'.i18n,
-                              subtitle: '$offlineTrackCount Songs'.i18n,
-                              icon: AlchemyIcons.download,
+                              title: 'Favorites'.i18n,
+                              subtitle: '${trackCount ?? 0} Songs'.i18n,
+                              icon: AlchemyIcons.heart,
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        const DownloadsScreen()));
+                                    builder: (context) => PlaylistDetails(
+                                        favoritesPlaylist ??
+                                            Playlist(
+                                                id: cache
+                                                    .favoritesPlaylistId))));
                               },
                             ),
                           ),
+
                           SizedBox(
                               width: MediaQuery.of(context).size.width *
                                   0.05), // Spacing between items
@@ -262,16 +268,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         children: [
                           Expanded(
                             child: LibraryGridItem(
-                              title: 'Favorites'.i18n,
-                              subtitle: '${trackCount ?? 0} Songs'.i18n,
-                              icon: AlchemyIcons.heart,
+                              title: 'Podcasts'.i18n,
+                              subtitle: '$favoriteShows Shows'.i18n,
+                              icon: AlchemyIcons.podcast,
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => PlaylistDetails(
-                                        favoritesPlaylist ??
-                                            Playlist(
-                                                id: cache
-                                                    .favoritesPlaylistId))));
+                                    builder: (context) =>
+                                        const LibraryShows()));
                               },
                             ),
                           ),

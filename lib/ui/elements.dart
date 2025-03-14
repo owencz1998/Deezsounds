@@ -1,7 +1,6 @@
 import 'package:alchemy/fonts/alchemy_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:logging/logging.dart';
 
 import '../settings.dart';
 
@@ -129,7 +128,8 @@ class _DetailedAppBarState extends State<DetailedAppBar> {
 
     widget.scrollController.addListener(() {
       double off = widget.scrollController.position.maxScrollExtent * 0.90;
-      if (widget.scrollController.position.pixels >= widget.expandedHeight &&
+      if (widget.scrollController.position.pixels >=
+              (widget.expandedHeight - MediaQuery.of(context).padding.top) &&
           mounted) {
         setState(() {
           isCollapsed = true;

@@ -12,7 +12,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:get_it/get_it.dart';
 import 'package:alchemy/fonts/alchemy_icons.dart';
 import 'package:alchemy/main.dart';
-import 'package:logging/logging.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 
 import '../api/deezer.dart';
@@ -58,10 +57,11 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = false;
       });
     }
+  }
 
+  void fetchNotifications() async {
     List<DeezerNotification> noti = await deezerAPI.getNotifications();
     if (mounted) {
-      Logger.root.info(noti);
       setState(() {
         notifications = noti;
         hasNewNotifications =
@@ -82,6 +82,9 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     }
+
+    fetchNotifications();
+
     super.initState();
   }
 
@@ -136,10 +139,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: IconButton(
                   splashRadius: 20,
                   alignment: Alignment.center,
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
+                  onPressed: () async {
+                    await Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) =>
                             NotificationScreen(notifications ?? [])));
+                    fetchNotifications();
                   },
                   icon: Icon(
                     hasNewNotifications
@@ -255,7 +259,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   @override
   void initState() {
-    Logger.root.info('Loading');
     super.initState();
     _load();
 

@@ -35,16 +35,19 @@ class _PlayerBarState extends State<PlayerBar> {
   //Recover dominant color
   Future _updateColor() async {
     if (audioHandler.mediaItem.value == null) return;
+    try {
+      PaletteGenerator palette = await PaletteGenerator.fromImageProvider(
+          CachedNetworkImageProvider(
+              audioHandler.mediaItem.value?.extras?['thumb'] ??
+                  audioHandler.mediaItem.value?.artUri));
 
-    PaletteGenerator palette = await PaletteGenerator.fromImageProvider(
-        CachedNetworkImageProvider(
-            audioHandler.mediaItem.value?.extras?['thumb'] ??
-                audioHandler.mediaItem.value?.artUri));
-
-    if (mounted) {
-      setState(() {
-        _bgColor = palette.dominantColor?.color;
-      });
+      if (mounted) {
+        setState(() {
+          _bgColor = palette.dominantColor?.color;
+        });
+      }
+    } catch (e) {
+      return;
     }
   }
 

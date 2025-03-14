@@ -275,7 +275,22 @@ class NotificationTile extends StatelessWidget {
         ),
         Padding(
           padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
-          child: Text(notification.footer ?? ''),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(notification.footer ?? ''),
+              if (!(notification.read ?? true))
+                Padding(
+                  padding: EdgeInsets.only(left: 8),
+                  child: CircleAvatar(
+                    radius: 4,
+                    backgroundColor: Theme.of(context).primaryColor,
+                  ),
+                )
+            ],
+          ),
         ),
         Divider()
       ],
@@ -924,9 +939,10 @@ class ShowEpisodeTile extends StatefulWidget {
   final VoidCallback? onTap;
   final VoidCallback? onHold;
   final Widget? trailing;
+  final Show? show;
 
   const ShowEpisodeTile(this.episode,
-      {super.key, this.onTap, this.onHold, this.trailing});
+      {super.key, this.onTap, this.onHold, this.trailing, this.show});
 
   @override
   _ShowEpisodeTileState createState() => _ShowEpisodeTileState();
@@ -1095,6 +1111,12 @@ class _ShowEpisodeTileState extends State<ShowEpisodeTile> {
                       size: 12.0,
                     ),
                   ),
+                if (!_isOffline)
+                  IconButton(
+                      onPressed: () {
+                        downloadManager.addOfflineEpisode(widget.episode);
+                      },
+                      icon: Icon(AlchemyIcons.download)),
                 if (widget.episode.isExplicit ?? false)
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 2.0),
