@@ -1,15 +1,13 @@
 ![Alchemy](./assets/banner.png?raw=true)
 
 [![Latest Version](https://img.shields.io/github/v/release/PetitPrinc3/DefinitelyNotDeezer?color=blue)](../../releases/latest)
-[![Release date](https://img.shields.io/github/release-date/PetitPrinc3/DefinitelyNotDeezer)](../../releases/latest)  
-[![Flutter Version](https://shields.io/badge/Flutter-v3.29.0-darkgreen.svg)](https://docs.flutter.dev/tools/sdk)
-[![Dart Version](https://shields.io/badge/Dart-v3.7.0-darkgreen.svg)](https://dart.dev/get-dart)
-[![Crowdin](https://badges.crowdin.net/refreezer/localized.svg)](https://crowdin.com/project/refreezer)
+[![Release date](https://img.shields.io/github/release-date/PetitPrinc3/DefinitelyNotDeezer)](../../releases/latest)
 [![License](https://img.shields.io/github/license/PetitPrinc3/Deezer?flat)](./LICENSE)
 
-[![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev/)
-[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
-[![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.java.com/)
+[![Flutter](https://img.shields.io/badge/Flutter-v3.29.0-blue?logo=flutter)](https://flutter.dev/)
+[![Dart](https://img.shields.io/badge/Dart-v3.7.0-blue?logo=dart)](https://dart.dev/)
+[![Android API](https://img.shields.io/badge/Android%20API-35-green?logo=android)](https://developer.android.com/about/versions/14)
+[![Java JDK](https://img.shields.io/badge/Java%20JDK-17-blue?logo=openjdk)](https://openjdk.java.net/projects/jdk/17/)
 
 ---
 
@@ -65,7 +63,6 @@ Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yours
 - Implement a song catcher ;
 - Create notification settings ;
 - Implement notificationtile onTap redirections ;
-- Download episode functionality ;
 - Prefetch lyrics for tracks in queue ;
 - Make a create playlist from queue option ;
 - Implement LyricFind API to get lyrics and translations ;

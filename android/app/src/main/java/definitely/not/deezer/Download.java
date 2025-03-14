@@ -18,12 +18,14 @@ public class Download {
     DownloadState state;
     String title;
     String image;
+    boolean isEpisode;
+    String url;
 
     //Dynamic
     long received;
     long filesize;
 
-    Download(int id, String path, boolean priv, int quality, DownloadState state, String trackId, String md5origin, String mediaVersion, String title, String image, String trackToken, String streamTrackId) {
+    Download(int id, String path, boolean priv, int quality, DownloadState state, String trackId, String md5origin, String mediaVersion, String title, String image, String trackToken, String streamTrackId, boolean isEpisode, String url) {
         this.id = id;
         this.path = path;
         this.priv = priv;
@@ -36,6 +38,8 @@ public class Download {
         this.quality = quality;
         this.trackToken = trackToken;
         this.streamTrackId = streamTrackId;
+        this.isEpisode = isEpisode;
+        this.url = url;
     }
 
     enum DownloadState {
@@ -73,7 +77,9 @@ public class Download {
                 cursor.getString(8),
                 cursor.getString(9),
                 cursor.getString(10),
-                cursor.getString(11)
+                cursor.getString(11),
+                cursor.getInt(12) == 1,
+                cursor.getString(13)
         );
     }
 
@@ -91,6 +97,8 @@ public class Download {
         values.put("quality", (int)data.get("quality"));
         values.put("trackToken", (String)data.get("trackToken"));
         values.put("streamTrackId", (String)data.get("streamTrackId"));
+        values.put("isEpisode", ((boolean)data.get("isEpisode")) ? 1 : 0);
+        values.put("url", (String)data.get("url"));
 
         return values;
     }

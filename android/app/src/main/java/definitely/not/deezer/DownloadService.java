@@ -282,6 +282,7 @@ public class DownloadService extends Service {
         File parentDir;
         File outFile;
         JSONObject trackJson;
+        JSONObject episodeJson;
         JSONObject albumJson;
         JSONObject privateJson;
         Lyrics lyricsData = null;
@@ -307,7 +308,7 @@ public class DownloadService extends Service {
                 }
 
             //Don't fetch meta if user uploaded mp3
-            if (!download.isUserUploaded()) {
+            if (!download.isUserUploaded() && !download.isEpisode) {
                 try {
                     trackJson = deezer.callPublicAPI("track", download.trackId);
                     albumJson = deezer.callPublicAPI("album", Integer.toString(trackJson.getJSONObject("album").getInt("id")));
@@ -320,145 +321,245 @@ public class DownloadService extends Service {
                 }
             }
 
-            //Fallback
-            Deezer.QualityInfo qualityInfo = new Deezer.QualityInfo(this.download.quality, this.download.streamTrackId, this.download.trackToken, this.download.md5origin, this.download.mediaVersion, logger);
-            String sURL = null;
-            if (!download.isUserUploaded()) {
-                try {
-                    sURL = qualityInfo.fallback(deezer);
-                    if (sURL == null)
-                        throw new Exception("No more to fallback!");
-
-                    download.quality = qualityInfo.quality;
-                } catch (Exception e) {
-                    logger.error("Fallback failed " + e.toString());
-                    download.state = Download.DownloadState.DEEZER_ERROR;
-                    exit();
-                    return;
-                }
-            } else {
-                //User uploaded MP3
-                qualityInfo.quality = 3;
-            }
-
-            //Check file
-            try {
-                if (download.isUserUploaded()) {
-                    outFile = new File(Deezer.generateUserUploadedMP3Filename(download.path, download.title));
-                } else {
-                    outFile = new File(Deezer.generateFilename(download.path, trackJson, albumJson, qualityInfo.quality));
-                }
-                parentDir = new File(outFile.getParent());
-            } catch (Exception e) {
-                logger.error("Error generating track filename (" + download.path + "): " + e.toString(), download);
-                e.printStackTrace();
-                download.state = Download.DownloadState.ERROR;
-                exit();
-                return;
-            }
-
-            //File already exists
-            if (outFile.exists()) {
-                //Delete if overwriting enabled
-                if (settings.overwriteDownload) {
-                    outFile.delete();
-                } else {
-                    download.state = Download.DownloadState.DONE;
-                    exit();
-                    return;
-                }
-            }
-
             //Temporary encrypted file
             File tmpFile = new File(getCacheDir(), download.id + ".ENC");
+            
+            if (!download.isEpisode) {
 
-            //Get start bytes offset
-            long start = 0;
-            if (tmpFile.exists()) {
-                start = tmpFile.length();
-            }
-
-            //Download
-            try {
-                URL url = new URL(sURL);
-                HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-                //Set headers
-                connection.setConnectTimeout(30000);
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
-                connection.setRequestProperty("Accept-Language", "*");
-                connection.setRequestProperty("Accept", "*/*");
-                connection.setRequestProperty("Range", "bytes=" + start + "-");
-                connection.connect();
-
-                //Open streams
-                BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
-                OutputStream outputStream = new FileOutputStream(tmpFile.getPath(), true);
-                //Save total
-                download.filesize = start + connection.getContentLength();
-                //Download
-                byte[] buffer = new byte[4096];
-                long received = 0;
-                int read;
-                while ((read = inputStream.read(buffer, 0, 4096)) != -1) {
-                    outputStream.write(buffer, 0, read);
-                    received += read;
-                    download.received = start + received;
-
-                    //Stop/Cancel download
-                    if (stopDownload) {
-                        download.state = Download.DownloadState.NONE;
-                        try {
-                            inputStream.close();
-                            outputStream.close();
-                            connection.disconnect();
-                        } catch (Exception ignored) {
-                        }
+                //Fallback
+                Deezer.QualityInfo qualityInfo = new Deezer.QualityInfo(this.download.quality, this.download.streamTrackId, this.download.trackToken, this.download.md5origin, this.download.mediaVersion, logger);
+                String sURL = null;
+                if (!download.isUserUploaded()) {
+                    try {
+                        sURL = qualityInfo.fallback(deezer);
+                        if (sURL == null)
+                            throw new Exception("No more to fallback!");
+    
+                        download.quality = qualityInfo.quality;
+                    } catch (Exception e) {
+                        logger.error("Fallback failed " + e.toString());
+                        download.state = Download.DownloadState.DEEZER_ERROR;
+                        exit();
+                        return;
+                    }
+                } else {
+                    //User uploaded MP3
+                    qualityInfo.quality = 3;
+                }
+    
+                //Check file
+                try {
+                    if (download.isUserUploaded()) {
+                        outFile = new File(Deezer.generateUserUploadedMP3Filename(download.path, download.title));
+                    } else {
+                        outFile = new File(Deezer.generateFilename(download.path, trackJson, albumJson, qualityInfo.quality));
+                    }
+                    parentDir = new File(outFile.getParent());
+                } catch (Exception e) {
+                    logger.error("Error generating track filename (" + download.path + "): " + e.toString(), download);
+                    e.printStackTrace();
+                    download.state = Download.DownloadState.ERROR;
+                    exit();
+                    return;
+                }
+    
+                //File already exists
+                if (outFile.exists()) {
+                    //Delete if overwriting enabled
+                    if (settings.overwriteDownload) {
+                        outFile.delete();
+                    } else {
+                        download.state = Download.DownloadState.DONE;
                         exit();
                         return;
                     }
                 }
-                //On done
-                inputStream.close();
-                outputStream.close();
-                connection.disconnect();
-                //Update
-                download.state = Download.DownloadState.POST;
-                updateProgress();
-            } catch (Exception e) {
-                //Download error
-                logger.error("Download error: " + e.toString(), download);
-                e.printStackTrace();
-                download.state = Download.DownloadState.ERROR;
-                exit();
-                return;
-            }
-
-            //Post processing
-
-            //Decrypt
-            if (qualityInfo.encrypted) {
+    
+    
+                //Get start bytes offset
+                long start = 0;
+                if (tmpFile.exists()) {
+                    start = tmpFile.length();
+                }
+    
+                //Download
                 try {
-                    File decFile = new File(tmpFile.getPath() + ".DEC");
-                    DeezerDecryptor decryptor = new DeezerDecryptor(download.streamTrackId);
-                    decryptor.decryptFile(tmpFile.getPath(), decFile.getPath());
-                    tmpFile.delete();
-                    tmpFile = decFile;
+                    URL url = new URL(sURL);
+                    HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+                    //Set headers
+                    connection.setConnectTimeout(30000);
+                    connection.setRequestMethod("GET");
+                    connection.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
+                    connection.setRequestProperty("Accept-Language", "*");
+                    connection.setRequestProperty("Accept", "*/*");
+                    connection.setRequestProperty("Range", "bytes=" + start + "-");
+                    connection.connect();
+    
+                    //Open streams
+                    BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                    OutputStream outputStream = new FileOutputStream(tmpFile.getPath(), true);
+                    //Save total
+                    download.filesize = start + connection.getContentLength();
+                    //Download
+                    byte[] buffer = new byte[8192];
+                    long received = 0;
+                    int read;
+                    while ((read = inputStream.read(buffer, 0, 8192)) != -1) {
+                        outputStream.write(buffer, 0, read);
+                        received += read;
+                        download.received = start + received;
+    
+                        //Stop/Cancel download
+                        if (stopDownload) {
+                            download.state = Download.DownloadState.NONE;
+                            try {
+                                inputStream.close();
+                                outputStream.close();
+                                connection.disconnect();
+                            } catch (Exception ignored) {
+                            }
+                            exit();
+                            return;
+                        }
+                    }
+                    //On done
+                    inputStream.close();
+                    outputStream.close();
+                    connection.disconnect();
+                    //Update
+                    download.state = Download.DownloadState.POST;
+                    updateProgress();
                 } catch (Exception e) {
-                    logger.error("Decryption error: " + e.toString(), download);
+                    //Download error
+                    logger.error("Download error: " + e.toString(), download);
                     e.printStackTrace();
-                    //Shouldn't ever fail
+                    download.state = Download.DownloadState.ERROR;
+                    exit();
+                    return;
+                }
+    
+                //Post processing
+    
+                //Decrypt
+                if (qualityInfo.encrypted) {
+                    try {
+                        File decFile = new File(tmpFile.getPath() + ".DEC");
+                        DeezerDecryptor decryptor = new DeezerDecryptor(download.streamTrackId);
+                        decryptor.decryptFile(tmpFile.getPath(), decFile.getPath());
+                        tmpFile.delete();
+                        tmpFile = decFile;
+                    } catch (Exception e) {
+                        logger.error("Decryption error: " + e.toString(), download);
+                        e.printStackTrace();
+                        //Shouldn't ever fail
+                    }
+                }
+    
+            } else {
+
+                try {
+                    episodeJson = deezer.callPublicAPI("episode", download.trackId);
+                } catch (Exception e) {
+                    logger.error("Unable to fetch episode metadata! " + e, download);
+                    e.printStackTrace();
+                    download.state = Download.DownloadState.ERROR;
+                    exit();
+                    return;
+                }
+
+                //Check file
+                try {
+                    outFile = new File(download.path);
+                    parentDir = new File(outFile.getParent());
+                } catch (Exception e) {
+                    logger.error("Error generating track filename (" + download.path + "): " + e.toString(), download);
+                    e.printStackTrace();
+                    download.state = Download.DownloadState.ERROR;
+                    exit();
+                    return;
+                }
+    
+                //File already exists
+                if (outFile.exists()) {
+                    //Delete if overwriting enabled
+                    if (settings.overwriteDownload) {
+                        outFile.delete();
+                    } else {
+                        download.state = Download.DownloadState.DONE;
+                        exit();
+                        return;
+                    }
+                }
+
+                //Get start bytes offset
+                long start = 0;
+                if (tmpFile.exists()) {
+                    start = tmpFile.length();
+                }
+
+                try {
+                    URL url = new URL(download.url);
+                    HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+                    //Set headers
+                    connection.setConnectTimeout(30000);
+                    connection.setRequestMethod("GET");
+                    connection.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
+                    connection.setRequestProperty("Accept-Language", "*");
+                    connection.setRequestProperty("Accept", "*/*");
+                    connection.setRequestProperty("Range", "bytes=" + start + "-");
+                    connection.connect();
+    
+                    //Open streams
+                    BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                    OutputStream outputStream = new FileOutputStream(tmpFile.getPath(), true);
+                    //Save total
+                    download.filesize = start + connection.getContentLength();
+                    //Download
+                    byte[] buffer = new byte[8192];
+                    long received = 0;
+                    int read;
+                    while ((read = inputStream.read(buffer, 0, 8192)) != -1) {
+                        outputStream.write(buffer, 0, read);
+                        received += read;
+                        download.received = start + received;
+    
+                        //Stop/Cancel download
+                        if (stopDownload) {
+                            download.state = Download.DownloadState.NONE;
+                            try {
+                                inputStream.close();
+                                outputStream.close();
+                                connection.disconnect();
+                            } catch (Exception ignored) {
+                            }
+                            exit();
+                            return;
+                        }
+                    }
+                    //On done
+                    inputStream.close();
+                    outputStream.close();
+                    connection.disconnect();
+                    //Update
+                    download.state = Download.DownloadState.POST;
+                    updateProgress();
+                } catch (Exception e) {
+                    //Download error
+                    logger.error("Download error: " + e.toString(), download);
+                    e.printStackTrace();
+                    download.state = Download.DownloadState.ERROR;
+                    exit();
+                    return;
                 }
             }
-
-
+    
             //If exists (duplicate download in DB), don't overwrite.
             if (outFile.exists()) {
                 download.state = Download.DownloadState.DONE;
                 exit();
                 return;
             }
-
+            
             //Create dirs and copy
             if (!parentDir.exists() && !parentDir.mkdirs()) {
                 //Log & Exit
@@ -497,7 +598,7 @@ public class DownloadService extends Service {
             }
 
             //Cover & Tags, ignore on user uploaded
-            if (!download.isUserUploaded()) {
+            if (!download.isUserUploaded() && !download.isEpisode) {
 
                 //Download cover for each track
                 File coverFile = new File(outFile.getPath().substring(0, outFile.getPath().lastIndexOf('.')) + ".jpg");
@@ -512,7 +613,7 @@ public class DownloadService extends Service {
                     InputStream inputStream = connection.getInputStream();
                     OutputStream outputStream = new FileOutputStream(coverFile.getPath());
                     //Download
-                    byte[] buffer = new byte[4096];
+                    byte[] buffer = new byte[8192];
                     int read = 0;
                     while ((read = inputStream.read(buffer)) != -1) {
                         outputStream.write(buffer, 0, read);
@@ -623,7 +724,7 @@ public class DownloadService extends Service {
                 InputStream inputStream = connection.getInputStream();
                 OutputStream outputStream = new FileOutputStream(coverFile.getPath());
                 //Download
-                byte[] buffer = new byte[4096];
+                byte[] buffer = new byte[8192];
                 int read = 0;
                 while ((read = inputStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, read);

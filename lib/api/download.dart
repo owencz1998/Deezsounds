@@ -48,7 +48,7 @@ class DownloadManager {
   }
 
   Future init() async {
-    String dbPath = p.join((await getDatabasesPath()), 'offline.db');
+    String dbPath = p.join((await getDatabasesPath()), 'offline2.db');
     //Open db
     db = await openDatabase(dbPath, version: 1,
         onCreate: (Database db, int version) async {
@@ -129,15 +129,6 @@ class DownloadManager {
             conflictAlgorithm: ConflictAlgorithm.ignore);
       }
     }
-    return batch;
-  }
-
-  //Insert track and metadata to DB
-  Future _addShowToDB(Batch batch, Show show, bool overwriteShow) async {
-    batch.insert('Shows', show.toSQL(off: true),
-        conflictAlgorithm: overwriteShow
-            ? ConflictAlgorithm.replace
-            : ConflictAlgorithm.ignore);
     return batch;
   }
 
@@ -316,13 +307,6 @@ class DownloadManager {
     //Permission
     if (!private && !(await checkPermission())) return false;
 
-    //Ask for quality
-    AudioQuality? quality;
-    if (!private && settings.downloadQuality == AudioQuality.ASK) {
-      quality = await qualitySelect();
-      if (quality == null) return false;
-    }
-
     //Add to DB
     if (private) {
       Batch b = db!.batch();
@@ -337,10 +321,8 @@ class DownloadManager {
     //Get path
     String path = _generatePath(episode.id!, private, isSingleton: isSingleton);
     if (!(await File(path).exists())) {
-      await platform.invokeMethod('addEpisodeDownload', [
-        await Download.jsonFromEpisode(episode, path,
-            private: private, quality: quality)
-      ]);
+      await platform.invokeMethod('addDownloads',
+          [await Download.jsonFromEpisode(episode, path, private: private)]);
     }
     await start();
     return true;
@@ -588,6 +570,25 @@ class DownloadManager {
     return album;
   }
 
+  Future<Show?> getOfflineShow(String id) async {
+    List rawShows = await db!.query('Shows', where: 'id == ?', whereArgs: [id]);
+    if (rawShows.isEmpty) return null;
+    Show show = Show.fromSQL(rawShows[0]);
+
+    List<ShowEpisode> episodes = [];
+    List rawEps =
+        await db!.query('Episodes', where: 'showId == ?', whereArgs: [id]);
+
+    //Load each episode
+    for (Map rawEp in rawEps) {
+      var offlineEp = ShowEpisode.fromSQL(rawEp);
+      if (offlineEp.id != null) episodes.add(offlineEp);
+    }
+
+    show.episodes = episodes;
+    return show;
+  }
+
   //Get all offline shows
   Future<List<Show>> getOfflineShows() async {
     List rawShows = await db!.query('Shows', where: 'offline == 1');
@@ -601,12 +602,27 @@ class DownloadManager {
   }
 
   //Get offline album with meta
-  Future<List<ShowEpisode?>> getOfflineEpisodes(String showId) async {
-    List rawShows =
+  Future<List<ShowEpisode>> getOfflineEpisodes(String showId) async {
+    List rawEps =
         await db!.query('Episodes', where: 'showId == ?', whereArgs: [showId]);
-    if (rawShows.isEmpty) return [];
-    Show show = Show.fromSQL(rawShows[0]);
-    return [];
+    List<ShowEpisode> out = [];
+    //Load each show
+    for (Map rawEp in rawEps) {
+      var offlineEp = ShowEpisode.fromSQL(rawEp);
+      if (offlineEp.id != null) out.add(offlineEp);
+    }
+    return out;
+  }
+
+  Future<List<ShowEpisode>> getAllOfflineEpisodes() async {
+    List rawEps = await db!.query('Episodes');
+    List<ShowEpisode> out = [];
+    //Load each show
+    for (Map rawEp in rawEps) {
+      var offlineEp = ShowEpisode.fromSQL(rawEp);
+      if (offlineEp.id != null) out.add(offlineEp);
+    }
+    return out;
   }
 
   //Get offline artist METADATA, not tracks
@@ -890,26 +906,31 @@ class Download {
   String? title;
   String? image;
   int? quality;
+  bool? isEpisode;
+  String? url;
   //Dynamic
   DownloadState? state;
   int? received;
   int? filesize;
 
-  Download(
-      {this.id,
-      this.path,
-      this.private,
-      this.trackId,
-      this.streamTrackId,
-      this.trackToken,
-      this.md5origin,
-      this.mediaVersion,
-      this.title,
-      this.image,
-      this.state,
-      this.received,
-      this.filesize,
-      this.quality});
+  Download({
+    this.id,
+    this.path,
+    this.private,
+    this.trackId,
+    this.streamTrackId,
+    this.trackToken,
+    this.md5origin,
+    this.mediaVersion,
+    this.title,
+    this.image,
+    this.state,
+    this.received,
+    this.filesize,
+    this.quality,
+    this.isEpisode,
+    this.url,
+  });
 
   //Get progress between 0 - 1
   double get progress {
@@ -919,14 +940,16 @@ class Download {
 
   factory Download.fromJson(Map<dynamic, dynamic> data) {
     return Download(
-        path: data['path'],
-        image: data['image'],
-        private: data['private'],
-        trackId: data['trackId'],
-        id: data['id'],
-        state: DownloadState.values[data['state']],
-        title: data['title'],
-        quality: data['quality']);
+      path: data['path'],
+      image: data['image'],
+      private: data['private'],
+      trackId: data['trackId'],
+      id: data['id'],
+      state: DownloadState.values[data['state']],
+      title: data['title'],
+      quality: data['quality'],
+      isEpisode: data['isEpisode'] == 1,
+    );
   }
 
   //Change values from "update json"
@@ -964,20 +987,22 @@ class Download {
           : settings.getQualityInt((quality ?? settings.downloadQuality)),
       'title': t.title,
       'path': path,
-      'image': t.albumArt?.thumb
+      'image': t.albumArt?.thumb,
+      'isEpisode': false,
     };
   }
 
   static Future<Map> jsonFromEpisode(ShowEpisode e, String path,
-      {private = true, AudioQuality? quality}) async {
+      {private = true}) async {
     return {
       'private': private,
-      'episodeId': e.id,
-      'showId': e.show?.id,
+      'trackId': e.id,
       'url': e.url,
       'title': e.title,
       'path': path,
-      'image': e.episodeCover?.thumb
+      'image': e.episodeCover?.thumb,
+      'quality': 1,
+      'isEpisode': true,
     };
   }
 }

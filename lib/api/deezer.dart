@@ -196,7 +196,7 @@ class DeezerAPI {
 
   Future<List<DeezerNotification>> getNotifications() async {
     Map<dynamic, dynamic> data = await deezerAPI.callGwApi('notification.list');
-    if (data['results']['data'] == null) {
+    if (data['results']?['data'] == null) {
       return [];
     } else {
       List<DeezerNotification> notifications = [];
@@ -220,7 +220,7 @@ class DeezerAPI {
   Future<bool> rawAuthorize({Function? onError}) async {
     try {
       Map<dynamic, dynamic> data = await callGwApi('deezer.getUserData');
-      if (data['results']['USER']['USER_ID'] == 0) {
+      if ((data['results']?['USER']?['USER_ID'] ?? 0) == 0) {
         return false;
       } else {
         token = data['results']['checkForm'];
@@ -312,14 +312,14 @@ class DeezerAPI {
   Future<SearchResults> search(String query) async {
     Map<dynamic, dynamic> data = await callGwApi('deezer.pageSearch',
         params: {'nb': 128, 'query': query, 'start': 0});
-    return SearchResults.fromPrivateJson(data['results']);
+    return SearchResults.fromPrivateJson(data['results'] ?? {});
   }
 
   Future<Track> track(String id) async {
     Map<dynamic, dynamic> data = await callGwApi('song.getListData', params: {
       'sng_ids': [id]
     });
-    return Track.fromPrivateJson(data['results']['data'][0]);
+    return Track.fromPrivateJson(data['results']?['data']?[0] ?? {});
   }
 
   //Get album details, tracks
@@ -348,6 +348,7 @@ class DeezerAPI {
       'art_id': id,
       'lang': settings.deezerLanguage,
     });
+    if (data['results'] == null) return Artist();
     return Artist.fromPrivateJson(data['results']['DATA'],
         topJson: data['results']['TOP'],
         albumsJson: data['results']['ALBUMS'],
@@ -364,6 +365,7 @@ class DeezerAPI {
       'tags': true,
       'start': start
     });
+    if (data['results'] == null) return [];
     return data['results']['SONGS']['data']
         .map<Track>((json) => Track.fromPrivateJson(json))
         .toList();
@@ -486,6 +488,8 @@ class DeezerAPI {
           'OPTIONS': []
         }));
 
+    if (data['results'] == null) return [];
+
     List<dynamic> sections = data['results']['sections'];
     List<Playlist> userQuizzes = [];
 
@@ -508,6 +512,7 @@ class DeezerAPI {
   Future<List<Playlist>> getMusicQuizzes() async {
     Map data = await callGwApi('deezer.pageProfile',
         params: {'nb': 100, 'tab': 'playlists', 'user_id': '5207298602'});
+    if (data['results'] == null) return [];
     return data['results']['TAB']['playlists']['data']
         .map<Playlist>((json) => Playlist.fromPrivateJson(json, library: true))
         .toList();

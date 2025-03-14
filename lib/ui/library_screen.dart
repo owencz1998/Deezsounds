@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:alchemy/service/audio_service.dart';
 import 'package:alchemy/ui/cached_image.dart';
-import 'package:alchemy/ui/downloads_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:alchemy/fonts/alchemy_icons.dart';
 import 'package:alchemy/main.dart';
@@ -300,7 +299,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                   ),
                 ),
               ),
-              if (_playlists?.isEmpty ?? true && _loading)
+              if ((_playlists?.isEmpty ?? true) && _loading)
                 SizedBox(
                   height: 260,
                   child: ListTile(

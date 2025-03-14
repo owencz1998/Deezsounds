@@ -537,7 +537,9 @@ class DownloadTile extends StatelessWidget {
   Future onClick(BuildContext context) async {
     if (download.state != DownloadState.DOWNLOADING &&
         download.state != DownloadState.POST) {
-      GetIt.I<AudioPlayerHandler>().playFromMediaId(download.trackId ?? '');
+      if (!(download.isEpisode ?? false)) {
+        GetIt.I<AudioPlayerHandler>().playFromMediaId(download.trackId ?? '');
+      }
     }
   }
 

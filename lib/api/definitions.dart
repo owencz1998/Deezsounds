@@ -1325,6 +1325,15 @@ class Show {
     this.episodes,
   });
 
+  bool isIn(List<Show> listOfShows) {
+    for (Show candidate in listOfShows) {
+      if (id == candidate.id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   //JSON
   factory Show.fromPrivateJson(Map<dynamic, dynamic> json,
           {Map<dynamic, dynamic>? epsJson}) =>
@@ -1394,6 +1403,15 @@ class ShowEpisode {
     this.show,
   });
 
+  bool isIn(List<ShowEpisode> listOfEpisode) {
+    for (ShowEpisode candidate in listOfEpisode) {
+      if (id == candidate.id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   factory ShowEpisode.fromSQL(data) => ShowEpisode(
       id: data['id'],
       title: data['title'],
@@ -1401,8 +1419,8 @@ class ShowEpisode {
       url: data['url'],
       duration: Duration(seconds: data['duration']),
       publishedDate: data['publishedDate'],
-      episodeCover: data['episodeCover'],
-      isExplicit: data['isExplicit'],
+      episodeCover: ImageDetails(fullUrl: data['episodeCover']),
+      isExplicit: data['isExplicit'] == 1,
       show: Show(id: data['showId']));
 
   Map<String, dynamic> toSQL({off = false}) => {

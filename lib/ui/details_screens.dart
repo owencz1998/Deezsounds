@@ -3471,21 +3471,36 @@ class _ShowScreenState extends State<ShowScreen> {
 
     // Initial load if no tracks
     if (_episodes.isEmpty) {
-      Show s;
-      try {
-        s = await deezerAPI.show(_show.id!);
-      } catch (e) {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _error = true;
-            Logger.root.info('err: $e');
-          });
+      Show? s;
+      if (await isConnected()) {
+        try {
+          s = await deezerAPI.show(_show.id!);
+        } catch (e) {
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+              _error = true;
+              Logger.root.info('err: $e');
+            });
+          }
+          return;
         }
-        return;
+      } else {
+        try {
+          s = await downloadManager.getOfflineShow(_show.id!);
+        } catch (e) {
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+              _error = true;
+              Logger.root.info('err: $e');
+            });
+          }
+          return;
+        }
       }
       setState(() {
-        _episodes = s.episodes ?? [];
+        _episodes = s?.episodes ?? [];
         _isLoading = false;
       });
     }
@@ -3513,25 +3528,23 @@ class _ShowScreenState extends State<ShowScreen> {
   }
 
   Future _isLibrary() async {
-/*
-    if (_.isIn(await downloadManager.getOfflinePlaylists())) {
+    if (_show.isIn(await downloadManager.getOfflineShows())) {
       setState(() {
         isLibrary = true;
       });
       return;
     }
-    if (playlist.isIn(await deezerAPI.g())) {
+    if (_show.isIn(await deezerAPI.getUserShows())) {
       setState(() {
         isLibrary = true;
       });
       return;
     }
-    */
   }
 
   void _loadTracks() async {
     // Got all tracks, return
-    if (_isLoadingTracks || _episodes.isEmpty) {
+    if (_isLoadingTracks || _episodes.isEmpty || !(await isConnected())) {
       return;
     }
 

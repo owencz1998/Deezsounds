@@ -640,14 +640,18 @@ class _LibraryShowsState extends State<LibraryShows> {
     //List<Show> offlineShows = await downloadManager.getOfflineShows();
     if (await isConnected()) {
       List<Show> onlineShows = await deezerAPI.getUserShows();
-
       if (mounted) {
         setState(() {
           libraryShows.addAll(onlineShows);
         });
       }
     } else {
-//      return offlineShows
+      List<Show> offlineShows = await downloadManager.getOfflineShows();
+      if (mounted) {
+        setState(() {
+          libraryShows.addAll(offlineShows);
+        });
+      }
     }
   }
 

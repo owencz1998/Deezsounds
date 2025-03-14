@@ -110,6 +110,7 @@ public class MainActivity extends AudioServiceActivity {
 
             //Get all downloads from DB
             if (call.method.equals("getDownloads")) {
+                db.beginTransaction();
                 Cursor cursor = db.query("Downloads", null, null, null, null, null, null);
                 ArrayList<HashMap<?,?>> downloads = new ArrayList<>();
                 //Parse downloads
@@ -118,6 +119,8 @@ public class MainActivity extends AudioServiceActivity {
                     downloads.add(download.toHashMap());
                 }
                 cursor.close();
+                db.setTransactionSuccessful();
+                db.endTransaction();
                 result.success(downloads);
                 return;
             }

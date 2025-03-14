@@ -1032,6 +1032,17 @@ class _ShowEpisodeTileState extends State<ShowEpisodeTile> {
     });
 
     super.initState();
+
+    _checkOffline();
+  }
+
+  void _checkOffline() async {
+    if (widget.episode.isIn(await downloadManager.getAllOfflineEpisodes()) &&
+        mounted) {
+      setState(() {
+        _isOffline = true;
+      });
+    }
   }
 
   @override
@@ -1102,15 +1113,7 @@ class _ShowEpisodeTileState extends State<ShowEpisodeTile> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (_isOffline)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 2.0),
-                    child: Icon(
-                      Octicons.primitive_dot,
-                      color: Colors.green,
-                      size: 12.0,
-                    ),
-                  ),
+                if (_isOffline) Icon(AlchemyIcons.download_fill),
                 if (!_isOffline)
                   IconButton(
                       onPressed: () {
