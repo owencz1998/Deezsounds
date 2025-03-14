@@ -68,7 +68,7 @@ public class MainActivity extends AudioServiceActivity {
 
             //Add downloads to DB, then refresh service
             if (call.method.equals("addDownloads")) {
-                ArrayList<HashMap<?,?>> downloads = call.arguments();
+                ArrayList<HashMap<String,Object>> downloads = call.arguments();
 
                 if (downloads != null) {
                     //TX

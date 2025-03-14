@@ -1,13 +1,15 @@
 ![Alchemy](./assets/banner.png?raw=true)
 
-[![Latest Version](https://img.shields.io/github/v/release/PetitPrinc3/DefinitelyNotDeezer?color=blue)](../../releases/latest)
-[![Release date](https://img.shields.io/github/release-date/PetitPrinc3/DefinitelyNotDeezer)](../../releases/latest)
+[![Latest Version](https://img.shields.io/github/v/release/PetitPrinc3/Alchemy?color=blue)](../../releases/latest)
+[![Release date](https://img.shields.io/github/release-date/PetitPrinc3/Alchemy)](../../releases/latest)
 [![License](https://img.shields.io/github/license/PetitPrinc3/Deezer?flat)](./LICENSE)
 
 [![Flutter](https://img.shields.io/badge/Flutter-v3.29.0-blue?logo=flutter)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-v3.7.0-blue?logo=dart)](https://dart.dev/)
 [![Android API](https://img.shields.io/badge/Android%20API-35-green?logo=android)](https://developer.android.com/about/versions/14)
 [![Java JDK](https://img.shields.io/badge/Java%20JDK-17-blue?logo=openjdk)](https://openjdk.java.net/projects/jdk/17/)
+
+[![Development Status](https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge)](https://github.com/PetitPrinc3/Alchemy)
 
 ---
 
@@ -58,14 +60,13 @@ Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yours
 - Design inspired by [Mallari Kishor's Spotify Redesign](https://www.behance.net/gallery/194018249/Spotify-App-Redesign).
 
 ## :building_construction: Upcoming features
-- Continue the Search page UI refont ;
-- Implement a profile edition screen ;
 - Implement a song catcher ;
-- Create notification settings ;
 - Implement notificationtile onTap redirections ;
-- Prefetch lyrics for tracks in queue ;
+- Continue the Search page UI refont ;
+- Create notification settings ;
+- Implement a profile edition screen ;
 - Make a create playlist from queue option ;
-- Implement LyricFind API to get lyrics and translations ;
+- Prefetch lyrics for tracks in queue ;
 - Add lyrics to the downloaded tracks.
 
 ## :lady_beetle: Bugs

@@ -84,7 +84,7 @@ public class Download {
     }
 
     //Convert object from method call to SQL ContentValues
-    static ContentValues flutterToSQL(HashMap data) {
+    static ContentValues flutterToSQL(HashMap<String, Object> data) {
         ContentValues values = new ContentValues();
         values.put("path", (String)data.get("path"));
         values.put("private", ((boolean)data.get("private")) ? 1 : 0);
@@ -104,8 +104,8 @@ public class Download {
     }
 
     //Used to send data to Flutter
-    HashMap toHashMap() {
-        HashMap map = new HashMap();
+    HashMap<String, Object> toHashMap() {
+        HashMap<String, Object> map = new HashMap<>();
         map.put("id", id);
         map.put("path", path);
         map.put("private", priv);
