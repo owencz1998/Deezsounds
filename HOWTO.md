@@ -1,15 +1,16 @@
 ![Alchemy](./assets/banner.png?raw=true)
 
-[![Flutter Version](https://shields.io/badge/Flutter-v3.29.0-darkgreen.svg)](https://docs.flutter.dev/tools/sdk)
-[![Dart Version](https://shields.io/badge/Dart-v3.7.0-darkgreen.svg)](https://dart.dev/get-dart)
-[![License](https://img.shields.io/github/license/PetitPrinc3/Deezer?flat)](./LICENSE)
+[![Flutter](https://img.shields.io/badge/Flutter-v3.29.0-blue?logo=flutter)](https://flutter.dev/)
+[![Dart](https://img.shields.io/badge/Dart-v3.7.0-blue?logo=dart)](https://dart.dev/)
+[![Android API](https://img.shields.io/badge/Android%20API-35-green?logo=android)](https://developer.android.com/about/versions/14)
+[![Java JDK](https://img.shields.io/badge/Java%20JDK-17-blue?logo=openjdk)](https://openjdk.java.net/projects/jdk/17/)
 
 ---
 
 > [!IMPORTANT]
 > This page aims at providing compilation steps for Alchmemy.  
 > By compiling and using this app, you have read and understood the [legal](./README.md#balance_scale-disclaimer--legal) section of the ALchemy project.  
-> You take full responsibility for using the app accordingly to the aformentioned disclaimer.
+> You take full responsibility for using the app in accordance with the aformentioned disclaimer.
 
 # :hammer_and_wrench: Getting Started: Compilation Guide
 
