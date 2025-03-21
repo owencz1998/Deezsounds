@@ -4,8 +4,8 @@
 [![Release date](https://img.shields.io/github/release-date/PetitPrinc3/Alchemy)](../../releases/latest)
 [![License](https://img.shields.io/github/license/PetitPrinc3/Deezer?flat)](./LICENSE)
 
-[![Flutter](https://img.shields.io/badge/Flutter-v3.29.0-blue?logo=flutter)](https://flutter.dev/)
-[![Dart](https://img.shields.io/badge/Dart-v3.7.0-blue?logo=dart)](https://dart.dev/)
+[![Flutter](https://img.shields.io/badge/Flutter-v3.29.2-blue?logo=flutter)](https://flutter.dev/)
+[![Dart](https://img.shields.io/badge/Dart-v3.7.2-blue?logo=dart)](https://dart.dev/)
 [![Android API](https://img.shields.io/badge/Android%20API-35-green?logo=android)](https://developer.android.com/about/versions/14)
 [![Java JDK](https://img.shields.io/badge/Java%20JDK-17-blue?logo=openjdk)](https://openjdk.java.net/projects/jdk/17/)
 
@@ -13,23 +13,24 @@
 
 ---
 
-#### :rocket: Alchemy Features :
-- Log in with an official Deezer account ;
-- Explore the official Deezer catalog ;
-- Play any track and skip freely ;
-- Like, save and add your favorite tracks to your own playlists ;
-- Sing along to the songs you love with synchronized lyrics ;
-- Download tracks, playlists and albums for offline listening ;
-- Challenge yourself with playlist-based blind tests ;
-- Export downloaded tracks to local storage ;
-- Import your playlists from Spotify ;
-- Customize themes, accent colors and more.
+#### :rocket: Alchemy Features:
 
-This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD.  
+*   Log in with an official Deezer account;
+*   Explore the official Deezer catalog;
+*   Play any track and skip freely;
+*   Like, save, and add your favorite tracks to your own playlists;
+*   Sing along to the songs you love with synchronized lyrics;
+*   Download tracks, playlists, and albums for offline listening;
+*   Challenge yourself with playlist-based blind tests;
+*   Export downloaded tracks to local storage;
+*   Import your playlists from Spotify;
+*   Customize themes, accent colors, and more.
 
-## :hammer_and_wrench: Compile from source
+This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD.
 
-Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yourself. 
+## :hammer_and_wrench: Compile from Source
+
+Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yourself.
 
 ## :camera_flash: Screenshots
 
@@ -55,35 +56,38 @@ Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yours
 </p>
 
 ## :star2: Credits
-- Built upon [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD ;
-- Lyrics provided by [LRCLIB](https://github.com/tranxuanthang/lrclib) by @tranxuanthang ;
-- Design inspired by [Mallari Kishor's Spotify Redesign](https://www.behance.net/gallery/194018249/Spotify-App-Redesign).
 
-## :building_construction: Upcoming features
-- Implement a song catcher ;
-- Implement notificationtile onTap redirections ;
-- Continue the Search page UI refont ;
-- Create notification settings ;
-- Implement a profile edition screen ;
-- Make a create playlist from queue option ;
-- Prefetch lyrics for tracks in queue ;
-- Add lyrics to the downloaded tracks.
+*   Built upon [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD;
+*   Lyrics provided by [LRCLIB](https://github.com/tranxuanthang/lrclib) by @tranxuanthang;
+*   Design inspired by [Mallari Kishor's Spotify Redesign](https://www.behance.net/gallery/194018249/Spotify-App-Redesign).
+
+## :building_construction: Upcoming Features
+
+*   Implement a song catcher;
+*   Implement notification tile `onTap` redirections;
+*   Continue the Search page UI refactor;
+*   Create notification settings;
+*   Implement a profile edition screen;
+*   Make a "create playlist from queue" option;
+*   Prefetch lyrics for tracks in the queue;
+*   Add lyrics to the downloaded tracks.
 
 ## :lady_beetle: Bugs
-- Skipping tracks on the player screen is not as fluid as it used to be and can be choppy ;
-- Some home tiles are not and will not be implemented (Concerts, Did you know, Original videos, ...)
-- [Tell me !](https://github.com/PetitPrinc3/Deezer/issues)
+
+*   Skipping tracks on the player screen is not as fluid as it used to be and can be choppy;
+*   Some home tiles are not and will not be implemented (Concerts, Did you know, Original videos, ...);
+*   [Tell me!](https://github.com/PetitPrinc3/Deezer/issues)
 
 ## :balance_scale: Disclaimer & Legal
 
-**Alchemy** was not developed for piracy, but educational and private use.
+**Alchemy** was not developed for piracy but for educational and private use.
 You are responsible for how you use **Alchemy**.
 Using **Alchemy** may be illegal in your country.
 
-**Alchemy** uses both Deezer's public and internal API's, but is not endorsed, certified or otherwise approved in any way by Deezer.
+**Alchemy** uses both Deezer's public and internal APIs but is not endorsed, certified, or otherwise approved in any way by Deezer.
 
-The Deezer brand and name is the registered trademark of its respective owner.
+The Deezer brand and name are the registered trademarks of their respective owner.
 
-**Alchemy** has no partnership, sponsorship or endorsement with Deezer.
+**Alchemy** has no partnership, sponsorship, or endorsement with Deezer.
 
-By using **Alchemy** you do not abide by Deezer's [Terms of Service](https://www.deezer.com/legal/cgu).
+By using **Alchemy,** you do not abide by Deezer's [Terms of Service](https://www.deezer.com/legal/cgu).

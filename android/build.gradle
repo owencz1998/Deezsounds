@@ -15,6 +15,7 @@ subprojects {
     // Also sets the compileSdk to 34 and the target javaVersion to 17 
     // (needs to be changed manually to the latest in the future)
     afterEvaluate {
+        println("Processing submodule: ${project.name}")
         // check if android block is available
         if (it.hasProperty('android')) {
 
@@ -41,8 +42,8 @@ subprojects {
                         jvmTarget = javaVersion.toString()
                     }
                 }
-                println("Setting java version to ${javaVersion.toString()} which is $javaVersion")
-                println("Setting compileSdk and targetSdk to $androidApiVersion")
+//                println("Setting java version to ${javaVersion.toString()} which is $javaVersion")
+//                println("Setting compileSdk and targetSdk to $androidApiVersion")
             }
         }
     }
