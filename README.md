@@ -9,8 +9,6 @@
 [![Android API](https://img.shields.io/badge/Android%20API-35-green?logo=android)](https://developer.android.com/about/versions/14)
 [![Java JDK](https://img.shields.io/badge/Java%20JDK-17-blue?logo=openjdk)](https://openjdk.java.net/projects/jdk/17/)
 
-[![Development Status](https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge)](https://github.com/PetitPrinc3/Alchemy)
-
 ---
 
 #### :rocket: Alchemy Features:
