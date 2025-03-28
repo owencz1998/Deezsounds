@@ -83,7 +83,8 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
     GetIt.I<AudioPlayerHandler>().stop();
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        systemNavigationBarColor: Colors.lightBlue.withAlpha(70)));
+        systemNavigationBarColor:
+            Theme.of(context).primaryColor.withAlpha(70)));
     _score();
     _rank();
   }
@@ -370,7 +371,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(15),
                         topRight: Radius.circular(15)),
-                    color: Colors.lightBlue,
+                    color: Theme.of(context).primaryColor,
                   ),
                   clipBehavior: Clip.hardEdge,
                   child: Stack(children: [
@@ -379,7 +380,7 @@ class _BlindTestChoiceScreen extends State<BlindTestChoiceScreen> {
                       valueColor: AlwaysStoppedAnimation(Theme.of(context)
                           .scaffoldBackgroundColor
                           .withAlpha(70)),
-                      backgroundColor: Colors.lightBlue,
+                      backgroundColor: Theme.of(context).primaryColor,
                       direction: Axis.vertical,
                       waveLength: 1.7,
                       waveHeight: 20,
@@ -543,6 +544,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
   String _goodAnswer = '';
   String _badAnswer = '';
   bool _isLoading = true;
+  bool _submitAvailable = true;
 
   void _startSyncTimer() {
     Timer.periodic(const Duration(milliseconds: 350), (timer) {
@@ -722,7 +724,13 @@ class _BlindTestScreenState extends State<BlindTestScreen>
   }
 
   void _submitAnswer(String id) async {
-    if (_goodAnswer != '') return;
+    if (_goodAnswer != '' || !_submitAvailable) return;
+
+    if (mounted) {
+      setState(() {
+        _submitAvailable = false;
+      });
+    }
 
     int questionScore = max(0, ((_remaining * 99) / 30)).toInt();
 
@@ -758,6 +766,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
               .track = Track(id: _goodAnswer);
           _blindTest.points +=
               (res['data']['blindTestMakeAGuess']['scoreVariation']) as int;
+          _submitAvailable = true;
         });
       }
     } else {
@@ -769,6 +778,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
           _badAnswer = _currentQuestion?.track?.id != id ? id : '';
           _blindTest.points +=
               _currentQuestion?.track?.id == id ? questionScore : 0;
+          _submitAvailable = true;
         });
       }
     }
@@ -788,7 +798,8 @@ class _BlindTestScreenState extends State<BlindTestScreen>
     WidgetsBinding.instance.addObserver(this);
     _loadBlindTest();
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        systemNavigationBarColor: Colors.lightBlue.withAlpha(70)));
+        systemNavigationBarColor:
+            Theme.of(context).primaryColor.withAlpha(70)));
     super.initState();
   }
 
@@ -951,11 +962,12 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                   Navigator.of(context, rootNavigator: true).maybePop();
                 },
                 child: Scaffold(
-                    backgroundColor: Colors.lightBlue,
+                    backgroundColor: Theme.of(context).primaryColor,
                     body: SafeArea(
                         child: Stack(children: [
                       Container(
-                        decoration: BoxDecoration(color: Colors.lightBlue),
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor),
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width,
                           height: MediaQuery.of(context).size.height,
@@ -966,7 +978,7 @@ class _BlindTestScreenState extends State<BlindTestScreen>
                                   .scaffoldBackgroundColor
                                   .withAlpha(70),
                             ),
-                            backgroundColor: Colors.lightBlue,
+                            backgroundColor: Theme.of(context).primaryColor,
                             direction: Axis.vertical,
                             waveLength: 1.7,
                             waveHeight: 20,
@@ -1531,7 +1543,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
   void initState() {
     _load();
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        systemNavigationBarColor: Colors.lightBlue.withAlpha(70)));
+        systemNavigationBarColor:
+            Theme.of(context).primaryColor.withAlpha(70)));
     super.initState();
   }
 
@@ -1547,12 +1560,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue,
+      backgroundColor: Theme.of(context).primaryColor,
       body: SafeArea(
         child: Stack(
           children: [
             Container(
-              decoration: BoxDecoration(color: Colors.lightBlue),
+              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
               child: SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
@@ -1561,7 +1574,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   valueColor: AlwaysStoppedAnimation(
                     Theme.of(context).scaffoldBackgroundColor.withAlpha(70),
                   ),
-                  backgroundColor: Colors.lightBlue,
+                  backgroundColor: Theme.of(context).primaryColor,
                   direction: Axis.vertical,
                   waveLength: 1.7,
                   waveHeight: 20,

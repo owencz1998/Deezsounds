@@ -61,12 +61,15 @@ Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yours
 
 ## :building_construction: Upcoming Features
 
+*   Fix background download fails;
+*   Mark tracks as "Downloaded" only once they are downloaded;
 *   Implement a song catcher;
 *   Implement notification tile `onTap` redirections;
 *   Continue the Search page UI refactor;
 *   Create notification settings;
 *   Implement a profile edition screen;
 *   Make a "create playlist from queue" option;
+*   Implement a visual pressed indicator for blind test choices;
 *   Prefetch lyrics for tracks in the queue;
 *   Add lyrics to the downloaded tracks.
 

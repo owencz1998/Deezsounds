@@ -1070,21 +1070,6 @@ class _LibraryPlaylistsState extends State<LibraryPlaylists> {
                   ],
                 ),
 
-              //Favorites playlist
-              PlaylistTile(
-                favoritesPlaylist,
-                onTap: () async {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          PlaylistDetails(favoritesPlaylist)));
-                },
-                onHold: () {
-                  MenuSheet m = MenuSheet();
-                  favoritesPlaylist.library = true;
-                  m.defaultPlaylistMenu(favoritesPlaylist, context: context);
-                },
-              ),
-
               if (_playlists != null)
                 ...List.generate(_sorted.length, (int i) {
                   Playlist p = (_sorted)[i];

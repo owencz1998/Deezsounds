@@ -1113,7 +1113,9 @@ class _ShowEpisodeTileState extends State<ShowEpisodeTile> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (_isOffline) Icon(AlchemyIcons.download_fill),
+                if (_isOffline)
+                  IconButton(
+                      onPressed: () {}, icon: Icon(AlchemyIcons.download_fill)),
                 if (!_isOffline)
                   IconButton(
                       onPressed: () {

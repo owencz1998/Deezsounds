@@ -944,11 +944,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             title: Text(
-              'Export tracks'.i18n,
+              'Export downloads'.i18n,
               style: TextStyle(fontSize: 16),
             ),
             subtitle: Text(
-              'Export tracks to local storage.'.i18n,
+              'Export downloads to local storage.'.i18n,
               style: TextStyle(fontSize: 12),
             ),
             leading: Transform.rotate(
@@ -1772,8 +1772,10 @@ class ExportsSettings extends StatefulWidget {
 class _ExportsSettingsState extends State<ExportsSettings> {
   final TextEditingController _artistSeparatorController =
       TextEditingController(text: settings.artistSeparator);
-  double? _progress;
-  bool _errors = false;
+  double? _trackProgress;
+  double? _showProgress;
+  bool _trackErrors = false;
+  bool _showErrors = false;
 
   @override
   Widget build(BuildContext context) {
@@ -1787,11 +1789,8 @@ class _ExportsSettingsState extends State<ExportsSettings> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Transform.rotate(
-                      angle: -pi / 2,
-                      child: Icon(
-                        AlchemyIcons.import,
-                      ),
+                    Icon(
+                      AlchemyIcons.double_note,
                     ),
                   ]),
               onTap: () async {
@@ -1814,26 +1813,81 @@ class _ExportsSettingsState extends State<ExportsSettings> {
                     }
                   } catch (e) {
                     setState(() {
-                      _errors = true;
+                      _trackErrors = true;
                     });
                   }
                   setState(() {
-                    _progress =
+                    _trackProgress =
                         (allTracks.indexOf(track) + 1) / allTracks.length;
                   });
                 }
                 Fluttertoast.showToast(
-                    msg: _errors ? 'Done. Some errors occured.' : 'Done !');
+                    msg:
+                        _trackErrors ? 'Done. Some errors occured.' : 'Done !');
               }),
-          if (_progress != null)
+          if (_trackProgress != null)
             Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
                 child: LinearProgressIndicator(
                   backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  color: _errors
+                  color: _trackErrors
                       ? Colors.red.shade600
                       : Colors.greenAccent.shade400,
-                  value: _progress,
+                  value: _trackProgress,
+                )),
+          ListTile(
+              title: Text('Exports podcasts'.i18n),
+              subtitle: Text('Export all podcasts to internal storage.'.i18n),
+              leading: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      AlchemyIcons.podcast,
+                    ),
+                  ]),
+              onTap: () async {
+                List<ShowEpisode> allEpisodes =
+                    await downloadManager.getAllOfflineEpisodes();
+                String dirPath = p.join(
+                    (await getExternalStorageDirectory())?.path ?? '',
+                    'offline/');
+                for (ShowEpisode episode in allEpisodes) {
+                  try {
+                    String fileName = (episode.title ?? '') + '.mp3';
+                    String destinationPath =
+                        p.join(settings.downloadPath ?? '', fileName);
+                    if (!(await Directory(p.dirname(destinationPath))
+                        .exists())) {
+                      await Directory(p.dirname(destinationPath))
+                          .create(recursive: true);
+                    }
+                    if (await File(p.join(dirPath, episode.id)).exists()) {
+                      await File(p.join(dirPath, episode.id))
+                          .copy(destinationPath);
+                    }
+                  } catch (e) {
+                    setState(() {
+                      _showErrors = true;
+                    });
+                  }
+                  setState(() {
+                    _showProgress =
+                        (allEpisodes.indexOf(episode) + 1) / allEpisodes.length;
+                  });
+                }
+                Fluttertoast.showToast(
+                    msg: _showErrors ? 'Done. Some errors occured.' : 'Done !');
+              }),
+          if (_showProgress != null)
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                child: LinearProgressIndicator(
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  color: _showErrors
+                      ? Colors.red.shade600
+                      : Colors.greenAccent.shade400,
+                  value: _showProgress,
                 )),
           const FreezerDivider(),
           ListTile(

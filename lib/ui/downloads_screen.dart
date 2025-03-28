@@ -123,26 +123,13 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         ),
         body: ListView(
           children: [
-            //Now downloading
-            Container(height: 2.0),
-            Column(
-                children: List.generate(
-                    downloading.length,
-                    (int i) => DownloadTile(
-                          downloading[i],
-                          updateCallback: () => _load(),
-                        ))),
-            Container(height: 8.0),
-
+            ...List.generate(
+                downloading.length,
+                (int i) => DownloadTile(
+                      downloading[i],
+                      updateCallback: () => _load(),
+                    )),
             //Queued
-            if (queued.isNotEmpty)
-              Text(
-                'Queued'.i18n,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 24.0, fontWeight: FontWeight.bold),
-              ),
-
             if (queued.isNotEmpty)
               Padding(
                 padding: EdgeInsets.symmetric(
@@ -164,6 +151,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                         ),
                       ),
                       child: ExpansionTile(
+                          shape: const Border(),
                           initiallyExpanded: true,
                           title: Text('Queue'),
                           trailing: CircleAvatar(
@@ -263,6 +251,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                         ),
                       ),
                       child: ExpansionTile(
+                        shape: const Border(),
                         title: Text('Failed downloads'),
                         trailing: CircleAvatar(
                           radius: 12,
@@ -403,6 +392,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                         ),
                       ),
                       child: ExpansionTile(
+                          shape: const Border(),
                           title: Text('Downloaded tracks'),
                           trailing: CircleAvatar(
                             radius: 12,

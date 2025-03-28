@@ -1084,6 +1084,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                 : OrientationBuilder(builder: (context, orientation) {
                     //Responsive
                     ScreenUtil.init(context, minTextAdapt: true);
+                    Logger.root.info(orientation);
                     //Landscape
                     if (orientation == Orientation.landscape) {
                       // ignore: prefer_const_constructors
@@ -1777,7 +1778,9 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                 },
                               );
                             },
-                            childCount: artist.topTracks.length,
+                            childCount: artist.topTracks.length > 3
+                                ? 3
+                                : artist.topTracks.length,
                           ),
                         ),
                         SliverToBoxAdapter(
@@ -1870,48 +1873,54 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                               fullThumb: true,
                                               rounded: true,
                                             ),
-                                            Padding(
-                                              padding: EdgeInsets.all(12.0),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    artist
-                                                        .highlight?.data?.title,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                    style: TextStyle(
-                                                        fontSize: 16.0),
-                                                  ),
-                                                  Padding(
-                                                      padding:
-                                                          EdgeInsets.all(4.0)),
-                                                  Text(
-                                                      'By ' +
-                                                          artist.highlight?.data
-                                                              ?.artistString,
+                                            Expanded(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(12.0),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      artist.highlight?.data
+                                                          ?.title,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      maxLines: 1,
                                                       style: TextStyle(
-                                                          fontSize: 12.0,
-                                                          color: Settings
-                                                              .secondaryText)),
-                                                  Padding(
-                                                      padding:
-                                                          EdgeInsets.all(4.0)),
-                                                  Text(
-                                                      'Released on ' +
-                                                          artist.highlight?.data
-                                                              ?.releaseDate,
-                                                      style: TextStyle(
-                                                          fontSize: 12.0,
-                                                          color: Settings
-                                                              .secondaryText))
-                                                ],
+                                                          fontSize: 16.0),
+                                                    ),
+                                                    Padding(
+                                                        padding: EdgeInsets.all(
+                                                            4.0)),
+                                                    Text(
+                                                        'By ' +
+                                                            artist
+                                                                .highlight
+                                                                ?.data
+                                                                ?.artistString,
+                                                        style: TextStyle(
+                                                            fontSize: 12.0,
+                                                            color: Settings
+                                                                .secondaryText)),
+                                                    Padding(
+                                                        padding: EdgeInsets.all(
+                                                            4.0)),
+                                                    Text(
+                                                        'Released on ' +
+                                                            artist
+                                                                .highlight
+                                                                ?.data
+                                                                ?.releaseDate,
+                                                        style: TextStyle(
+                                                            fontSize: 12.0,
+                                                            color: Settings
+                                                                .secondaryText))
+                                                  ],
+                                                ),
                                               ),
-                                            )
+                                            ),
                                           ],
                                         ),
                                       ),
