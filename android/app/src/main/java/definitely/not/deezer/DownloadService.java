@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -21,6 +22,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.ServiceCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -57,8 +59,9 @@ public class DownloadService extends Service {
     static final int SERVICE_RETRY_DOWNLOADS = 8;
     static final int SERVICE_REMOVE_DOWNLOADS = 9;
 
-    static final String NOTIFICATION_CHANNEL_ID = "refreezerdownloads";
+    static final String NOTIFICATION_CHANNEL_ID = "alchemydownloads";
     static final int NOTIFICATION_ID_START = 6969;
+    static final String NOTIFICATION_GROUP_KEY = "definitely.not.deezer.DOWNLOAD_GROUP";
 
     boolean running = false;
     DownloadSettings settings;
@@ -125,7 +128,6 @@ public class DownloadService extends Service {
             activityMessenger = intent.getParcelableExtra("activityMessenger");
         }
 
-
         //return super.onStartCommand(intent, flags, startId);
         //Prevent battery savers I guess
         return START_STICKY;
@@ -175,7 +177,7 @@ public class DownloadService extends Service {
 
         db.setTransactionSuccessful();
         db.endTransaction();
-
+           
         //Create new download tasks
         if (running) {
             int nThreads = settings.downloadThreads - threads.size();
@@ -198,6 +200,7 @@ public class DownloadService extends Service {
             //Check if last download
             if (threads.isEmpty()) {
                 running = false;
+                ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE);
             }
         }
         //Send updates to UI
@@ -797,14 +800,15 @@ public class DownloadService extends Service {
     private void updateNotification(Download download) {
         //Cancel notification for done/none/error downloads
         if (download.state == Download.DownloadState.NONE || download.state.getValue() >= 3) {
-            notificationManager.cancel(NOTIFICATION_ID_START + download.id);
+            notificationManager.cancel(NOTIFICATION_ID_START + 1 + download.id);
             return;
         }
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, DownloadService.NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(download.title)
                 .setSmallIcon(R.drawable.ic_logo)
-                .setPriority(NotificationCompat.PRIORITY_MIN);
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setGroup(NOTIFICATION_GROUP_KEY);
 
         //Show progress when downloading
         if (download.state == Download.DownloadState.DOWNLOADING) {
@@ -821,7 +825,7 @@ public class DownloadService extends Service {
         }
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            notificationManager.notify(NOTIFICATION_ID_START + download.id, notificationBuilder.build());
+            notificationManager.notify(NOTIFICATION_ID_START + 1 + download.id, notificationBuilder.build());
         }
 
     }
@@ -851,6 +855,30 @@ public class DownloadService extends Service {
                 //Start/Resume
                 case SERVICE_START_DOWNLOAD:
                     running = true;
+
+                    // Attempt to start foreground service HERE
+                    try {
+                        ServiceCompat.startForeground(
+                                DownloadService.this, 
+                                NOTIFICATION_ID_START,
+                                new  NotificationCompat.Builder(context, DownloadService.NOTIFICATION_CHANNEL_ID)
+                                    .setContentTitle("Downloading...")
+                                    .setSmallIcon(R.drawable.ic_logo)
+                                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                                    .setGroup(NOTIFICATION_GROUP_KEY)
+                                    .setGroupSummary(true)
+                                    .build(),
+                                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC : 0
+                        );
+                         Log.i("DownloadService", "Foreground service started via SERVICE_START_DOWNLOAD.");
+
+                    } catch (Exception e) {
+                        Log.e("DownloadService", "ForegroundServiceStartNotAllowedException or other error starting foreground from handleMessage", e);
+                        ServiceCompat.stopForeground(DownloadService.this, ServiceCompat.STOP_FOREGROUND_REMOVE);
+                        running = false; // Maybe reset state if start fails?
+                        updateState(); // Update UI about the failure
+                    }
+
                     if (downloads.isEmpty())
                         loadDownloads();
                     updateQueue();
@@ -867,6 +895,7 @@ public class DownloadService extends Service {
                 //Stop downloads
                 case SERVICE_STOP_DOWNLOADS:
                     stop();
+                    ServiceCompat.stopForeground(DownloadService.this, ServiceCompat.STOP_FOREGROUND_REMOVE);
                     break;
 
                 //Remove download

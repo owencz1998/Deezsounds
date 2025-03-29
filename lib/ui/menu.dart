@@ -290,11 +290,8 @@ class MenuSheet {
       onTap: () async {
         bool isDownloaded = await downloadManager.checkOffline(track: t);
         if (isDownloaded) {}
-        if (await downloadManager.addOfflineTrack(t,
-                private: true, isSingleton: true) !=
-            false) {
-          showDownloadStartedToast();
-        }
+        downloadManager.addOfflineTrack(t, private: true, isSingleton: true);
+        showDownloadStartedToast();
         if (context.mounted) _close(context);
       },
     );

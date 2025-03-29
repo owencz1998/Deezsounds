@@ -61,8 +61,6 @@ Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yours
 
 ## :building_construction: Upcoming Features
 
-*   Fix background download fails;
-*   Mark tracks as "Downloaded" only once they are downloaded;
 *   Implement a song catcher;
 *   Implement notification tile `onTap` redirections;
 *   Continue the Search page UI refactor;
@@ -75,6 +73,7 @@ Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yours
 
 ## :lady_beetle: Bugs
 
+*   Downloads that are stopped and restarted will not be saved in the database and therefore not be available;
 *   Skipping tracks on the player screen is not as fluid as it used to be and can be choppy;
 *   Some home tiles are not and will not be implemented (Concerts, Did you know, Original videos, ...);
 *   [Tell me!](https://github.com/PetitPrinc3/Deezer/issues)

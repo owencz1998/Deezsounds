@@ -131,59 +131,61 @@ class _PlayerScreenState extends State<PlayerScreen> {
     scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
 
     return Scaffold(
-        body: SafeArea(
-            child: Container(
-                decoration: BoxDecoration(
-                    gradient:
-                        settings.blurPlayerBackground ? null : _bgGradient),
-                child: Stack(
-                  children: [
-                    if (settings.blurPlayerBackground)
-                      ClipRect(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  image: _blurImage ?? const NetworkImage(''),
-                                  fit: BoxFit.fill,
-                                  colorFilter: ColorFilter.mode(
-                                      Colors.black.withAlpha(65),
-                                      BlendMode.dstATop))),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                            child: Container(color: Colors.transparent),
-                          ),
-                        ),
-                      ),
-                    StreamBuilder(
-                      stream: StreamZip(
-                          [audioHandler.playbackState, audioHandler.mediaItem]),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        //When disconnected
-                        if (audioHandler.mediaItem.value == null) {
-                          //playerHelper.startService();
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
+      body: Container(
+        padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top,
+            bottom: MediaQuery.of(context).padding.bottom),
+        decoration: BoxDecoration(
+            gradient: settings.blurPlayerBackground ? null : _bgGradient),
+        child: Stack(
+          children: [
+            if (settings.blurPlayerBackground)
+              ClipRect(
+                child: Container(
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: _blurImage ?? const NetworkImage(''),
+                          fit: BoxFit.fill,
+                          colorFilter: ColorFilter.mode(
+                              Colors.black.withAlpha(65), BlendMode.dstATop))),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                    child: Container(color: Colors.transparent),
+                  ),
+                ),
+              ),
+            StreamBuilder(
+              stream: StreamZip(
+                  [audioHandler.playbackState, audioHandler.mediaItem]),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                //When disconnected
+                if (audioHandler.mediaItem.value == null) {
+                  //playerHelper.startService();
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-                        return OrientationBuilder(
-                          builder: (context, orientation) {
-                            //Responsive
-                            ScreenUtil.init(context, minTextAdapt: true);
-                            //Landscape
-                            if (orientation == Orientation.landscape) {
-                              // ignore: prefer_const_constructors
-                              return PlayerScreenHorizontal();
-                            }
-                            //Portrait
-                            // ignore: prefer_const_constructors
-                            return PlayerScreenVertical();
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                ))));
+                return OrientationBuilder(
+                  builder: (context, orientation) {
+                    //Responsive
+                    ScreenUtil.init(context, minTextAdapt: true);
+                    //Landscape
+                    if (orientation == Orientation.landscape) {
+                      // ignore: prefer_const_constructors
+                      return PlayerScreenHorizontal();
+                    }
+                    //Portrait
+                    // ignore: prefer_const_constructors
+                    return PlayerScreenVertical();
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

@@ -279,6 +279,23 @@ class DownloadManager {
       track = await deezerAPI.track(track.id!);
     }
 
+    //Get path
+    String path = _generatePath(track.id!, private, isSingleton: isSingleton);
+    if (!(await File(path).exists())) {
+      await platform.invokeMethod('addDownloads', [
+        await Download.jsonFromTrack(track, path,
+            private: private, quality: quality)
+      ]);
+
+      await start();
+
+      // Wait for the download to complete
+      bool downloadSuccess = await _waitForDownloadCompletion(track.id!);
+      if (!downloadSuccess) {
+        return false; // Exit if the download failed
+      }
+    }
+
     //Add to DB
     if (private) {
       Batch b = db!.batch();
@@ -290,22 +307,53 @@ class DownloadManager {
       DefaultCacheManager().getSingleFile(track.albumArt?.full ?? '');
     }
 
-    //Get path
-    String path = _generatePath(track.id!, private, isSingleton: isSingleton);
-    if (!(await File(path).exists())) {
-      await platform.invokeMethod('addDownloads', [
-        await Download.jsonFromTrack(track, path,
-            private: private, quality: quality)
-      ]);
-    }
-    await start();
     return true;
+  }
+
+  // Helper function to wait for download completion
+  Future<bool> _waitForDownloadCompletion(String trackId) async {
+    // Listen to the service events to check the download state
+    Completer<bool> completer = Completer<bool>();
+    late StreamSubscription subscription;
+
+    subscription = serviceEvents.stream.listen((event) {
+      if (event['action'] == 'onProgress') {
+        for (var download in event['data']) {
+          if (download['trackId'] == trackId &&
+              download['state'] == DownloadState.DONE.index) {
+            completer.complete(true);
+            subscription.cancel();
+          } else if (download['trackId'] == trackId &&
+              download['state'] == DownloadState.ERROR.index) {
+            completer.complete(false);
+            subscription.cancel();
+          }
+        }
+      }
+    });
+
+    return completer.future;
   }
 
   Future<bool> addOfflineEpisode(ShowEpisode episode,
       {private = true, isSingleton = false, Show? show}) async {
     //Permission
     if (!private && !(await checkPermission())) return false;
+
+    //Get path
+    String path = _generatePath(episode.id!, private, isSingleton: isSingleton);
+    if (!(await File(path).exists())) {
+      await platform.invokeMethod('addDownloads',
+          [await Download.jsonFromEpisode(episode, path, private: private)]);
+
+      await start();
+
+      // Wait for the download to complete
+      bool downloadSuccess = await _waitForDownloadCompletion(episode.id!);
+      if (!downloadSuccess) {
+        return false; // Exit if the download failed
+      }
+    }
 
     //Add to DB
     if (private) {
@@ -318,13 +366,6 @@ class DownloadManager {
       DefaultCacheManager().getSingleFile(episode.episodeCover?.full ?? '');
     }
 
-    //Get path
-    String path = _generatePath(episode.id!, private, isSingleton: isSingleton);
-    if (!(await File(path).exists())) {
-      await platform.invokeMethod('addDownloads',
-          [await Download.jsonFromEpisode(episode, path, private: private)]);
-    }
-    await start();
     return true;
   }
 
