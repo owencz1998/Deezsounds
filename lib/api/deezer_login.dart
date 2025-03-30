@@ -18,7 +18,8 @@ class DeezerLogin {
   static final cookieManager = CookieManager();
 
   //Login with email
-  static Future<String?> getArlByEmailAndPassword(String email, String password) async {
+  static Future<String?> getArlByEmailAndPassword(
+      String email, String password) async {
     cookieManager.reset();
     // Get initial cookies (sid) from empty getUser call
     String url =
@@ -32,9 +33,14 @@ class DeezerLogin {
     if (accessToken == null) return '';
 
     // Get ARL
-    Map<String, String> requestheaders = {...defaultHeaders, ...cookieManager.cookieHeader};
-    url = 'https://www.deezer.com/ajax/gw-light.php?method=user.getArl&input=3&api_version=1.0&api_token=null';
-    http.Response response = await http.get(Uri.parse(url), headers: requestheaders);
+    Map<String, String> requestheaders = {
+      ...defaultHeaders,
+      ...cookieManager.cookieHeader
+    };
+    url =
+        'https://www.deezer.com/ajax/gw-light.php?method=user.getArl&input=3&api_version=1.0&api_token=null';
+    http.Response response =
+        await http.get(Uri.parse(url), headers: requestheaders);
     Map<dynamic, dynamic> data = jsonDecode(response.body);
     return data['results'];
   }
@@ -44,10 +50,15 @@ class DeezerLogin {
     final clientSecret = Env.deezerClientSecret;
     String? accessToken;
 
-    Map<String, String> requestheaders = {...defaultHeaders, ...cookieManager.cookieHeader};
+    Map<String, String> requestheaders = {
+      ...defaultHeaders,
+      ...cookieManager.cookieHeader
+    };
     requestheaders.addAll(cookieManager.cookieHeader);
     final hashedPassword = md5.convert(utf8.encode(password)).toString();
-    final hashedParams = md5.convert(utf8.encode('$clientId$email$hashedPassword$clientSecret')).toString();
+    final hashedParams = md5
+        .convert(utf8.encode('$clientId$email$hashedPassword$clientSecret'))
+        .toString();
     final url = Uri.parse(
         'https://connect.deezer.com/oauth/user_auth.php?app_id=$clientId&login=$email&password=$hashedPassword&hash=$hashedParams');
 
@@ -57,7 +68,8 @@ class DeezerLogin {
       if (responseJson.containsKey('access_token')) {
         accessToken = responseJson['access_token'];
       } else if (responseJson.containsKey('error')) {
-        throw DeezerLoginException(responseJson['error']['type'], responseJson['error']['message']);
+        throw DeezerLoginException(
+            responseJson['error']['type'], responseJson['error']['message']);
       }
     }).catchError((e) {
       Logger.root.severe('Login Error (E): $e');

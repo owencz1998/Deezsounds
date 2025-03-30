@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:alchemy/utils/env.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:alchemy/api/cache.dart';
 import 'package:http/http.dart' as http;
@@ -27,8 +29,16 @@ class DeezerAPI {
   String? userId;
   String? favoritesPlaylistId;
   String? sid;
+  String? gatewaySID;
+  String? gatewayARL;
+  final String deezerGatewayAPI = Env.deezerGatewayAPI;
+  final String deezerMobileKey = Env.deezerMobileKey;
 
   Future? _authorizing;
+
+  Future testFunction() async {
+    Logger.root.info(await getShowNotificationIds());
+  }
 
   //Get headers
   Map<String, String> get headers => {
@@ -114,7 +124,7 @@ class DeezerAPI {
   }
 
   //Call private GW-light API
-  Future<Map<String, dynamic>> callGwApi(String method,
+  Future<Map<String, dynamic>> callGwLightApi(String method,
       {Map<String, dynamic>? params, String? gatewayInput}) async {
     //Generate URL
     Uri uri = Uri.https('www.deezer.com', '/ajax/gw-light.php', {
@@ -147,7 +157,107 @@ class DeezerAPI {
     if (body['error'].isNotEmpty &&
         body['error'].containsKey('VALID_TOKEN_REQUIRED') &&
         (method != 'deezer.getUserData' && await rawAuthorize())) {
-      return callGwApi(method, params: params, gatewayInput: gatewayInput);
+      return callGwLightApi(method, params: params, gatewayInput: gatewayInput);
+    }
+    return body;
+  }
+
+  Future getGatewayAuth() async {
+    final initKeyBytes = utf8.encode(deezerMobileKey);
+    final encrypt.Key initKey = encrypt.Key(initKeyBytes);
+    final initEncrypter = encrypt.Encrypter(
+        encrypt.AES(initKey, mode: encrypt.AESMode.ecb, padding: null));
+
+    Uri tokenUri = Uri.https('api.deezer.com', '/1.0/gateway.php',
+        {'api_key': deezerGatewayAPI, 'output': '3', 'method': 'mobile_auth'});
+    http.Response tokenReq =
+        await http.get(tokenUri, headers: headers).catchError((e) {
+      return http.Response('', 200);
+    });
+
+    dynamic tokenRes = jsonDecode(tokenReq.body);
+
+    String token = tokenRes['results']['TOKEN'];
+
+    String decrypted =
+        initEncrypter.decrypt(encrypt.Encrypted.fromBase16(token));
+
+    String apiToken = decrypted.substring(0, 64);
+    String apiTokenKey = decrypted.substring(64, 80);
+
+    final encrypter = encrypt.Encrypter(encrypt.AES(
+        encrypt.Key(utf8.encode(apiTokenKey)),
+        mode: encrypt.AESMode.ecb,
+        padding: null));
+
+    String authToken = encrypter.encrypt(apiToken).base16.toString();
+
+    Uri sidUri = Uri.https('api.deezer.com', '/1.0/gateway.php', {
+      'api_key': deezerGatewayAPI,
+      'output': '3',
+      'method': 'api_checkToken',
+      'auth_token': authToken
+    });
+    http.Response sidReq =
+        await http.get(sidUri, headers: headers).catchError((e) {
+      return http.Response('', 200);
+    });
+
+    dynamic sidRes = jsonDecode(sidReq.body);
+
+    gatewaySID = sidRes['results'];
+
+    Uri arlUri = Uri.https('api.deezer.com', '/1.0/gateway.php', {
+      'api_key': deezerGatewayAPI,
+      'sid': gatewaySID,
+      'output': '3',
+      'method': 'mobile_userAutolog',
+    });
+    http.Response arlReq =
+        await http.get(arlUri, headers: headers).catchError((e) {
+      return http.Response('', 200);
+    });
+
+    dynamic arlRes = jsonDecode(arlReq.body);
+
+    gatewayARL = arlRes['results']['ARL'];
+  }
+
+  //Call private gateway API
+  Future<Map<String, dynamic>> callGwApi(String method,
+      {Map<String, dynamic>? params, String? gatewayInput}) async {
+    //Generate URL
+    Uri uri = Uri.https('api.deezer.com', '/1.0/gateway.php', {
+      'api_key': deezerGatewayAPI,
+      'sid': gatewaySID,
+      'method': 'shownotification_getIds',
+      'output': '3',
+      'input': '3',
+      'arl': arl,
+    });
+    //Post
+    http.Response res = await http
+        .post(uri, headers: headers, body: jsonEncode({'CHECKSUM': ''}))
+        .catchError((e) {
+      return http.Response('', 200);
+    });
+
+    dynamic body = jsonDecode(res.body);
+
+    //Grab SID
+    if (method == 'deezer.getUserData' && res.headers['set-cookie'] != null) {
+      for (String cookieHeader in res.headers['set-cookie']!.split(';')) {
+        if (cookieHeader.startsWith('sid=')) {
+          sid = cookieHeader.split('=')[1];
+        }
+      }
+    }
+    // In case of error "Invalid CSRF token" retrieve new one and retry the same call
+    // Except for "deezer.getUserData" method, which would cause infinite loop
+    if (body['error'].isNotEmpty &&
+        body['error'].containsKey('VALID_TOKEN_REQUIRED') &&
+        (method != 'deezer.getUserData' && await rawAuthorize())) {
+      return callGwLightApi(method, params: params, gatewayInput: gatewayInput);
     }
     return body;
   }
@@ -195,7 +305,8 @@ class DeezerAPI {
   }
 
   Future<List<DeezerNotification>> getNotifications() async {
-    Map<dynamic, dynamic> data = await deezerAPI.callGwApi('notification.list');
+    Map<dynamic, dynamic> data =
+        await deezerAPI.callGwLightApi('notification.list');
     if (data['results']?['data'] == null) {
       return [];
     } else {
@@ -219,7 +330,7 @@ class DeezerAPI {
   //Authorize, bool = success
   Future<bool> rawAuthorize({Function? onError}) async {
     try {
-      Map<dynamic, dynamic> data = await callGwApi('deezer.getUserData');
+      Map<dynamic, dynamic> data = await callGwLightApi('deezer.getUserData');
       if ((data['results']?['USER']?['USER_ID'] ?? 0) == 0) {
         return false;
       } else {
@@ -310,13 +421,14 @@ class DeezerAPI {
 
   //Search
   Future<SearchResults> search(String query) async {
-    Map<dynamic, dynamic> data = await callGwApi('deezer.pageSearch',
+    Map<dynamic, dynamic> data = await callGwLightApi('deezer.pageSearch',
         params: {'nb': 128, 'query': query, 'start': 0});
     return SearchResults.fromPrivateJson(data['results'] ?? {});
   }
 
   Future<Track> track(String id) async {
-    Map<dynamic, dynamic> data = await callGwApi('song.getListData', params: {
+    Map<dynamic, dynamic> data =
+        await callGwLightApi('song.getListData', params: {
       'sng_ids': [id]
     });
     return Track.fromPrivateJson(data['results']?['data']?[0] ?? {});
@@ -324,14 +436,15 @@ class DeezerAPI {
 
   //Get album details, tracks
   Future<Album> album(String id) async {
-    Map<dynamic, dynamic> data = await callGwApi('deezer.pageAlbum', params: {
-      'alb_id': id,
-      'header': true,
-      'lang': settings.deezerLanguage
-    });
+    Map<dynamic, dynamic> data = await callGwLightApi('deezer.pageAlbum',
+        params: {
+          'alb_id': id,
+          'header': true,
+          'lang': settings.deezerLanguage
+        });
     while (data['results']?['DATA'] == null &&
         data['payload']?['FALLBACK']?['ALB_ID'] != null) {
-      data = await callGwApi('deezer.pageAlbum', params: {
+      data = await callGwLightApi('deezer.pageAlbum', params: {
         'alb_id': data['payload']?['FALLBACK']?['ALB_ID'],
         'header': true,
         'lang': settings.deezerLanguage
@@ -344,7 +457,8 @@ class DeezerAPI {
 
   //Get artist details
   Future<Artist> artist(String id) async {
-    Map<dynamic, dynamic> data = await callGwApi('deezer.pageArtist', params: {
+    Map<dynamic, dynamic> data =
+        await callGwLightApi('deezer.pageArtist', params: {
       'art_id': id,
       'lang': settings.deezerLanguage,
     });
@@ -358,7 +472,7 @@ class DeezerAPI {
   //Get playlist tracks at offset
   Future<List<Track>> playlistTracksPage(String id, int start,
       {int nb = 50}) async {
-    Map data = await callGwApi('deezer.pagePlaylist', params: {
+    Map data = await callGwLightApi('deezer.pagePlaylist', params: {
       'playlist_id': id,
       'lang': settings.deezerLanguage,
       'nb': nb,
@@ -374,7 +488,7 @@ class DeezerAPI {
   //Get playlist details
   Future<Playlist> playlist(String id, {int nb = 100}) async {
     Map<dynamic, dynamic> data =
-        await callGwApi('deezer.pagePlaylist', params: {
+        await callGwLightApi('deezer.pagePlaylist', params: {
       'playlist_id': id,
       'lang': settings.deezerLanguage,
       'nb': nb,
@@ -392,38 +506,67 @@ class DeezerAPI {
   }
 
   //Add track to favorites
-  Future addFavoriteTrack(String id) async {
-    await callGwApi('favorite_song.add', params: {'SNG_ID': id});
+  Future<bool> addFavoriteTrack(String id) async {
+    Map data =
+        await callGwLightApi('favorite_song.add', params: {'SNG_ID': id});
     if (await downloadManager.checkOffline(
         playlist: Playlist(id: favoritesPlaylistId))) {
       downloadManager.updateOfflinePlaylist(Playlist(id: favoritesPlaylistId));
     }
+
+    if (data['results'] == true) {
+      return true;
+    }
+
+    return false;
   }
 
   //Add album to favorites/library
-  Future addFavoriteAlbum(String id) async {
-    await callGwApi('album.addFavorite', params: {'ALB_ID': id});
+  Future<bool> addFavoriteAlbum(String id) async {
+    Map data =
+        await callGwLightApi('album.addFavorite', params: {'ALB_ID': id});
+
+    if (data['results'] == true) {
+      return true;
+    }
+
+    return false;
   }
 
   //Add artist to favorites/library
-  Future addFavoriteArtist(String id) async {
-    await callGwApi('artist.addFavorite', params: {'ART_ID': id});
+  Future<bool> addFavoriteArtist(String id) async {
+    Map data =
+        await callGwLightApi('artist.addFavorite', params: {'ART_ID': id});
+
+    if (data['results'] == true) {
+      return true;
+    }
+
+    return false;
   }
 
   //Remove artist from favorites/library
-  Future removeArtist(String id) async {
-    await callGwApi('artist.deleteFavorite', params: {'ART_ID': id});
+  Future<bool> removeArtist(String id) async {
+    Map data =
+        await callGwLightApi('artist.deleteFavorite', params: {'ART_ID': id});
+
+    if (data['results'] == true) {
+      return true;
+    }
+
+    return false;
   }
 
   // Mark track as disliked
   Future dislikeTrack(String id) async {
-    await callGwApi('favorite_dislike.add', params: {'ID': id, 'TYPE': 'song'});
+    await callGwLightApi('favorite_dislike.add',
+        params: {'ID': id, 'TYPE': 'song'});
   }
 
   //Add tracks to playlist
   Future addToPlaylist(String trackId, String playlistId,
       {int offset = -1}) async {
-    await callGwApi('playlist.addSongs', params: {
+    await callGwLightApi('playlist.addSongs', params: {
       'offset': offset,
       'playlist_id': playlistId,
       'songs': [
@@ -438,7 +581,7 @@ class DeezerAPI {
 
   //Remove track from playlist
   Future removeFromPlaylist(String trackId, String playlistId) async {
-    await callGwApi('playlist.deleteSongs', params: {
+    await callGwLightApi('playlist.deleteSongs', params: {
       'playlist_id': playlistId,
       'songs': [
         [trackId, 0]
@@ -464,7 +607,7 @@ class DeezerAPI {
       'video-link',
       'external-link'
     ];
-    Map data = await callGwApi('page.get',
+    Map data = await callGwLightApi('page.get',
         gatewayInput: jsonEncode({
           'PAGE': 'channels/games',
           'VERSION': '2.5',
@@ -510,7 +653,7 @@ class DeezerAPI {
   }
 
   Future<List<Playlist>> getMusicQuizzes() async {
-    Map data = await callGwApi('deezer.pageProfile',
+    Map data = await callGwLightApi('deezer.pageProfile',
         params: {'nb': 100, 'tab': 'playlists', 'user_id': '5207298602'});
     if (data['results'] == null) return [];
     return data['results']['TAB']['playlists']['data']
@@ -520,7 +663,7 @@ class DeezerAPI {
 
   //Get users playlists
   Future<List<Playlist>> getPlaylists() async {
-    Map data = await callGwApi('deezer.pageProfile',
+    Map data = await callGwLightApi('deezer.pageProfile',
         params: {'nb': 100, 'tab': 'playlists', 'user_id': userId});
     return data['results']['TAB']['playlists']['data']
         .map<Playlist>((json) => Playlist.fromPrivateJson(json, library: true))
@@ -529,8 +672,8 @@ class DeezerAPI {
 
   //Get favorite trackIds
   Future<List<String>?> getFavoriteTrackIds() async {
-    Map data =
-        await callGwApi('user.getAllFeedbacks', params: {'checksums': null});
+    Map data = await callGwLightApi('user.getAllFeedbacks',
+        params: {'checksums': null});
     final songsData = data['results']?['FAVORITES']?['SONGS']?['data'];
 
     if (songsData is List) {
@@ -541,7 +684,7 @@ class DeezerAPI {
 
   //Get favorite albums
   Future<List<Album>> getAlbums() async {
-    Map data = await callGwApi('deezer.pageProfile',
+    Map data = await callGwLightApi('deezer.pageProfile',
         params: {'nb': 50, 'tab': 'albums', 'user_id': userId});
     List albumList = data['results']['TAB']['albums']['data'];
     List<Album> albums = albumList
@@ -551,18 +694,32 @@ class DeezerAPI {
   }
 
   //Remove album from library
-  Future removeAlbum(String id) async {
-    await callGwApi('album.deleteFavorite', params: {'ALB_ID': id});
+  Future<bool> removeAlbum(String id) async {
+    Map data =
+        await callGwLightApi('album.deleteFavorite', params: {'ALB_ID': id});
+
+    if (data['results'] == true) {
+      return true;
+    }
+
+    return false;
   }
 
   //Remove track from favorites
-  Future removeFavorite(String id) async {
-    await callGwApi('favorite_song.remove', params: {'SNG_ID': id});
+  Future<bool> removeFavorite(String id) async {
+    Map data =
+        await callGwLightApi('favorite_song.remove', params: {'SNG_ID': id});
+
+    if (data['results'] == true) {
+      return true;
+    }
+
+    return false;
   }
 
   //Get favorite artists
   Future<List<Artist>> getArtists() async {
-    Map data = await callGwApi('deezer.pageProfile',
+    Map data = await callGwLightApi('deezer.pageProfile',
         params: {'nb': 40, 'tab': 'artists', 'user_id': userId});
     return data['results']['TAB']['artists']['data']
         .map<Artist>((json) => Artist.fromPrivateJson(json, library: true))
@@ -705,7 +862,8 @@ class DeezerAPI {
 
   //Get lyrics by track id from legacy GW api
   Future<Lyrics> lyricsLegacy(String trackId) async {
-    Map data = await callGwApi('song.getLyrics', params: {'sng_id': trackId});
+    Map data =
+        await callGwLightApi('song.getLyrics', params: {'sng_id': trackId});
     if (data['error'] != null && data['error'].length > 0) {
       return Lyrics.error(data['error']['DATA_ERROR']);
     }
@@ -780,8 +938,20 @@ class DeezerAPI {
     return LyricsFull.fromPrivateJson(data['data']);
   }
 
+  Future<List<Track?>> userTracks({int? limit}) async {
+    Map data = await callGwLightApi('charts.getUserSongs', params: {
+      'USER_ID': userId,
+      'START': '0',
+      'NB': (limit ?? 100).toString()
+    });
+    if (data['results']['data'] == null) return [];
+    return data['results']['data']
+        .map<Track>((json) => Track.fromPrivateJson(json))
+        .toList();
+  }
+
   Future<SmartTrackList?> smartTrackList(String id) async {
-    Map data = await callGwApi('deezer.pageSmartTracklist',
+    Map data = await callGwLightApi('deezer.pageSmartTracklist',
         params: {'smarttracklist_id': id});
     if (data['results']['DATA'] == null) {
       return null;
@@ -791,7 +961,7 @@ class DeezerAPI {
   }
 
   Future<List<Track>> flow({String? type}) async {
-    Map data = await callGwApi('radio.getUserRadio',
+    Map data = await callGwLightApi('radio.getUserRadio',
         params: {'user_id': userId, 'config_id': type});
     return data['results']['data']
         .map<Track>((json) => Track.fromPrivateJson(json))
@@ -812,7 +982,7 @@ class DeezerAPI {
       'track',
       'user'
     ];
-    Map data = await callGwApi('page.get',
+    Map data = await callGwLightApi('page.get',
         gatewayInput: jsonEncode({
           'PAGE': 'home',
           'VERSION': '2.5',
@@ -840,7 +1010,7 @@ class DeezerAPI {
 
   //Log song listen to deezer
   Future logListen(String trackId) async {
-    await callGwApi('log.listen', params: {
+    await callGwLightApi('log.listen', params: {
       'params': {
         'timestamp': DateTime.now().millisecondsSinceEpoch,
         'ts_listen': DateTime.now().millisecondsSinceEpoch,
@@ -864,7 +1034,7 @@ class DeezerAPI {
       'track',
       'user'
     ];
-    Map data = await callGwApi('page.get',
+    Map data = await callGwLightApi('page.get',
         gatewayInput: jsonEncode({
           'PAGE': target,
           'VERSION': '2.5',
@@ -891,20 +1061,32 @@ class DeezerAPI {
   }
 
   //Add playlist to library
-  Future addPlaylist(String id) async {
-    await callGwApi('playlist.addFavorite',
+  Future<bool> addPlaylist(String id) async {
+    Map data = await callGwLightApi('playlist.addFavorite',
         params: {'parent_playlist_id': int.parse(id)});
+
+    if (data['results'] == true) {
+      return true;
+    }
+
+    return false;
   }
 
   //Remove playlist from library
-  Future removePlaylist(String id) async {
-    await callGwApi('playlist.deleteFavorite',
+  Future<bool> removePlaylist(String id) async {
+    Map data = await callGwLightApi('playlist.deleteFavorite',
         params: {'playlist_id': int.parse(id)});
+
+    if (data['results'] == true) {
+      return true;
+    }
+
+    return false;
   }
 
   //Delete playlist
   Future deletePlaylist(String id) async {
-    await callGwApi('playlist.delete', params: {'playlist_id': id});
+    await callGwLightApi('playlist.delete', params: {'playlist_id': id});
   }
 
   //Create playlist
@@ -913,7 +1095,7 @@ class DeezerAPI {
       {String description = '',
       int status = 1,
       List<String> trackIds = const []}) async {
-    Map data = await callGwApi('playlist.create', params: {
+    Map data = await callGwLightApi('playlist.create', params: {
       'title': title,
       'description': description,
       'songs': trackIds
@@ -928,7 +1110,7 @@ class DeezerAPI {
   //Get part of discography
   Future<List<Album>> discographyPage(String artistId,
       {int start = 0, int nb = 50}) async {
-    Map data = await callGwApi('album.getDiscography', params: {
+    Map data = await callGwLightApi('album.getDiscography', params: {
       'art_id': int.parse(artistId),
       'discography_mode': 'all',
       'nb': nb,
@@ -942,14 +1124,14 @@ class DeezerAPI {
   }
 
   Future<List> searchSuggestions(String query) async {
-    Map data =
-        await callGwApi('search_getSuggestedQueries', params: {'QUERY': query});
+    Map data = await callGwLightApi('search_getSuggestedQueries',
+        params: {'QUERY': query});
     return data['results']['SUGGESTION'].map((s) => s['QUERY']).toList();
   }
 
   //Get smart radio for artist id
   Future<List<Track>> smartRadio(String artistId) async {
-    Map data = await callGwApi('smart.getSmartRadio',
+    Map data = await callGwLightApi('smart.getSmartRadio',
         params: {'art_id': int.parse(artistId)});
     return data['results']['data']
         .map<Track>((t) => Track.fromPrivateJson(t))
@@ -959,7 +1141,7 @@ class DeezerAPI {
   //Update playlist metadata, status = see createPlaylist
   Future updatePlaylist(String id, String title, String description,
       {int status = 1}) async {
-    await callGwApi('playlist.update', params: {
+    await callGwLightApi('playlist.update', params: {
       'description': description,
       'title': title,
       'playlist_id': int.parse(id),
@@ -970,7 +1152,7 @@ class DeezerAPI {
 
   //Get shuffled library
   Future<List<Track>> libraryShuffle({int start = 0}) async {
-    Map data = await callGwApi('tracklist.getShuffledCollection',
+    Map data = await callGwLightApi('tracklist.getShuffledCollection',
         params: {'nb': 50, 'start': start});
     return data['results']['data']
         .map<Track>((t) => Track.fromPrivateJson(t))
@@ -979,7 +1161,7 @@ class DeezerAPI {
 
   //Get similar tracks for track with id [trackId]
   Future<List<Track>> playMix(String trackId) async {
-    Map data = await callGwApi('song.getSearchTrackMix',
+    Map data = await callGwLightApi('song.getSearchTrackMix',
         params: {'sng_id': trackId, 'start_with_input_track': 'true'});
     return data['results']['data']
         .map<Track>((t) => Track.fromPrivateJson(t))
@@ -987,7 +1169,8 @@ class DeezerAPI {
   }
 
   Future<Show> show(String showId, {int page = 0, int nb = 1000}) async {
-    Map<String, dynamic> data = await callGwApi('deezer.pageShow', params: {
+    Map<String, dynamic> data =
+        await callGwLightApi('deezer.pageShow', params: {
       'country': settings.deezerCountry,
       'lang': settings.deezerLanguage,
       'nb': nb,
@@ -1001,9 +1184,109 @@ class DeezerAPI {
     return show;
   }
 
+  //Add show to library
+  Future<bool> addShow(String id) async {
+    Map data = await callGwLightApi('show.addFavorite', params: {
+      'CTXT': {
+        'id': int.parse(id),
+        't': 'show_page',
+      },
+      'SHOW_ID': id
+    });
+
+    if (data['results'] == true) {
+      return true;
+    }
+
+    return false;
+  }
+
+  //Add show to library
+  Future<bool> removeShow(String id) async {
+    Map data = await callGwLightApi('show.deleteFavorite', params: {
+      'CTXT': {
+        'id': int.parse(id),
+        't': 'show_page',
+      },
+      'SHOW_ID': id
+    });
+
+    if (data['results'] == true) {
+      return true;
+    }
+
+    return false;
+  }
+
+  Future<List<String>> getShowNotificationIds() async {
+    if (gatewaySID == null || gatewayARL == null) {
+      await getGatewayAuth();
+    }
+
+    //Generate URL
+    Uri uri = Uri.https('api.deezer.com', '/1.0/gateway.php', {
+      'api_key': deezerGatewayAPI,
+      'sid': gatewaySID,
+      'method': 'shownotification_getIds',
+      'output': '3',
+      'input': '3',
+      'arl': gatewayARL,
+    });
+    //Post
+    http.Response res = await http
+        .post(uri, headers: headers, body: jsonEncode({'CHECKSUM': ''}))
+        .catchError((e) {
+      return http.Response('', 200);
+    });
+
+    dynamic body = jsonDecode(res.body);
+
+    // Check if the data list exists and is not null
+    if (body['results'] == null ||
+        body['results']['data'] == null ||
+        body['results']['data'] is! List) {
+      return [];
+    }
+
+    List<dynamic> dataList = body['results']['data'];
+
+    return dataList
+        .map<String>((item) {
+          if (item != null && item['SHOW_ID'] != null) {
+            return item['SHOW_ID'].toString();
+          } else {
+            return '';
+          }
+        })
+        .where((id) => id != '')
+        .toList();
+  }
+
+  Future<bool> subscribeShow(String id) async {
+    Map data = await callGwLightApi('shownotification_subscribe',
+        params: {'SHOW_ID': id});
+
+    if (data['results'] == true) {
+      return true;
+    }
+
+    return false;
+  }
+
+  Future<bool> unSubscribeShow(String id) async {
+    Map data = await callGwLightApi('shownotification_unsubscribe',
+        params: {'SHOW_ID': id});
+
+    if (data['results'] == true) {
+      return true;
+    }
+
+    return false;
+  }
+
   Future<ShowEpisode> showEpisode(String episodeId) async {
-    Map<String, dynamic> data =
-        await callGwApi('episode.getData', params: {'episode_id': episodeId});
+    Map<String, dynamic> data = await callGwLightApi('episode.getData',
+        params: {'episode_id': episodeId});
     if (data['results'] == null) {
       return ShowEpisode();
     }
@@ -1011,7 +1294,8 @@ class DeezerAPI {
   }
 
   Future<List<Show>> getUserShows() async {
-    Map<String, dynamic> data = await callGwApi('deezer.pageProfile', params: {
+    Map<String, dynamic> data =
+        await callGwLightApi('deezer.pageProfile', params: {
       'user_id': userId,
       'tab': 'podcasts',
       'nb': 10000,

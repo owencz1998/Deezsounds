@@ -1311,6 +1311,7 @@ class Show {
   int? fans;
   bool? isExplicit;
   bool? isLibrary;
+  bool? isSubscribed;
   List<ShowEpisode>? episodes;
 
   Show({

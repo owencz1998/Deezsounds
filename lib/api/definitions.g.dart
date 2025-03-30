@@ -499,7 +499,10 @@ Show _$ShowFromJson(Map<String, dynamic> json) => Show(
       fans: (json['fans'] as num?)?.toInt(),
       isExplicit: json['isExplicit'] as bool?,
       isLibrary: json['isLibrary'] as bool?,
-    );
+      episodes: (json['episodes'] as List<dynamic>?)
+          ?.map((e) => ShowEpisode.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    )..isSubscribed = json['isSubscribed'] as bool?;
 
 Map<String, dynamic> _$ShowToJson(Show instance) => <String, dynamic>{
       'name': instance.name,
@@ -510,6 +513,8 @@ Map<String, dynamic> _$ShowToJson(Show instance) => <String, dynamic>{
       'fans': instance.fans,
       'isExplicit': instance.isExplicit,
       'isLibrary': instance.isLibrary,
+      'isSubscribed': instance.isSubscribed,
+      'episodes': instance.episodes,
     };
 
 ShowEpisode _$ShowEpisodeFromJson(Map<String, dynamic> json) => ShowEpisode(

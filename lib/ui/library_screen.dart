@@ -75,7 +75,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
             deezerAPI.getPlaylists(),
             deezerAPI.getArtists(),
             deezerAPI.getAlbums(),
-            deezerAPI.smartTrackList('annual-top'),
+            deezerAPI.userTracks(),
             deezerAPI.getUserShows(),
           ]
         : [];
@@ -101,19 +101,24 @@ class _LibraryScreenState extends State<LibraryScreen> {
         isOnline && results.length > 6 ? results[6] as List<Artist> : null;
     List<Album>? userAlbums =
         isOnline && results.length > 7 ? results[7] as List<Album> : null;
-    SmartTrackList? topTracks =
-        isOnline && results.length > 8 ? results[8] as SmartTrackList? : null;
+    List<Track>? topTracks =
+        isOnline && results.length > 8 ? results[8] as List<Track>? : null;
     List<Show>? userShows =
         isOnline && results.length > 9 ? results[9] as List<Show> : null;
 
     if (mounted) {
       setState(() {
-        tracks = topTracks?.tracks ??
-            onlineFavPlaylist?.tracks ??
-            favPlaylist?.tracks ??
-            [];
+        tracks =
+            topTracks ?? onlineFavPlaylist?.tracks ?? favPlaylist?.tracks ?? [];
         topPlaylist = topTracks != null
-            ? Playlist.fromSmartTrackList(topTracks)
+            ? Playlist(
+                id: '0',
+                title: 'Your top tracks',
+                image: ImageDetails.fromJson(cache.userPicture),
+                duration: Duration.zero,
+                user: User(id: '0', name: 'Deezer'),
+                tracks: topTracks,
+              )
             : onlineFavPlaylist ?? favPlaylist;
         cache.favoriteTracks = tracks;
         if (onlineFavPlaylist?.id != null) {

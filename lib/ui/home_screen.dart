@@ -101,6 +101,9 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Padding(padding: EdgeInsets.only(top: 4.0)),
           ListTile(
+            onTap: () {
+              deezerAPI.testFunction();
+            },
             contentPadding: EdgeInsets.symmetric(
                 horizontal: MediaQuery.of(context).size.width * 0.05),
             leading: ClipRRect(

@@ -47,7 +47,7 @@ class _NotificationScreen extends State<NotificationScreen> {
         .toList();
 
     if (notificationId.isNotEmpty) {
-      await deezerAPI.callGwApi('notification.markAsRead',
+      await deezerAPI.callGwLightApi('notification.markAsRead',
           params: {'notif_ids': notificationId});
     }
   }

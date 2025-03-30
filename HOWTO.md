@@ -1,7 +1,9 @@
 ![Alchemy](./assets/banner.png?raw=true)
 
-[![Flutter Version](https://shields.io/badge/Flutter-v3.29.2-darkgreen.svg)](https://docs.flutter.dev/tools/sdk)
-[![Dart Version](https://shields.io/badge/Dart-v3.7.2-darkgreen.svg)](https://dart.dev/get-dart)
+[![Flutter](https://img.shields.io/badge/Flutter-v3.29.2-blue?logo=flutter)](https://flutter.dev/)
+[![Dart](https://img.shields.io/badge/Dart-v3.7.2-blue?logo=dart)](https://dart.dev/)
+[![Android API](https://img.shields.io/badge/Android%20API-35-green?logo=android)](https://developer.android.com/about/versions/14)
+[![Java JDK](https://img.shields.io/badge/Java%20JDK-17-blue?logo=openjdk)](https://openjdk.java.net/projects/jdk/17/)
 [![License](https://img.shields.io/github/license/PetitPrinc3/Deezer?flat)](./LICENSE)
 
 ---
@@ -53,19 +55,33 @@ flutter clean
 
 ## Providing API Keys
 
-To use Alchemy, you'll need API keys from Deezer and Last.fm:
+To use Alchemy, you'll need API keys from Deezer, Last.fm and ACRCloud:
 
 *   Deezer: [https://developers.deezer.com/myapps](https://developers.deezer.com/myapps) (Required for authentication)
 *   LastFm: [https://www.last.fm/fr/api](https://www.last.fm/fr/api) (Required for optional scrobbling)
+*   ACR Cloud [https://console.acrcloud.com/](https://console.acrcloud.com/) (Required for optional song or humming recognition)
 
 Create a `.env` file in the `/lib` directory with your API credentials:
 
 ```bash
-deezerClientId = '<Your_Deezer_Client_Id>';
-deezerClientSecret = '<Your_Deezer_Client_Secret>';
+# Deezer GW light API credentials 
+deezerClientId = '<Required_Deezer_Client_Id>';
+deezerClientSecret = '<Required_Deezer_Client_Secret>';
 
-lastFmApiKey = '<Your_LastFM_API_Key>';
-lastFmApiSecret = '<Your_LastFM_API_Secret>';
+# Deezer GW API
+deezerGatewayAPI = '<Required_Deezer_Gateway_Key>';
+deezerMobileKey = '<Required_Deezer_Mobile_Key>';
+
+# LastFM API credentials
+lastFmApiKey = '<LastFM_API_Key_Can_Be_Left_Empty>';
+lastFmApiSecret = '<LastFM_API_Secret_Can_Be_Left_Empty>';
+
+# ACRCloud's API Key
+acrcloudSongApiKey = '<ACRCloud_Song_Recognition_API_Key_Can_Be_Left_Empty>';
+acrcloudSongApiSecret = '<ACRCloud_Song_Recognition_API_Secret_Can_Be_Left_Empty>';
+acrcloudHumsApiKey = '<ACRCloud_Humming_Recognition_API_Key_Can_Be_Left_Empty>';
+acrcloudHumsApiSecret = '<ACRCloud_Humming_Recognition_API_Secret_Can_Be_Left_Empty>';
+
 ```
 
 ## Creating Signing Keys
