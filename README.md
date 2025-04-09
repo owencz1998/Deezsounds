@@ -2,6 +2,7 @@
 
 [![Latest Version](https://img.shields.io/github/v/release/PetitPrinc3/Alchemy?color=blue)](../../releases/latest)
 [![Release date](https://img.shields.io/github/release-date/PetitPrinc3/Alchemy)](../../releases/latest)
+[![Latest commit](https://img.shields.io/github/last-commit/PetitPrinc3/Alchemy)](./commit/master)
 [![License](https://img.shields.io/github/license/PetitPrinc3/Deezer?flat)](./LICENSE)
 
 [![Flutter](https://img.shields.io/badge/Flutter-v3.29.2-blue?logo=flutter)](https://flutter.dev/)
