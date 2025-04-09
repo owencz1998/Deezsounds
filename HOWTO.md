@@ -77,6 +77,7 @@ lastFmApiKey = '<LastFM_API_Key_Can_Be_Left_Empty>';
 lastFmApiSecret = '<LastFM_API_Secret_Can_Be_Left_Empty>';
 
 # ACRCloud's API Key
+acrcloudHost = '<ACRCloud_host_address>'; # eg. "identify-eu-west-1.acrcloud.com"
 acrcloudSongApiKey = '<ACRCloud_Song_Recognition_API_Key_Can_Be_Left_Empty>';
 acrcloudSongApiSecret = '<ACRCloud_Song_Recognition_API_Secret_Can_Be_Left_Empty>';
 acrcloudHumsApiKey = '<ACRCloud_Humming_Recognition_API_Key_Can_Be_Left_Empty>';

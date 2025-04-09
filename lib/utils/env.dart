@@ -22,6 +22,8 @@ abstract class Env {
   static final String lastFmApiSecret = _Env.lastFmApiSecret;
 
   // ACR Cloud
+  @EnviedField(varName: 'acrcloudHost', obfuscate: true)
+  static final String acrcloudHost = _Env.acrcloudHost;
   @EnviedField(varName: 'acrcloudSongApiKey', obfuscate: true)
   static final String acrcloudSongApiKey = _Env.acrcloudSongApiKey;
   @EnviedField(varName: 'acrcloudSongApiSecret', obfuscate: true)

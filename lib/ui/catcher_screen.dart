@@ -1,4 +1,5 @@
 import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/ui/acrtest.dart';
 import 'package:alchemy/ui/settings_screen.dart';
 import 'package:awesome_ripple_animation/awesome_ripple_animation.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,7 @@ class _CatcherScreen extends State<CatcherScreen> {
                     decoration: ShapeDecoration(
                         shape: CircleBorder(),
                         color: Theme.of(context).scaffoldBackgroundColor),
+                    child: AcrConfigureWidget(),
                   ),
                 ),
               ),

@@ -54,14 +54,13 @@ class _LyricsScreenState extends State<LyricsScreen> {
   }
 
   Future _load() async {
-    if (widget.parentLyrics?.isLoaded() == true) {
-      _updateLyricsState(widget.parentLyrics!);
-      return;
-    }
-
     try {
-      Lyrics l = await deezerAPI.lyrics(widget.track);
-      _updateLyricsState(l);
+      if (widget.parentLyrics?.id == null) {
+        Lyrics l = await deezerAPI.lyrics(widget.track);
+        _updateLyricsState(l);
+      } else {
+        _updateLyricsState(widget.parentLyrics!);
+      }
     } catch (e) {
       _timer?.cancel();
       setState(() {
@@ -71,24 +70,24 @@ class _LyricsScreenState extends State<LyricsScreen> {
     }
   }
 
-  void _updateLyricsState(Lyrics lyrics) {
+  void _updateLyricsState(Lyrics l) {
     String screenTitle = 'Lyrics'.i18n;
 
-    if (lyrics.isSynced()) {
+    if (l.isSynced()) {
       _startSyncTimer();
-    } else if ((lyrics.isUnsynced())) {
+    } else if ((l.isUnsynced())) {
       screenTitle = 'Unsynchronized lyrics'.i18n;
       _timer?.cancel();
     }
 
-    if (lyrics.errorMessage != null) {
+    if (l.errorMessage != null) {
       Logger.root.warning(
-          'Error loading lyrics for track id ${widget.track.id}: ${lyrics.errorMessage}');
+          'Error loading lyrics for track id ${widget.track.id}: ${l.errorMessage}');
     }
 
     setState(() {
       appBarTitle = screenTitle;
-      this.lyrics = lyrics;
+      lyrics = l;
       _loading = false;
       _error = false;
     });

@@ -41,12 +41,9 @@ dependencies:
   custom_navigator:
     path: ./custom_navigator
   device_info_plus: ^11.1.0
-  # Gradle 8 updated version:
   draggable_scrollbar: ^0.1.0
   encrypt: ^5.0.3
   envied: ^1.1.1
-  # Gradle 8 updated version:
-  # Gradle 8 updated version:
   external_path:
     path: ./external_path
   filesize: ^2.0.1
@@ -54,7 +51,6 @@ dependencies:
   fluttertoast: ^8.2.4
   flutter_cache_manager: ^3.3.1
   flutter_displaymode: ^0.6.0
-  #flutter_file_dialog: ^3.0.1
   flutter_inappwebview: ^6.1.0+1
   flutter_local_notifications: ^18.0.1
   flutter_markdown: ^0.7.4+3
@@ -68,22 +64,9 @@ dependencies:
   intl: ^0.19.0
   json_annotation: ^4.9.0
   just_audio: ^0.9.39
-  #just_audio:
-  #  git:
-  #    url: https://github.com/ryanheise/just_audio.git
-  #    ref: visualizer
-  #    path: just_audio
-  #just_audio_platform_interface:
-  #  git:
-  #    url: https://github.com/ryanheise/just_audio.git
-  #    ref: visualizer
-  #    path: just_audio_platform_interface
   logging: ^1.2.0
-  #marquee: ^2.2.3
   marquee:
     path: ./marquee
-  #move_to_background: ^1.0.1
-  # Gradle 8 updated version:
   move_to_background:
     path: ./move_to_background
   numberpicker: ^2.1.2
@@ -95,12 +78,6 @@ dependencies:
   photo_view: ^0.15.0
   pointycastle: ^3.7.4
   quick_actions: ^1.0.6
-  #random_string: ^2.0.1
-  #restart_app: ^1.2.1
-  # Gradle 8 updated version:
-  #restart_app:
-  #  git:
-  #    url: https://github.com/Argaros/restart_app.git
   rxdart: ^0.28.0
   scrobblenaut:
     path: ./scrobblenaut
@@ -108,7 +85,6 @@ dependencies:
   spotify: ^0.13.1
   sqflite: ^2.3.0
   url_launcher: ^6.2.2
-  #version: ^3.0.2 Added contents in source directly for compatibility
   visibility_detector: ^0.4.0+2
   wakelock_plus: ^1.2.10
   lottie: ^3.1.3
