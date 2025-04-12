@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:alchemy/fonts/alchemy_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -334,5 +337,188 @@ class CustomOverflowText extends StatelessWidget {
         }
       },
     );
+  }
+}
+
+class MinimalistSoundWave extends StatefulWidget {
+  final Color color;
+  final int barCount;
+  final double width;
+  final double height;
+  final Duration duration;
+  final double barWidth; // Optional: specify bar width
+  final double gap; // Optional: specify gap between bars
+
+  const MinimalistSoundWave({
+    super.key,
+    this.color = Colors.blue,
+    this.barCount = 5,
+    required this.width,
+    required this.height,
+    this.duration = const Duration(milliseconds: 800),
+    this.barWidth = -1, // Default to calculated width
+    this.gap = -1, // Default to calculated gap
+  });
+
+  @override
+  _MinimalistSoundWaveState createState() => _MinimalistSoundWaveState();
+}
+
+class _MinimalistSoundWaveState extends State<MinimalistSoundWave>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: widget.duration,
+    )..repeat(reverse: true);
+  }
+
+  // Update duration if widget rebuilds with a new one
+  @override
+  void didUpdateWidget(MinimalistSoundWave oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.duration != oldWidget.duration) {
+      // Update the controller's duration
+      _controller.duration = widget.duration;
+      if (_controller.isAnimating) {
+        _controller.repeat(reverse: true);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Using the updated painter below
+    return SizedBox(
+      width: widget.width,
+      height: widget.height,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return CustomPaint(
+            painter: _SoundWavePainter(
+              // Painter is updated
+              animation: _controller,
+              color: widget.color,
+              barCount: widget.barCount,
+              initialBarWidth: widget.barWidth,
+              initialGap: widget.gap,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// --- MODIFIED Painter for More Complex Animation ---
+class _SoundWavePainter extends CustomPainter {
+  final Animation<double> animation;
+  final Color color;
+  final int barCount;
+  final double initialBarWidth;
+  final double initialGap;
+
+  // Parameters for the sine waves - tweak these for different effects!
+  final double freq1 = 0.3; // Spatial frequency of the first wave
+  final double freq2 = 0.9; // Spatial frequency of the second wave
+  final double speed1 = 1.0; // Temporal speed multiplier for the first wave
+  final double speed2 = 1.5; // Temporal speed multiplier for the second wave
+
+  _SoundWavePainter({
+    required this.animation,
+    required this.color,
+    required this.barCount,
+    required this.initialBarWidth,
+    required this.initialGap,
+  }) : super(repaint: animation);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    // Calculation of barWidth and gap (same as before)
+    double barWidth = initialBarWidth;
+    double gap = initialGap;
+    if (barWidth <= 0 || gap < 0) {
+      double totalGapSpace = (gap >= 0) ? (gap * (barCount - 1)) : 0;
+      double availableWidth = size.width - totalGapSpace;
+      if (barWidth <= 0) {
+        barWidth = availableWidth / barCount;
+        if (gap < 0) {
+          gap = barWidth / 4;
+          totalGapSpace = gap * (barCount - 1);
+          availableWidth = size.width - totalGapSpace;
+          barWidth = availableWidth / barCount;
+        }
+      } else if (gap < 0) {
+        gap = (size.width - (barWidth * barCount)) / max(1, barCount - 1);
+      }
+    }
+    gap = max(0, gap);
+    barWidth = max(1, barWidth);
+
+    final double totalWidthOfBarsAndGaps =
+        (barWidth * barCount) + (gap * (barCount - 1));
+    final double startX = (size.width - totalWidthOfBarsAndGaps) / 2;
+
+    final double maxBarHeight = size.height;
+    final double minBarHeight = size.height * 0.1; // Or adjust if needed
+    final double verticalCenter = size.height / 2;
+
+    // Calculate base phases based on animation value and speeds
+    final double basePhase = animation.value * 2 * pi;
+    final double phase1 = basePhase * speed1;
+    final double phase2 = basePhase * speed2;
+
+    for (int i = 0; i < barCount; i++) {
+      // Calculate the value of each sine wave for this bar (i) and phase
+      final double wave1 = sin(i * freq1 + phase1); // Value between -1 and 1
+      final double wave2 = sin(i * freq2 + phase2); // Value between -1 and 1
+
+      // Combine the waves. The result is between -2 and 2.
+      final double combinedWaves = wave1 + wave2;
+
+      // Normalize the combined value to the range 0.0 to 1.0
+      final double normalizedHeight = (combinedWaves + 2) / 4;
+
+      // Clamp to ensure it stays strictly within bounds (optional but safe)
+      final double clampedHeight = normalizedHeight.clamp(0.0, 1.0);
+
+      // Calculate the actual bar height using lerp
+      final double barHeight =
+          lerpDouble(minBarHeight, maxBarHeight, clampedHeight)!;
+
+      // Calculate position (centered alignment)
+      final double top = verticalCenter - (barHeight / 2);
+      final double x = startX + i * (barWidth + gap);
+
+      // Draw the rounded rectangle (same as before)
+      final Rect rect = Rect.fromLTWH(x, top, barWidth, barHeight);
+      final RRect rrect =
+          RRect.fromRectAndRadius(rect, Radius.circular(barWidth));
+      canvas.drawRRect(rrect, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _SoundWavePainter oldDelegate) {
+    // Only repaint if essential properties change, animation handles itself.
+    return oldDelegate.color != color ||
+        oldDelegate.barCount != barCount ||
+        oldDelegate.initialBarWidth != initialBarWidth ||
+        oldDelegate.initialGap != initialGap;
   }
 }

@@ -1544,7 +1544,7 @@ class _ArtistDetailsState extends State<ArtistDetails> {
                                     ),
                                   //Albums
                                   Container(
-                                    height: 8.0,
+                                    height: 8,
                                   ),
                                   Column(
                                     children: [
