@@ -7,15 +7,15 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:logging/logging.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
-import 'package:deezer/main.dart';
-import 'package:deezer/settings.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/main.dart';
+import 'package:alchemy/settings.dart';
 
 import '../api/cache.dart';
 import '../api/download.dart';
@@ -126,6 +126,7 @@ class _UpdaterScreenState extends State<UpdaterScreen> {
       fileSink.close();
 
       OpenFilex.open(path);
+
       setState(() {
         _buttonEnabled = true;
         _progress = 0.0;
@@ -184,7 +185,7 @@ class _UpdaterScreenState extends State<UpdaterScreen> {
               iconColor: Theme.of(context).textTheme.bodyMedium?.color,
               collapsedTextColor: Settings.secondaryText,
               collapsedIconColor: Settings.secondaryText,
-              leading: Icon(DeezerIcons.release_notes),
+              leading: Icon(AlchemyIcons.release_notes),
               title: Text('See changelog'),
               children: [
                 Markdown(
@@ -309,7 +310,7 @@ class DeezerLatest {
   static Future<DeezerLatest> fetch() async {
     http.Response res = await http.get(
       Uri.parse(
-          'https://api.github.com/repos/PetitPrinc3/Deezer/releases/latest'),
+          'https://api.github.com/repos/PetitPrinc3/DefinitelyNotDeezer/releases/latest'),
       headers: {'Accept': 'application/vnd.github.v3+json'},
     );
 

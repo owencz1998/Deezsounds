@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:alchemy/api/definitions.dart';
 import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -29,8 +30,6 @@ class Settings {
   //Main
   @JsonKey(defaultValue: false)
   late bool ignoreInterruptions;
-  @JsonKey(defaultValue: false)
-  late bool enableEqualizer;
 
   //Account
   String? arl;
@@ -100,7 +99,7 @@ class Settings {
   late List<String> tags;
 
   //Appearance
-  @JsonKey(defaultValue: Themes.Deezer)
+  @JsonKey(defaultValue: Themes.Alchemy)
   late Themes theme;
   @JsonKey(defaultValue: false)
   late bool useSystemTheme;
@@ -117,12 +116,13 @@ class Settings {
 
   //Colors
   @JsonKey(toJson: _colorToJson, fromJson: _colorFromJson)
-  Color primaryColor = Color(0xFFA238FF);
-  static const deezerBg = Color(0xFF0F0D13);
+  Color primaryColor = Colors.lightBlue;
+  //  static const bgColor = Color(0xFF1B1B1E);
+  static const bgColor = Color(0xFF0D0D28);
   static const secondaryText = Color(0xFFA9A6AA);
 
-  static _colorToJson(Color c) => c.value;
-  static _colorFromJson(int? v) => v == null ? Color(0xFFA238FF) : Color(v);
+  static _colorToJson(Color c) => c.toARGB32();
+  static _colorFromJson(int? v) => v == null ? Colors.lightBlue : Color(v);
 
   @JsonKey(defaultValue: false)
   bool useArtColor = false;
@@ -137,6 +137,17 @@ class Settings {
   late bool logListen;
   @JsonKey(defaultValue: null)
   String? proxyAddress;
+  @JsonKey(defaultValue: BlindTestType.DEEZER)
+  BlindTestType blindTestType = BlindTestType.DEEZER;
+
+  @JsonKey(defaultValue: ['DEEZER', 'LRCLIB', 'LYRICFIND'])
+  List<String> lyricsProviders = ['DEEZER', 'LRCLIB', 'LYRICFIND'];
+
+  @JsonKey(defaultValue: false)
+  bool advancedLRCLib = false;
+
+  @JsonKey(defaultValue: '')
+  String? lyricfindKey;
 
   //LastFM
   @JsonKey(defaultValue: null)
@@ -160,7 +171,7 @@ class Settings {
       if (PlatformDispatcher.instance.platformBrightness == Brightness.light) {
         return _themeData[Themes.Light]!;
       } else {
-        if (theme == Themes.Light) return _themeData[Themes.Dark]!;
+        if (theme == Themes.Light) return _themeData[Themes.Deezer]!;
         return _themeData[theme]!;
       }
     }
@@ -198,12 +209,12 @@ class Settings {
 
   SliderThemeData get _sliderTheme => SliderThemeData(
       activeTrackColor: Colors.white,
-      inactiveTrackColor: Colors.white.withOpacity(0.2),
+      inactiveTrackColor: Colors.white.withAlpha(50),
       trackHeight: 0.5,
       thumbShape: RoundSliderThumbShape(enabledThumbRadius: 1),
       thumbColor: Colors.white,
       overlayShape: RoundSliderOverlayShape(overlayRadius: 4),
-      overlayColor: Colors.white.withOpacity(0.2));
+      overlayColor: Colors.white.withAlpha(50));
 
   //Load settings/init
   Future<Settings> loadSettings() async {
@@ -249,6 +260,10 @@ class Settings {
     }
   }
 
+  ThemeData themeDataFor(Themes theme) {
+    return _themeData[theme] ?? ThemeData();
+  }
+
   //Check if is dark, can't use theme directly, because of system themes, and Theme.of(context).brightness broke
   bool get isDark {
     if (useSystemTheme) {
@@ -265,7 +280,7 @@ class Settings {
       ? null
       : GoogleFonts.getTextTheme(font,
           isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme);
-  String? get _fontFamily => (font == 'Deezer') ? 'MabryPro' : null;
+  String? get _fontFamily => (font == 'Deezer') ? 'Poppins' : null;
 
   //Overrides for the non-deprecated buttons to look like the old ones
   OutlinedButtonThemeData get outlinedButtonTheme => OutlinedButtonThemeData(
@@ -287,6 +302,7 @@ class Settings {
             textTheme: textTheme,
             fontFamily: _fontFamily,
             primaryColor: primaryColor,
+            highlightColor: Colors.transparent,
             sliderTheme: _sliderTheme,
             outlinedButtonTheme: outlinedButtonTheme,
             textButtonTheme: textButtonTheme,
@@ -340,14 +356,16 @@ class Settings {
             ),
             bottomAppBarTheme:
                 const BottomAppBarTheme(color: Color(0xfff5f5f5))),
-        Themes.Dark: ThemeData(
+        Themes.Deezer: ThemeData(
             useMaterial3: false,
             brightness: Brightness.dark,
             textTheme: textTheme,
             fontFamily: _fontFamily,
             primaryColor: primaryColor,
+            highlightColor: Color(0xFFA238FF),
             sliderTheme: _sliderTheme,
             outlinedButtonTheme: outlinedButtonTheme,
+            scaffoldBackgroundColor: Color(0xFF0F0D13),
             textButtonTheme: textButtonTheme,
             colorScheme: ColorScheme.fromSwatch()
                 .copyWith(secondary: primaryColor, brightness: Brightness.dark),
@@ -399,29 +417,90 @@ class Settings {
             ),
             bottomAppBarTheme:
                 const BottomAppBarTheme(color: Color(0xFF0F0D13))),
-        Themes.Deezer: ThemeData(
+        Themes.Spotify: ThemeData(
             useMaterial3: false,
             brightness: Brightness.dark,
             textTheme: textTheme,
             fontFamily: _fontFamily,
             primaryColor: primaryColor,
+            highlightColor: Color(0xFF00FF7F),
+            sliderTheme: _sliderTheme,
+            outlinedButtonTheme: outlinedButtonTheme,
+            scaffoldBackgroundColor: Color(0xFF1B1B1E),
+            textButtonTheme: textButtonTheme,
+            colorScheme: ColorScheme.fromSwatch()
+                .copyWith(secondary: primaryColor, brightness: Brightness.dark),
+            checkboxTheme: CheckboxThemeData(
+              fillColor: WidgetStateProperty.resolveWith<Color?>(
+                  (Set<WidgetState> states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return null;
+                }
+                if (states.contains(WidgetState.selected)) {
+                  return primaryColor;
+                }
+                return null;
+              }),
+            ),
+            radioTheme: RadioThemeData(
+              fillColor: WidgetStateProperty.resolveWith<Color?>(
+                  (Set<WidgetState> states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return null;
+                }
+                if (states.contains(WidgetState.selected)) {
+                  return primaryColor;
+                }
+                return null;
+              }),
+            ),
+            switchTheme: SwitchThemeData(
+              thumbColor: WidgetStateProperty.resolveWith<Color?>(
+                  (Set<WidgetState> states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return null;
+                }
+                if (states.contains(WidgetState.selected)) {
+                  return primaryColor;
+                }
+                return null;
+              }),
+              trackColor: WidgetStateProperty.resolveWith<Color?>(
+                  (Set<WidgetState> states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return null;
+                }
+                if (states.contains(WidgetState.selected)) {
+                  return primaryColor;
+                }
+                return null;
+              }),
+            ),
+            bottomAppBarTheme:
+                const BottomAppBarTheme(color: Color(0xFF1B1B1E))),
+        Themes.Alchemy: ThemeData(
+            useMaterial3: false,
+            brightness: Brightness.dark,
+            textTheme: textTheme,
+            fontFamily: _fontFamily,
+            primaryColor: primaryColor,
+            highlightColor: Colors.transparent,
             unselectedWidgetColor: secondaryText,
             sliderTheme: _sliderTheme,
-            scaffoldBackgroundColor: deezerBg,
-            dialogBackgroundColor: deezerBg,
+            scaffoldBackgroundColor: bgColor,
             hintColor: Color(0xFF1B191F),
             inputDecorationTheme: const InputDecorationTheme(
               hintStyle: TextStyle(color: secondaryText),
               labelStyle: TextStyle(color: secondaryText),
             ),
             bottomSheetTheme:
-                const BottomSheetThemeData(backgroundColor: deezerBg),
-            cardColor: deezerBg,
+                const BottomSheetThemeData(backgroundColor: bgColor),
+            cardColor: bgColor,
             outlinedButtonTheme: outlinedButtonTheme,
             textButtonTheme: textButtonTheme,
             colorScheme: ColorScheme.fromSwatch().copyWith(
                 secondary: primaryColor,
-                surface: deezerBg,
+                surface: bgColor,
                 brightness: Brightness.dark),
             checkboxTheme: CheckboxThemeData(
               fillColor: WidgetStateProperty.resolveWith<Color?>(
@@ -469,18 +548,19 @@ class Settings {
                 return null;
               }),
             ),
-            bottomAppBarTheme: const BottomAppBarTheme(color: deezerBg),
+            bottomAppBarTheme: const BottomAppBarTheme(color: bgColor),
             progressIndicatorTheme:
-                ProgressIndicatorThemeData(color: primaryColor)),
+                ProgressIndicatorThemeData(color: primaryColor),
+            dialogTheme: DialogThemeData(backgroundColor: bgColor)),
         Themes.Black: ThemeData(
             useMaterial3: false,
             brightness: Brightness.dark,
             textTheme: textTheme,
             fontFamily: _fontFamily,
             primaryColor: primaryColor,
-            scaffoldBackgroundColor: deezerBg,
+            highlightColor: Colors.transparent,
+            scaffoldBackgroundColor: Colors.black,
             hintColor: Colors.grey.shade700,
-            dialogBackgroundColor: deezerBg,
             sliderTheme: _sliderTheme,
             bottomSheetTheme: const BottomSheetThemeData(
               backgroundColor: Colors.black,
@@ -537,7 +617,8 @@ class Settings {
                 return null;
               }),
             ),
-            bottomAppBarTheme: const BottomAppBarTheme(color: Colors.black))
+            bottomAppBarTheme: const BottomAppBarTheme(color: Colors.black),
+            dialogTheme: DialogThemeData(backgroundColor: bgColor))
       };
 
   Future<String> getPath() async =>
@@ -551,7 +632,7 @@ class Settings {
 
 enum AudioQuality { MP3_128, MP3_320, FLAC, ASK }
 
-enum Themes { Light, Dark, Deezer, Black }
+enum Themes { Alchemy, Deezer, Spotify, Light, Black }
 
 @JsonSerializable()
 class SpotifyCredentialsSave {

@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:palette_generator/palette_generator.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 
 import '../service/audio_service.dart';
 import '../settings.dart';
@@ -34,16 +35,19 @@ class _PlayerBarState extends State<PlayerBar> {
   //Recover dominant color
   Future _updateColor() async {
     if (audioHandler.mediaItem.value == null) return;
+    try {
+      PaletteGenerator palette = await PaletteGenerator.fromImageProvider(
+          CachedNetworkImageProvider(
+              audioHandler.mediaItem.value?.extras?['thumb'] ??
+                  audioHandler.mediaItem.value?.artUri));
 
-    PaletteGenerator palette = await PaletteGenerator.fromImageProvider(
-        CachedNetworkImageProvider(
-            audioHandler.mediaItem.value?.extras?['thumb'] ??
-                audioHandler.mediaItem.value?.artUri));
-
-    if (mounted) {
-      setState(() {
-        _bgColor = palette.dominantColor?.color.withOpacity(1);
-      });
+      if (mounted) {
+        setState(() {
+          _bgColor = palette.dominantColor?.color;
+        });
+      }
+    } catch (e) {
+      return;
     }
   }
 
@@ -106,14 +110,19 @@ class _PlayerBarState extends State<PlayerBar> {
               .push(SlideBottomRoute(widget: const PlayerScreen()));
         } else if ((details.primaryVelocity ?? 0) > 100) {
           // Swiped down => close
-          await audioHandler.clearQueue();
+          await audioHandler.stop();
         }
         updateColor();
       },
       child: StreamBuilder(
-          stream: Stream.periodic(const Duration(milliseconds: 250)),
+          stream: Stream.periodic(const Duration(milliseconds: 150)),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (GetIt.I<AudioPlayerHandler>().mediaItem.value == null) {
+            if (GetIt.I<AudioPlayerHandler>().mediaItem.value == null ||
+                GetIt.I<AudioPlayerHandler>()
+                        .playbackState
+                        .value
+                        .processingState ==
+                    AudioProcessingState.idle) {
               return const SizedBox(
                 width: 0,
                 height: 0,
@@ -121,15 +130,18 @@ class _PlayerBarState extends State<PlayerBar> {
             }
             return Container(
               clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  border: Border.all(
-                      color: _bgColor?.withOpacity(0.7) ??
-                          Theme.of(context).scaffoldBackgroundColor),
-                  borderRadius: BorderRadius.circular(17)),
+              decoration: ShapeDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                shape: SmoothRectangleBorder(
+                  borderRadius: SmoothBorderRadius(
+                    cornerRadius: 20,
+                    cornerSmoothing: 0.4,
+                  ),
+                ),
+              ),
               child: Container(
                   decoration: BoxDecoration(
-                    color: _bgColor?.withOpacity(0.7) ??
+                    color: _bgColor?.withAlpha(180) ??
                         Theme.of(context).scaffoldBackgroundColor,
                   ),
                   child: Column(
@@ -149,17 +161,21 @@ class _PlayerBarState extends State<PlayerBar> {
                                   Theme.of(context).scaffoldBackgroundColor,
                             ));
                           },
-                          leading: CachedImage(
-                            width: 40,
-                            height: 40,
-                            url: GetIt.I<AudioPlayerHandler>()
-                                    .mediaItem
-                                    .value
-                                    ?.extras?['thumb'] ??
-                                GetIt.I<AudioPlayerHandler>()
-                                    .mediaItem
-                                    .value
-                                    ?.artUri,
+                          leading: Padding(
+                            padding: EdgeInsets.only(left: 6),
+                            child: CachedImage(
+                              width: 40,
+                              height: 40,
+                              url: GetIt.I<AudioPlayerHandler>()
+                                      .mediaItem
+                                      .value
+                                      ?.extras?['thumb'] ??
+                                  GetIt.I<AudioPlayerHandler>()
+                                      .mediaItem
+                                      .value
+                                      ?.artUri
+                                      .toString(),
+                            ),
                           ),
                           title: Text(
                             GetIt.I<AudioPlayerHandler>()
@@ -201,10 +217,11 @@ class _PlayerBarState extends State<PlayerBar> {
                             ),
                           )),
                       SizedBox(
+                        height: 2,
                         child: LinearProgressIndicator(
                           backgroundColor:
                               (_bgColor ?? Theme.of(context).primaryColor)
-                                  .withOpacity(0.1),
+                                  .withAlpha(25),
                           color: _bgColor ?? Theme.of(context).primaryColor,
                           value: _progress,
                         ),
@@ -235,7 +252,7 @@ class PrevNextButton extends StatelessWidget {
           if (!(queueState?.hasNext ?? false)) {
             return IconButton(
               icon: Icon(
-                DeezerIcons.skip_next_fill,
+                AlchemyIcons.skip_next_fill,
                 semanticLabel: 'Play next'.i18n,
               ),
               iconSize: size,
@@ -244,7 +261,7 @@ class PrevNextButton extends StatelessWidget {
           }
           return IconButton(
             icon: Icon(
-              DeezerIcons.skip_next_fill,
+              AlchemyIcons.skip_next_fill,
               semanticLabel: 'Play next'.i18n,
             ),
             iconSize: size,
@@ -261,7 +278,7 @@ class PrevNextButton extends StatelessWidget {
             }
             return IconButton(
               icon: Icon(
-                DeezerIcons.skip_back,
+                AlchemyIcons.skip_back,
                 semanticLabel: 'Play previous'.i18n,
               ),
               iconSize: size,
@@ -270,7 +287,7 @@ class PrevNextButton extends StatelessWidget {
           }
           return IconButton(
             icon: Icon(
-              DeezerIcons.skip_back,
+              AlchemyIcons.skip_back,
               semanticLabel: 'Play previous'.i18n,
             ),
             iconSize: size,
@@ -339,10 +356,10 @@ class _PlayPauseButtonState extends State<PlayPauseButton>
                         child: FadeTransition(opacity: anim, child: child),
                       ),
                   child: !playing
-                      ? Icon(DeezerIcons.play_fill_small,
+                      ? Icon(AlchemyIcons.play_fill_small,
                           key: const ValueKey('Play'))
                       : Icon(
-                          DeezerIcons.pause_fill_small,
+                          AlchemyIcons.pause_fill_small,
                           key: const ValueKey('Pause'),
                         )),
               iconSize: widget.size,

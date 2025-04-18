@@ -323,11 +323,15 @@ public class Deezer {
     public Pair<String, Boolean> getTrackUrl(String trackId, String trackToken, String md5origin, String mediaVersion,
             int quality, int refreshAttempt) {
         // Hi-Fi url gen
-        if (this.licenseToken != null && (quality == 3 || quality == 9)) {
+        if (this.licenseToken != null && (quality > 0)) {
             String url = null;
             String format = "FLAC";
 
-            if (quality == 3) format = "MP3_320";
+            if (quality == 3) {
+                format = "MP3_320";
+            } else if (quality == 1) {
+                format = "MP3_128";
+            }
 
             try {
                 //arl cookie

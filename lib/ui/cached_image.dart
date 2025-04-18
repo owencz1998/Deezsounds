@@ -26,7 +26,9 @@ class ImagesDatabase {
 
   Future<bool> isDark(String url) async {
     PaletteGenerator paletteGenerator = await getPaletteGenerator(url);
-    return paletteGenerator.colors.first.computeLuminance() > 0.5 ? false : true;
+    return paletteGenerator.colors.first.computeLuminance() > 0.5
+        ? false
+        : true;
   }
 }
 
@@ -54,6 +56,14 @@ class CachedImage extends StatefulWidget {
 class _CachedImageState extends State<CachedImage> {
   @override
   Widget build(BuildContext context) {
+    if (!widget.url.startsWith('http')) {
+      return Image.asset(
+        widget.url != '' ? widget.url : 'assets/cover.jpg',
+        width: widget.width,
+        height: widget.height,
+      );
+    }
+
     if (widget.rounded) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
@@ -79,14 +89,6 @@ class _CachedImageState extends State<CachedImage> {
       ));
     }
 
-    if (!widget.url.startsWith('http')) {
-      return Image.asset(
-        widget.url,
-        width: widget.width,
-        height: widget.height,
-      );
-    }
-
     return CachedNetworkImage(
       imageUrl: widget.url,
       width: widget.width,
@@ -99,10 +101,13 @@ class _CachedImageState extends State<CachedImage> {
             height: widget.height,
           );
         }
-        return Image.asset('assets/cover_thumb.jpg', width: widget.width, height: widget.height);
+        return Image.asset('assets/cover_thumb.jpg',
+            width: widget.width, height: widget.height);
       },
-      errorWidget: (context, url, error) =>
-          Image.asset('assets/cover_thumb.jpg', width: widget.width, height: widget.height),
+      errorWidget: (context, url, error) => Image.asset(
+          'assets/cover_thumb.jpg',
+          width: widget.width,
+          height: widget.height),
     );
   }
 }
@@ -112,7 +117,8 @@ class ZoomableImage extends StatefulWidget {
   final bool rounded;
   final double? width;
 
-  const ZoomableImage({super.key, required this.url, this.rounded = false, this.width});
+  const ZoomableImage(
+      {super.key, required this.url, this.rounded = false, this.width});
 
   @override
   _ZoomableImageState createState() => _ZoomableImageState();
@@ -133,7 +139,8 @@ class _ZoomableImageState extends State<ZoomableImage> {
   void listener(PhotoViewControllerValue value) {
     if (value.scale! < 0.16 && photoViewOpened) {
       Navigator.pop(ctx!);
-      photoViewOpened = false; // to avoid multiple pop() when picture are being scaled out too slowly
+      photoViewOpened =
+          false; // to avoid multiple pop() when picture are being scaled out too slowly
     }
   }
 
@@ -160,7 +167,8 @@ class _ZoomableImageState extends State<ZoomableImage> {
                     maxScale: 8.0,
                     minScale: 0.2,
                     controller: controller,
-                    backgroundDecoration: const BoxDecoration(color: Color.fromARGB(0x90, 0, 0, 0)));
+                    backgroundDecoration: const BoxDecoration(
+                        color: Color.fromARGB(0x90, 0, 0, 0)));
               }));
         });
   }

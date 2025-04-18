@@ -244,7 +244,9 @@ LyricsClassic _$LyricsClassicFromJson(Map<String, dynamic> json) =>
       unsyncedLyrics: json['unsyncedLyrics'] as String?,
     )
       ..isExplicit = json['isExplicit'] as bool?
-      ..copyright = json['copyright'] as String?;
+      ..copyright = json['copyright'] as String?
+      ..provider =
+          $enumDecodeNullable(_$LyricsProviderEnumMap, json['provider']);
 
 Map<String, dynamic> _$LyricsClassicToJson(LyricsClassic instance) =>
     <String, dynamic>{
@@ -255,7 +257,14 @@ Map<String, dynamic> _$LyricsClassicToJson(LyricsClassic instance) =>
       'unsyncedLyrics': instance.unsyncedLyrics,
       'isExplicit': instance.isExplicit,
       'copyright': instance.copyright,
+      'provider': _$LyricsProviderEnumMap[instance.provider],
     };
+
+const _$LyricsProviderEnumMap = {
+  LyricsProvider.DEEZER: 'DEEZER',
+  LyricsProvider.LRCLIB: 'LRCLIB',
+  LyricsProvider.LYRICFIND: 'LYRICFIND',
+};
 
 LyricsFull _$LyricsFullFromJson(Map<String, dynamic> json) => LyricsFull(
       id: json['id'] as String?,
@@ -267,6 +276,7 @@ LyricsFull _$LyricsFullFromJson(Map<String, dynamic> json) => LyricsFull(
       unsyncedLyrics: json['unsyncedLyrics'] as String?,
       isExplicit: json['isExplicit'] as bool?,
       copyright: json['copyright'] as String?,
+      provider: $enumDecodeNullable(_$LyricsProviderEnumMap, json['provider']),
     );
 
 Map<String, dynamic> _$LyricsFullToJson(LyricsFull instance) =>
@@ -278,6 +288,7 @@ Map<String, dynamic> _$LyricsFullToJson(LyricsFull instance) =>
       'unsyncedLyrics': instance.unsyncedLyrics,
       'isExplicit': instance.isExplicit,
       'copyright': instance.copyright,
+      'provider': _$LyricsProviderEnumMap[instance.provider],
     };
 
 SynchronizedLyric _$SynchronizedLyricFromJson(Map<String, dynamic> json) =>
@@ -342,6 +353,14 @@ Map<String, dynamic> _$SmartTrackListToJson(SmartTrackList instance) =>
     };
 
 HomePage _$HomePageFromJson(Map<String, dynamic> json) => HomePage(
+      flowSection: json['flowSection'] == null
+          ? null
+          : HomePageSection.fromJson(
+              json['flowSection'] as Map<String, dynamic>),
+      mainSection: json['mainSection'] == null
+          ? null
+          : HomePageSection.fromJson(
+              json['mainSection'] as Map<String, dynamic>),
       sections: (json['sections'] as List<dynamic>?)
               ?.map((e) => HomePageSection.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -349,6 +368,8 @@ HomePage _$HomePageFromJson(Map<String, dynamic> json) => HomePage(
     );
 
 Map<String, dynamic> _$HomePageToJson(HomePage instance) => <String, dynamic>{
+      'flowSection': instance.flowSection,
+      'mainSection': instance.mainSection,
       'sections': instance.sections,
     };
 
@@ -356,6 +377,8 @@ HomePageSection _$HomePageSectionFromJson(Map<String, dynamic> json) =>
     HomePageSection(
       layout:
           $enumDecodeNullable(_$HomePageSectionLayoutEnumMap, json['layout']),
+      type: $enumDecodeNullable(_$HomePageSectionTypeEnumMap, json['type']),
+      source: json['source'] as String?,
       items: HomePageSection._homePageItemFromJson(json['items']),
       title: json['title'] as String?,
       pagePath: json['pagePath'] as String?,
@@ -366,6 +389,8 @@ Map<String, dynamic> _$HomePageSectionToJson(HomePageSection instance) =>
     <String, dynamic>{
       'title': instance.title,
       'layout': _$HomePageSectionLayoutEnumMap[instance.layout],
+      'type': _$HomePageSectionTypeEnumMap[instance.type],
+      'source': instance.source,
       'pagePath': instance.pagePath,
       'hasMore': instance.hasMore,
       'items': HomePageSection._homePageItemToJson(instance.items),
@@ -374,6 +399,12 @@ Map<String, dynamic> _$HomePageSectionToJson(HomePageSection instance) =>
 const _$HomePageSectionLayoutEnumMap = {
   HomePageSectionLayout.ROW: 'ROW',
   HomePageSectionLayout.GRID: 'GRID',
+};
+
+const _$HomePageSectionTypeEnumMap = {
+  HomePageSectionType.FLOW: 'FLOW',
+  HomePageSectionType.MAIN: 'MAIN',
+  HomePageSectionType.OTHER: 'OTHER',
 };
 
 DeezerChannel _$DeezerChannelFromJson(Map<String, dynamic> json) =>
@@ -459,18 +490,31 @@ const _$SortSourceTypesEnumMap = {
 
 Show _$ShowFromJson(Map<String, dynamic> json) => Show(
       name: json['name'] as String?,
+      authors: json['authors'] as String?,
       description: json['description'] as String?,
       art: json['art'] == null
           ? null
           : ImageDetails.fromJson(json['art'] as Map<String, dynamic>),
       id: json['id'] as String?,
-    );
+      fans: (json['fans'] as num?)?.toInt(),
+      isExplicit: json['isExplicit'] as bool?,
+      isLibrary: json['isLibrary'] as bool?,
+      episodes: (json['episodes'] as List<dynamic>?)
+          ?.map((e) => ShowEpisode.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    )..isSubscribed = json['isSubscribed'] as bool?;
 
 Map<String, dynamic> _$ShowToJson(Show instance) => <String, dynamic>{
       'name': instance.name,
       'description': instance.description,
+      'authors': instance.authors,
       'art': instance.art,
       'id': instance.id,
+      'fans': instance.fans,
+      'isExplicit': instance.isExplicit,
+      'isLibrary': instance.isLibrary,
+      'isSubscribed': instance.isSubscribed,
+      'episodes': instance.episodes,
     };
 
 ShowEpisode _$ShowEpisodeFromJson(Map<String, dynamic> json) => ShowEpisode(
@@ -482,6 +526,10 @@ ShowEpisode _$ShowEpisodeFromJson(Map<String, dynamic> json) => ShowEpisode(
           ? null
           : Duration(microseconds: (json['duration'] as num).toInt()),
       publishedDate: json['publishedDate'] as String?,
+      episodeCover: json['episodeCover'] == null
+          ? null
+          : ImageDetails.fromJson(json['episodeCover'] as Map<String, dynamic>),
+      isExplicit: json['isExplicit'] as bool?,
       show: json['show'] == null
           ? null
           : Show.fromJson(json['show'] as Map<String, dynamic>),
@@ -495,5 +543,7 @@ Map<String, dynamic> _$ShowEpisodeToJson(ShowEpisode instance) =>
       'url': instance.url,
       'duration': instance.duration?.inMicroseconds,
       'publishedDate': instance.publishedDate,
+      'episodeCover': instance.episodeCover,
+      'isExplicit': instance.isExplicit,
       'show': instance.show,
     };

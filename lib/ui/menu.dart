@@ -1,12 +1,14 @@
 import 'dart:async';
 
+import 'package:alchemy/ui/blind_test.dart';
+import 'package:alchemy/ui/router.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttericon/octicons_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:numberpicker/numberpicker.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
-import 'package:deezer/settings.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/settings.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -252,11 +254,11 @@ class MenuSheet {
 
   Widget addTrackFavorite(Track t, BuildContext context) => ListTile(
       title: Text('Add track to favorites'.i18n),
-      leading: const Icon(DeezerIcons.heart_fill),
+      leading: const Icon(AlchemyIcons.heart_fill),
       onTap: () async {
         await deezerAPI.addFavoriteTrack(t.id!);
         //Make track offline, if favorites are offline
-        Playlist p = Playlist(id: deezerAPI.favoritesPlaylistId);
+        Playlist p = Playlist(id: cache.favoritesPlaylistId);
         if (await downloadManager.checkOffline(playlist: p)) {
           downloadManager.addOfflinePlaylist(p);
         }
@@ -281,18 +283,15 @@ class MenuSheet {
       title: Text((isOffline) ? 'Remove from storage' : 'Download'.i18n),
       leading: (isOffline)
           ? Icon(
-              DeezerIcons.download_fill,
+              AlchemyIcons.download_fill,
               color: Theme.of(context).primaryColor,
             )
-          : Icon(DeezerIcons.download),
+          : Icon(AlchemyIcons.download),
       onTap: () async {
         bool isDownloaded = await downloadManager.checkOffline(track: t);
         if (isDownloaded) {}
-        if (await downloadManager.addOfflineTrack(t,
-                private: true, isSingleton: true) !=
-            false) {
-          showDownloadStartedToast();
-        }
+        downloadManager.addOfflineTrack(t, private: true, isSingleton: true);
+        showDownloadStartedToast();
         if (context.mounted) _close(context);
       },
     );
@@ -321,22 +320,24 @@ class MenuSheet {
                       );
                     });
               });
-          //if (context.mounted) _close(context);
+          if (context.mounted) _close(context);
         },
       );
 
-  Widget removeFromPlaylist(Track t, Playlist p, BuildContext context) =>
+  Widget removeFromPlaylist(
+          Track t, Playlist p, BuildContext context, Function? onRemove) =>
       ListTile(
         title: Text('Remove from playlist'.i18n),
-        leading: const Icon(DeezerIcons.trash),
+        leading: const Icon(AlchemyIcons.trash),
         onTap: () async {
           await deezerAPI.removeFromPlaylist(t.id!, p.id!);
+          if (onRemove != null) onRemove();
           Fluttertoast.showToast(
             msg: 'Track removed from'.i18n + ' ${p.title}',
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
           );
-          //if (context.mounted) _close(context);
+          if (context.mounted) _close(context);
         },
       );
 
@@ -344,13 +345,13 @@ class MenuSheet {
       ListTile(
         title: Text('Remove favorite'.i18n),
         leading: Icon(
-          DeezerIcons.heart_fill,
+          AlchemyIcons.heart_fill,
           color: Theme.of(context).primaryColor,
         ),
         onTap: () async {
           await deezerAPI.removeFavorite(t.id!);
           //Check if favorites playlist is offline, update it
-          Playlist p = Playlist(id: deezerAPI.favoritesPlaylistId);
+          Playlist p = Playlist(id: cache.favoritesPlaylistId);
           if (await downloadManager.checkOffline(playlist: p)) {
             await downloadManager.addOfflinePlaylist(p);
           }
@@ -436,7 +437,7 @@ class MenuSheet {
 
   Widget downloadAlbum(Album a, BuildContext context) => ListTile(
       title: Text('Download'.i18n),
-      leading: const Icon(DeezerIcons.download),
+      leading: const Icon(AlchemyIcons.download),
       onTap: () async {
         if (context.mounted) _close(context);
         if (await downloadManager.addOfflineAlbum(a, private: false) != false) {
@@ -471,7 +472,7 @@ class MenuSheet {
           {required Function onRemove}) =>
       ListTile(
         title: Text('Remove album'.i18n),
-        leading: const Icon(DeezerIcons.trash),
+        leading: const Icon(AlchemyIcons.trash),
         onTap: () async {
           await deezerAPI.removeAlbum(a.id!);
           await downloadManager.removeOfflineAlbum(a.id!);
@@ -509,7 +510,7 @@ class MenuSheet {
   Widget removeArtist(Artist a, BuildContext context, {Function? onRemove}) =>
       ListTile(
         title: Text('Remove from favorites'.i18n),
-        leading: const Icon(DeezerIcons.trash),
+        leading: const Icon(AlchemyIcons.trash),
         onTap: () async {
           await deezerAPI.removeArtist(a.id!);
           Fluttertoast.showToast(
@@ -523,7 +524,7 @@ class MenuSheet {
 
   Widget favoriteArtist(Artist a, BuildContext context) => ListTile(
         title: Text('Add to favorites'.i18n),
-        leading: const Icon(DeezerIcons.heart_fill),
+        leading: const Icon(AlchemyIcons.heart_fill),
         onTap: () async {
           await deezerAPI.addFavoriteArtist(a.id!);
           Fluttertoast.showToast(
@@ -544,10 +545,11 @@ class MenuSheet {
       Function? onRemove,
       Function? onUpdate}) {
     show(context, [
-      (playlist.library != null)
+      (playlist.library == true)
           ? removePlaylistLibrary(playlist, context, onRemove: onRemove)
           : addPlaylistLibrary(playlist, context),
-      addPlaylistOffline(playlist, context),
+      playBlindTest(playlist, context),
+      if (!(playlist.library ?? false)) addPlaylistOffline(playlist, context),
       shareTile('playlist', playlist.id!),
       if (playlist.user?.id == deezerAPI.userId)
         editPlaylist(playlist, context: context, onUpdate: onUpdate),
@@ -559,11 +561,22 @@ class MenuSheet {
   // PLAYLIST OPTIONS
   //===================
 
+  Widget playBlindTest(Playlist p, BuildContext context,
+          {Function? onRemove}) =>
+      ListTile(
+        title: Text('Play blind test'.i18n),
+        leading: const Icon(AlchemyIcons.question),
+        onTap: () async {
+          Navigator.of(context, rootNavigator: true)
+              .push(SlideBottomRoute(widget: BlindTestChoiceScreen(p)));
+        },
+      );
+
   Widget removePlaylistLibrary(Playlist p, BuildContext context,
           {Function? onRemove}) =>
       ListTile(
         title: Text('Remove from library'.i18n),
-        leading: const Icon(DeezerIcons.trash),
+        leading: const Icon(AlchemyIcons.trash),
         onTap: () async {
           if (p.user?.id?.trim() == deezerAPI.userId) {
             //Delete playlist if own
@@ -580,7 +593,7 @@ class MenuSheet {
 
   Widget addPlaylistLibrary(Playlist p, BuildContext context) => ListTile(
         title: Text('Add playlist to library'.i18n),
-        leading: const Icon(DeezerIcons.heart_fill),
+        leading: const Icon(AlchemyIcons.heart_fill),
         onTap: () async {
           await deezerAPI.addPlaylist(p.id!);
           Fluttertoast.showToast(
@@ -606,7 +619,7 @@ class MenuSheet {
           {required BuildContext context, Function? onUpdate}) =>
       ListTile(
         title: Text('Edit playlist'.i18n),
-        leading: const Icon(DeezerIcons.pen),
+        leading: const Icon(AlchemyIcons.pen),
         onTap: () async {
           await showDialog(
               context: context,
@@ -632,7 +645,7 @@ class MenuSheet {
 
   Widget shareShow(String id) => ListTile(
         title: Text('Share show'.i18n),
-        leading: const Icon(DeezerIcons.share_android),
+        leading: const Icon(AlchemyIcons.share_android),
         onTap: () async {
           Share.share('https://deezer.com/show/$id');
         },
@@ -641,7 +654,7 @@ class MenuSheet {
   //Open direct download link in browser
   Widget downloadExternalEpisode(ShowEpisode e) => ListTile(
         title: Text('Download externally'.i18n),
-        leading: const Icon(DeezerIcons.download),
+        leading: const Icon(AlchemyIcons.download),
         onTap: () async {
           if (e.url != null) await launchUrlString(e.url!);
         },

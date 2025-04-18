@@ -1,9 +1,6 @@
 [submodule "custom_navigator"]
 	path = custom_navigator
 	url = https://github.com/DJDoubleD/custom_navigator.git
-[submodule "equalizer_flutter"]
-	path = equalizer_flutter
-	url = https://github.com/DJDoubleD/equalizer_flutter.git
 [submodule "external_path"]
 	path = external_path
 	url = https://github.com/DJDoubleD/external_path.git
@@ -16,3 +13,12 @@
 [submodule "scrobblenaut"]
 	path = scrobblenaut
 	url = https://github.com/DJDoubleD/Scrobblenaut.git
+[submodule "liquid_progress_indicator_v2"]
+	path = liquid_progress_indicator_v2
+	url = https://github.com/PetitPrinc3/liquid_progress_indicator_v2.git
+[submodule "figma_squircle"]
+	path = figma_squircle
+	url = https://github.com/SedlarDavid/figma_squircle.git
+[submodule "open_filex"]
+	path = open_filex
+	url = https://github.com/mufassalhussain/open_filex.git

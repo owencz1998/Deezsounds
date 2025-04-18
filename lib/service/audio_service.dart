@@ -5,16 +5,16 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:equalizer_flutter/equalizer_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:deezer/utils/connectivity.dart';
-import 'package:deezer/utils/env.dart';
+import 'package:alchemy/utils/connectivity.dart';
+import 'package:alchemy/utils/env.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:scrobblenaut/scrobblenaut.dart';
 
@@ -45,10 +45,6 @@ class AudioPlayerHandler extends BaseAudioHandler
   AudioPlayerHandler() {
     _init();
   }
-
-  int? _audioSession;
-  int? _prevAudioSession;
-  bool _equalizerOpen = false;
 
   final AndroidAuto _androidAuto =
       AndroidAuto(); // Create an instance of AndroidAuto
@@ -184,31 +180,6 @@ class AudioPlayerHandler extends BaseAudioHandler
       }
     });
 
-    //Audio session
-    _player.androidAudioSessionIdStream.listen((session) {
-      if (!settings.enableEqualizer) return;
-
-      //Save
-      _prevAudioSession = _audioSession;
-      _audioSession = session;
-      if (_audioSession == null) return;
-
-      //Open EQ
-      if (!_equalizerOpen) {
-        EqualizerFlutter.open(session!);
-        _equalizerOpen = true;
-        return;
-      }
-
-      //Change session id
-      if (_prevAudioSession != _audioSession) {
-        if (_prevAudioSession != null) {
-          EqualizerFlutter.removeAudioSessionId(_prevAudioSession!);
-        }
-        EqualizerFlutter.setAudioSessionId(_audioSession!);
-      }
-    });
-
     // When 75% of item played, save loggedTrackId to cache & log listen (if enabled)
     AudioService.position.listen((position) {
       if (mediaItem.value == null || !playbackState.value.playing) {
@@ -263,6 +234,60 @@ class AudioPlayerHandler extends BaseAudioHandler
     }
   }
 
+  Future<void> playDeezerPreview(String trackToken, String? artUri) async {
+    String previewURI = await deezerAPI.getMediaPreview(trackToken);
+
+    if (previewURI == '') {
+      throw Exception(
+          'Unable to load media preview from API. Are you a premium user ?');
+    }
+
+    MediaItem blindTrack = MediaItem(
+        id: '0',
+        title: 'Blind test',
+        duration: Duration(seconds: 30),
+        artist: 'Definitely not Deezer',
+        artUri: Uri.parse(artUri ?? ''));
+
+    await pause();
+    await _playlist.clear();
+    if (previewURI.startsWith('http')) {
+      _playlist
+          .add(ProgressiveAudioSource(Uri.parse(previewURI), tag: blindTrack));
+    }
+    AudioSource.uri(Uri.parse(previewURI), tag: blindTrack);
+    await setShuffleMode(AudioServiceShuffleMode.none);
+    await skipToQueueItem(0);
+    await play();
+  }
+
+  Future<void> playBlindTrack(String trackId, String? artUri) async {
+    String previewURI = await deezerAPI.getTrackPreview(trackId);
+
+    if (previewURI == '') {
+      Logger.root.warning('Unable to fetch preview for $trackId');
+      throw Exception('Unable to load media preview from API.');
+    }
+
+    MediaItem blindTrack = MediaItem(
+        id: '0',
+        title: 'Blind test',
+        duration: Duration(seconds: 30),
+        artist: 'Definitely not Deezer',
+        artUri: Uri.parse(artUri ?? ''));
+
+    await pause();
+    await _playlist.clear();
+    if (previewURI.startsWith('http')) {
+      _playlist
+          .add(ProgressiveAudioSource(Uri.parse(previewURI), tag: blindTrack));
+    }
+    AudioSource.uri(Uri.parse(previewURI), tag: blindTrack);
+    await setShuffleMode(AudioServiceShuffleMode.none);
+    await skipToQueueItem(0);
+    await play();
+  }
+
   @override
   Future<void> pause() async {
     _player.pause();
@@ -310,8 +335,10 @@ class AudioPlayerHandler extends BaseAudioHandler
     if (newQueue.isNotEmpty) {
       await _playlist.addAll(await _itemsToSources(newQueue));
     } else {
-      if (mediaItem.hasValue) {
-        mediaItem.add(null);
+      try {
+        GetIt.I<AudioHandler>().stop();
+      } catch (e) {
+        Logger.root.warning("Can't stop audioHandler.");
       }
     }
   }
@@ -652,7 +679,8 @@ class AudioPlayerHandler extends BaseAudioHandler
   }
 
   Future<void> _addToHistory(MediaItem item) async {
-    if (!_player.playing) return;
+    // Id = '0' is a blindtestpreview track which should not be logged to history
+    if (!_player.playing || item.id == '0') return;
 
     // Scrobble to LastFM
     if (_scrobblenautReady && !(_loggedTrackId == item.id)) {
@@ -726,7 +754,9 @@ class AudioPlayerHandler extends BaseAudioHandler
       if (queueString == '') return;
       Map<String, dynamic> json = jsonDecode(queueString);
       List<MediaItem> savedQueue = (json['queue'] ?? [])
-          .map<MediaItem>((mi) => (MediaItemConverter.mediaItemFromMap(mi)))
+          .where(
+              (mi) => mi['id'] != '0') // Avoid errors loading blind test tracks
+          .map<MediaItem>((mi) => MediaItemConverter.mediaItemFromMap(mi))
           .toList();
       final int lastIndex = json['index'] ?? 0;
       final Duration lastPos = Duration(milliseconds: json['position'] ?? 0);
@@ -885,7 +915,7 @@ class AudioPlayerHandler extends BaseAudioHandler
       if (stl.id == 'flow') {
         stl.tracks = await deezerAPI.flow(type: stl.flowType);
       } else {
-        stl = await deezerAPI.smartTrackList(stl.id ?? '');
+        stl = await deezerAPI.smartTrackList(stl.id ?? '') ?? SmartTrackList();
       }
     }
     QueueSource queueSource = QueueSource(

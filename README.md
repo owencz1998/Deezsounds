@@ -1,81 +1,95 @@
-![Deezer](./assets/banner.png?raw=true)
+![Alchemy](./assets/banner.png?raw=true)
 
-[![Latest Version](https://img.shields.io/github/v/release/PetitPrinc3/Deezer?color=blue)](../../releases/latest)
-[![Release date](https://img.shields.io/github/release-date/PetitPrinc3/Deezer)](../../releases/latest)
-[![Downloads Definitely Not Deezer](https://img.shields.io/github/downloads/PetitPrinc3/Deezer/total?color=blue&label=Definitely%20Not%20Deezer%20downloads)](../../releases)  
-[![Flutter Version](https://shields.io/badge/Flutter-v3.27.1-darkgreen.svg)](https://docs.flutter.dev/tools/sdk)
-[![Dart Version](https://shields.io/badge/Dart-v3.6.0-darkgreen.svg)](https://dart.dev/get-dart)
-[![Crowdin](https://badges.crowdin.net/refreezer/localized.svg)](https://crowdin.com/project/refreezer)
+[![Latest Version](https://img.shields.io/github/v/release/PetitPrinc3/Alchemy?color=blue)](../../releases/latest)
+[![Release date](https://img.shields.io/github/release-date/PetitPrinc3/Alchemy)](../../releases/latest)
+[![Latest commit](https://img.shields.io/github/last-commit/PetitPrinc3/Alchemy)](../../commit/master)
 [![License](https://img.shields.io/github/license/PetitPrinc3/Deezer?flat)](./LICENSE)
 
-[![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev/)
-[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
-[![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.java.com/)
+[![Flutter](https://img.shields.io/badge/Flutter-v3.29.2-blue?logo=flutter)](https://flutter.dev/)
+[![Dart](https://img.shields.io/badge/Dart-v3.7.2-blue?logo=dart)](https://dart.dev/)
+[![Android API](https://img.shields.io/badge/Android%20API-35-green?logo=android)](https://developer.android.com/about/versions/14)
+[![Java JDK](https://img.shields.io/badge/Java%20JDK-17-blue?logo=openjdk)](https://openjdk.java.net/projects/jdk/17/)
 
 ---
 
->[!CAUTION]
-> The Deezer name, brand and affiliated designs are the registered trademark of **Deezer SA**  
-> Providing an app using the Deezer branding theme and bypassing Deezer restrictions is illegal.  
-> Therefore, there will be no apk releases or steps to compile published in this repository.  
-> If you are a developper interested in taking on the project and providing the app, feel free to fork.  
+#### :rocket: Alchemy Features:
 
-This is definitely not Deezer.  
-This is an app that uses both public and internal Deezer APIs to provide similar features.  
+*   Log in with an official Deezer account;
+*   Explore the official Deezer catalog;
+*   Play any track and skip freely;
+*   Like, save, and add your favorite tracks to your own playlists;
+*   Sing along to the songs you love with synchronized lyrics;
+*   Download tracks, playlists, and albums for offline listening;
+*   Challenge yourself with playlist-based blind tests;
+*   Export downloaded tracks to local storage;
+*   Import your playlists from Spotify;
+*   Customize themes, accent colors, and more.
 
-This repository originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD.  
+This project originates from [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD.
+
+## :hammer_and_wrench: Compile from Source
+
+Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yourself.
 
 ## :camera_flash: Screenshots
 
 <p align="center">
-    <img src="./assets/screenshots/Mod_login.png" width=100>
-    <img src="./assets/screenshots/Mod_home.png" width=100>
-    <img src="./assets/screenshots/Mod_player.png" width=100>
-    <img src="./assets/screenshots/Mod_search.png" width=100>
-    <img src="./assets/screenshots/Mod_favorites.png" width=100>
-    <img src="./assets/screenshots/Mod_playlists.png" width=100>
-    <img src="./assets/screenshots/Mod_artists.png" width=100>
-    <img src="./assets/screenshots/Mod_menu.png" width=100>
+    <img src="./assets/screenshots/login.png" width=100>
+    <img src="./assets/screenshots/home.png" width=100>
+    <img src="./assets/screenshots/player.png" width=100>
+    <img src="./assets/screenshots/search.png" width=100>
+    <img src="./assets/screenshots/favorites.png" width=100>
+    <img src="./assets/screenshots/playlists.png" width=100>
+    <img src="./assets/screenshots/artists.png" width=100>
+    <img src="./assets/screenshots/menu.png" width=100>
 </p>
 <p align="center">
-    <img src="./assets/screenshots/landscape_artist.png" height=150>
-    <img src="./assets/screenshots/landscape_playlist.png" height=150>
+    <img src="./assets/screenshots/chooseBlindTest.png" width=100>
+    <img src="./assets/screenshots/blindTrackTest.png" width=100>
+    <img src="./assets/screenshots/blindArtistTest.png" width=100>
+    <img src="./assets/screenshots/blindResults.png" width=100>
+</p>
+<p align="center">
+    <img src="./assets/screenshots/artist_landscape.png" height=150>
+    <img src="./assets/screenshots/playlist_landscape.png" height=150>
 </p>
 
-## :star2: Features & changes
+## :star2: Credits
 
-#### :lady_beetle: Bugs
-- If queue is cleared and player bar is dismissed, it will not be brought back up if the user clicks back on the formerly playing track.
-- Lyrics are re-fetched from api each time the player is brought back. This is because the API does not include informations regarding the lyrics in the track model.
-- Player bar does not always update its color on track tile tap or various other scenarios.
-- Favorite tracks playlist id is not always properly saved (no/minor UX consequences).
-- Queue screen is laggy. This seems to be because of how the images are loaded.
-- Tracks removed from playlist/favorites will not disappear immediately from the detailed screen.
+*   Built upon [ReFreezer](https://github.com/DJDoubleD/ReFreezer) by @DJDoubleD;
+*   Lyrics provided by [LRCLIB](https://github.com/tranxuanthang/lrclib) by @tranxuanthang;
+*   Design inspired by [Mallari Kishor's Spotify Redesign](https://www.behance.net/gallery/194018249/Spotify-App-Redesign).
 
-#### :building_construction: Upcoming features
-- Caching information to avoid reloading every time (eg. favorites screen)
-- Turn the mod into a skin for the official refreezer app
+## :building_construction: Upcoming Features
 
-#### :rocket: Definitely Not Deezer Features :
-- Floating player bar with background color based on title artwork
-- Deezer original icons & font
-- Deezer original navigation menu (+ settings)
-- Deezer like player screen
-- Deezer like info menu
-- Deezer like favorite screen (Offline : offline playlists and random offline tracks)
-- Most Deezer like pages (artists, playlists, albums)
-- Downloads are stored within the app storage (Android/data/package) and can be exported to local storage under settings with full tags
-- Fixed lyrics support
+*   Move all gateway light API calls to mobile gateway API;
+*   Implement a song catcher;
+*   Implement notification tile `onTap` redirections;
+*   Continue the Search page UI refactor;
+*   Create notification settings;
+*   Implement a profile edition screen;
+*   Make a "create playlist from queue" option;
+*   Implement a visual pressed indicator for blind test choices;
+*   Prefetch lyrics for tracks in the queue;
+*   Add lyrics to the downloaded tracks.
+
+## :lady_beetle: Bugs
+
+*   Downloads that are stopped and restarted will not be saved in the database and therefore not be available;
+*   Skipping tracks on the player screen is not as fluid as it used to be and can be choppy;
+*   Some home tiles are not and will not be implemented (Concerts, Did you know, Original videos, ...);
+*   [Tell me!](https://github.com/PetitPrinc3/Deezer/issues)
 
 ## :balance_scale: Disclaimer & Legal
 
-**Definitely not Deezer** was not developed for piracy, but educational and private use.
-You are responsible for how you use **Definitely not Deezer**.
+**Alchemy** was not developed for piracy but for educational and private use.
+You are responsible for how you use **Alchemy**.
+Using **Alchemy** may be illegal in your country.
 
-**Definitely not Deezer** uses both Deezer's public and internal API's, but is not endorsed, certified or otherwise approved in any way by Deezer.
+**Alchemy** uses both Deezer's public and internal APIs but is not endorsed, certified, or otherwise approved in any way by Deezer.
 
-The Deezer brand and name is the registered trademark of its respective owner.
+The Deezer brand and name are the registered trademarks of their respective owner.
 
-**Definitely not Deezer** has no partnership, sponsorship or endorsement with Deezer.
+**Alchemy** has no partnership, sponsorship, or endorsement with Deezer.
 
-By using **Definitely not Deezer** you do not abide by Deezer's [CGU](https://www.deezer.com/legal/cgu)
+By using **Alchemy,** you do not abide by Deezer's [Terms of Service](https://www.deezer.com/legal/cgu).

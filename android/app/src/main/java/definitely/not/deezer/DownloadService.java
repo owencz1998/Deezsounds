@@ -7,10 +7,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Looper;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -20,6 +22,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.ServiceCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -56,8 +59,9 @@ public class DownloadService extends Service {
     static final int SERVICE_RETRY_DOWNLOADS = 8;
     static final int SERVICE_REMOVE_DOWNLOADS = 9;
 
-    static final String NOTIFICATION_CHANNEL_ID = "refreezerdownloads";
+    static final String NOTIFICATION_CHANNEL_ID = "alchemydownloads";
     static final int NOTIFICATION_ID_START = 6969;
+    static final String NOTIFICATION_GROUP_KEY = "definitely.not.deezer.DOWNLOAD_GROUP";
 
     boolean running = false;
     DownloadSettings settings;
@@ -73,7 +77,7 @@ public class DownloadService extends Service {
     ArrayList<DownloadThread> threads = new ArrayList<>();
     ArrayList<Boolean> updateRequests = new ArrayList<>();
     boolean updating = false;
-    Handler progressUpdateHandler = new Handler();
+    Handler progressUpdateHandler = new Handler(Looper.getMainLooper());
     DownloadLog logger = new DownloadLog();
 
     public DownloadService() {
@@ -124,7 +128,6 @@ public class DownloadService extends Service {
             activityMessenger = intent.getParcelableExtra("activityMessenger");
         }
 
-
         //return super.onStartCommand(intent, flags, startId);
         //Prevent battery savers I guess
         return START_STICKY;
@@ -174,7 +177,7 @@ public class DownloadService extends Service {
 
         db.setTransactionSuccessful();
         db.endTransaction();
-
+           
         //Create new download tasks
         if (running) {
             int nThreads = settings.downloadThreads - threads.size();
@@ -197,6 +200,7 @@ public class DownloadService extends Service {
             //Check if last download
             if (threads.isEmpty()) {
                 running = false;
+                ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE);
             }
         }
         //Send updates to UI
@@ -281,6 +285,7 @@ public class DownloadService extends Service {
         File parentDir;
         File outFile;
         JSONObject trackJson;
+        JSONObject episodeJson;
         JSONObject albumJson;
         JSONObject privateJson;
         Lyrics lyricsData = null;
@@ -306,7 +311,7 @@ public class DownloadService extends Service {
                 }
 
             //Don't fetch meta if user uploaded mp3
-            if (!download.isUserUploaded()) {
+            if (!download.isUserUploaded() && !download.isEpisode) {
                 try {
                     trackJson = deezer.callPublicAPI("track", download.trackId);
                     albumJson = deezer.callPublicAPI("album", Integer.toString(trackJson.getJSONObject("album").getInt("id")));
@@ -319,145 +324,245 @@ public class DownloadService extends Service {
                 }
             }
 
-            //Fallback
-            Deezer.QualityInfo qualityInfo = new Deezer.QualityInfo(this.download.quality, this.download.streamTrackId, this.download.trackToken, this.download.md5origin, this.download.mediaVersion, logger);
-            String sURL = null;
-            if (!download.isUserUploaded()) {
-                try {
-                    sURL = qualityInfo.fallback(deezer);
-                    if (sURL == null)
-                        throw new Exception("No more to fallback!");
-
-                    download.quality = qualityInfo.quality;
-                } catch (Exception e) {
-                    logger.error("Fallback failed " + e.toString());
-                    download.state = Download.DownloadState.DEEZER_ERROR;
-                    exit();
-                    return;
-                }
-            } else {
-                //User uploaded MP3
-                qualityInfo.quality = 3;
-            }
-
-            //Check file
-            try {
-                if (download.isUserUploaded()) {
-                    outFile = new File(Deezer.generateUserUploadedMP3Filename(download.path, download.title));
-                } else {
-                    outFile = new File(Deezer.generateFilename(download.path, trackJson, albumJson, qualityInfo.quality));
-                }
-                parentDir = new File(outFile.getParent());
-            } catch (Exception e) {
-                logger.error("Error generating track filename (" + download.path + "): " + e.toString(), download);
-                e.printStackTrace();
-                download.state = Download.DownloadState.ERROR;
-                exit();
-                return;
-            }
-
-            //File already exists
-            if (outFile.exists()) {
-                //Delete if overwriting enabled
-                if (settings.overwriteDownload) {
-                    outFile.delete();
-                } else {
-                    download.state = Download.DownloadState.DONE;
-                    exit();
-                    return;
-                }
-            }
-
             //Temporary encrypted file
             File tmpFile = new File(getCacheDir(), download.id + ".ENC");
+            
+            if (!download.isEpisode) {
 
-            //Get start bytes offset
-            long start = 0;
-            if (tmpFile.exists()) {
-                start = tmpFile.length();
-            }
-
-            //Download
-            try {
-                URL url = new URL(sURL);
-                HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-                //Set headers
-                connection.setConnectTimeout(30000);
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
-                connection.setRequestProperty("Accept-Language", "*");
-                connection.setRequestProperty("Accept", "*/*");
-                connection.setRequestProperty("Range", "bytes=" + start + "-");
-                connection.connect();
-
-                //Open streams
-                BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
-                OutputStream outputStream = new FileOutputStream(tmpFile.getPath(), true);
-                //Save total
-                download.filesize = start + connection.getContentLength();
-                //Download
-                byte[] buffer = new byte[4096];
-                long received = 0;
-                int read;
-                while ((read = inputStream.read(buffer, 0, 4096)) != -1) {
-                    outputStream.write(buffer, 0, read);
-                    received += read;
-                    download.received = start + received;
-
-                    //Stop/Cancel download
-                    if (stopDownload) {
-                        download.state = Download.DownloadState.NONE;
-                        try {
-                            inputStream.close();
-                            outputStream.close();
-                            connection.disconnect();
-                        } catch (Exception ignored) {
-                        }
+                //Fallback
+                Deezer.QualityInfo qualityInfo = new Deezer.QualityInfo(this.download.quality, this.download.streamTrackId, this.download.trackToken, this.download.md5origin, this.download.mediaVersion, logger);
+                String sURL = null;
+                if (!download.isUserUploaded()) {
+                    try {
+                        sURL = qualityInfo.fallback(deezer);
+                        if (sURL == null)
+                            throw new Exception("No more to fallback!");
+    
+                        download.quality = qualityInfo.quality;
+                    } catch (Exception e) {
+                        logger.error("Fallback failed " + e.toString());
+                        download.state = Download.DownloadState.DEEZER_ERROR;
+                        exit();
+                        return;
+                    }
+                } else {
+                    //User uploaded MP3
+                    qualityInfo.quality = 3;
+                }
+    
+                //Check file
+                try {
+                    if (download.isUserUploaded()) {
+                        outFile = new File(Deezer.generateUserUploadedMP3Filename(download.path, download.title));
+                    } else {
+                        outFile = new File(Deezer.generateFilename(download.path, trackJson, albumJson, qualityInfo.quality));
+                    }
+                    parentDir = new File(outFile.getParent());
+                } catch (Exception e) {
+                    logger.error("Error generating track filename (" + download.path + "): " + e.toString(), download);
+                    e.printStackTrace();
+                    download.state = Download.DownloadState.ERROR;
+                    exit();
+                    return;
+                }
+    
+                //File already exists
+                if (outFile.exists()) {
+                    //Delete if overwriting enabled
+                    if (settings.overwriteDownload) {
+                        outFile.delete();
+                    } else {
+                        download.state = Download.DownloadState.DONE;
                         exit();
                         return;
                     }
                 }
-                //On done
-                inputStream.close();
-                outputStream.close();
-                connection.disconnect();
-                //Update
-                download.state = Download.DownloadState.POST;
-                updateProgress();
-            } catch (Exception e) {
-                //Download error
-                logger.error("Download error: " + e.toString(), download);
-                e.printStackTrace();
-                download.state = Download.DownloadState.ERROR;
-                exit();
-                return;
-            }
-
-            //Post processing
-
-            //Decrypt
-            if (qualityInfo.encrypted) {
+    
+    
+                //Get start bytes offset
+                long start = 0;
+                if (tmpFile.exists()) {
+                    start = tmpFile.length();
+                }
+    
+                //Download
                 try {
-                    File decFile = new File(tmpFile.getPath() + ".DEC");
-                    DeezerDecryptor decryptor = new DeezerDecryptor(download.streamTrackId);
-                    decryptor.decryptFile(tmpFile.getPath(), decFile.getPath());
-                    tmpFile.delete();
-                    tmpFile = decFile;
+                    URL url = new URL(sURL);
+                    HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+                    //Set headers
+                    connection.setConnectTimeout(30000);
+                    connection.setRequestMethod("GET");
+                    connection.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
+                    connection.setRequestProperty("Accept-Language", "*");
+                    connection.setRequestProperty("Accept", "*/*");
+                    connection.setRequestProperty("Range", "bytes=" + start + "-");
+                    connection.connect();
+    
+                    //Open streams
+                    BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                    OutputStream outputStream = new FileOutputStream(tmpFile.getPath(), true);
+                    //Save total
+                    download.filesize = start + connection.getContentLength();
+                    //Download
+                    byte[] buffer = new byte[8192];
+                    long received = 0;
+                    int read;
+                    while ((read = inputStream.read(buffer, 0, 8192)) != -1) {
+                        outputStream.write(buffer, 0, read);
+                        received += read;
+                        download.received = start + received;
+    
+                        //Stop/Cancel download
+                        if (stopDownload) {
+                            download.state = Download.DownloadState.NONE;
+                            try {
+                                inputStream.close();
+                                outputStream.close();
+                                connection.disconnect();
+                            } catch (Exception ignored) {
+                            }
+                            exit();
+                            return;
+                        }
+                    }
+                    //On done
+                    inputStream.close();
+                    outputStream.close();
+                    connection.disconnect();
+                    //Update
+                    download.state = Download.DownloadState.POST;
+                    updateProgress();
                 } catch (Exception e) {
-                    logger.error("Decryption error: " + e.toString(), download);
+                    //Download error
+                    logger.error("Download error: " + e.toString(), download);
                     e.printStackTrace();
-                    //Shouldn't ever fail
+                    download.state = Download.DownloadState.ERROR;
+                    exit();
+                    return;
+                }
+    
+                //Post processing
+    
+                //Decrypt
+                if (qualityInfo.encrypted) {
+                    try {
+                        File decFile = new File(tmpFile.getPath() + ".DEC");
+                        DeezerDecryptor decryptor = new DeezerDecryptor(download.streamTrackId);
+                        decryptor.decryptFile(tmpFile.getPath(), decFile.getPath());
+                        tmpFile.delete();
+                        tmpFile = decFile;
+                    } catch (Exception e) {
+                        logger.error("Decryption error: " + e.toString(), download);
+                        e.printStackTrace();
+                        //Shouldn't ever fail
+                    }
+                }
+    
+            } else {
+
+                try {
+                    episodeJson = deezer.callPublicAPI("episode", download.trackId);
+                } catch (Exception e) {
+                    logger.error("Unable to fetch episode metadata! " + e, download);
+                    e.printStackTrace();
+                    download.state = Download.DownloadState.ERROR;
+                    exit();
+                    return;
+                }
+
+                //Check file
+                try {
+                    outFile = new File(download.path);
+                    parentDir = new File(outFile.getParent());
+                } catch (Exception e) {
+                    logger.error("Error generating track filename (" + download.path + "): " + e.toString(), download);
+                    e.printStackTrace();
+                    download.state = Download.DownloadState.ERROR;
+                    exit();
+                    return;
+                }
+    
+                //File already exists
+                if (outFile.exists()) {
+                    //Delete if overwriting enabled
+                    if (settings.overwriteDownload) {
+                        outFile.delete();
+                    } else {
+                        download.state = Download.DownloadState.DONE;
+                        exit();
+                        return;
+                    }
+                }
+
+                //Get start bytes offset
+                long start = 0;
+                if (tmpFile.exists()) {
+                    start = tmpFile.length();
+                }
+
+                try {
+                    URL url = new URL(download.url);
+                    HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+                    //Set headers
+                    connection.setConnectTimeout(30000);
+                    connection.setRequestMethod("GET");
+                    connection.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
+                    connection.setRequestProperty("Accept-Language", "*");
+                    connection.setRequestProperty("Accept", "*/*");
+                    connection.setRequestProperty("Range", "bytes=" + start + "-");
+                    connection.connect();
+    
+                    //Open streams
+                    BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                    OutputStream outputStream = new FileOutputStream(tmpFile.getPath(), true);
+                    //Save total
+                    download.filesize = start + connection.getContentLength();
+                    //Download
+                    byte[] buffer = new byte[8192];
+                    long received = 0;
+                    int read;
+                    while ((read = inputStream.read(buffer, 0, 8192)) != -1) {
+                        outputStream.write(buffer, 0, read);
+                        received += read;
+                        download.received = start + received;
+    
+                        //Stop/Cancel download
+                        if (stopDownload) {
+                            download.state = Download.DownloadState.NONE;
+                            try {
+                                inputStream.close();
+                                outputStream.close();
+                                connection.disconnect();
+                            } catch (Exception ignored) {
+                            }
+                            exit();
+                            return;
+                        }
+                    }
+                    //On done
+                    inputStream.close();
+                    outputStream.close();
+                    connection.disconnect();
+                    //Update
+                    download.state = Download.DownloadState.POST;
+                    updateProgress();
+                } catch (Exception e) {
+                    //Download error
+                    logger.error("Download error: " + e.toString(), download);
+                    e.printStackTrace();
+                    download.state = Download.DownloadState.ERROR;
+                    exit();
+                    return;
                 }
             }
-
-
+    
             //If exists (duplicate download in DB), don't overwrite.
             if (outFile.exists()) {
                 download.state = Download.DownloadState.DONE;
                 exit();
                 return;
             }
-
+            
             //Create dirs and copy
             if (!parentDir.exists() && !parentDir.mkdirs()) {
                 //Log & Exit
@@ -496,7 +601,7 @@ public class DownloadService extends Service {
             }
 
             //Cover & Tags, ignore on user uploaded
-            if (!download.isUserUploaded()) {
+            if (!download.isUserUploaded() && !download.isEpisode) {
 
                 //Download cover for each track
                 File coverFile = new File(outFile.getPath().substring(0, outFile.getPath().lastIndexOf('.')) + ".jpg");
@@ -511,7 +616,7 @@ public class DownloadService extends Service {
                     InputStream inputStream = connection.getInputStream();
                     OutputStream outputStream = new FileOutputStream(coverFile.getPath());
                     //Download
-                    byte[] buffer = new byte[4096];
+                    byte[] buffer = new byte[8192];
                     int read = 0;
                     while ((read = inputStream.read(buffer)) != -1) {
                         outputStream.write(buffer, 0, read);
@@ -622,7 +727,7 @@ public class DownloadService extends Service {
                 InputStream inputStream = connection.getInputStream();
                 OutputStream outputStream = new FileOutputStream(coverFile.getPath());
                 //Download
-                byte[] buffer = new byte[4096];
+                byte[] buffer = new byte[8192];
                 int read = 0;
                 while ((read = inputStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, read);
@@ -695,14 +800,15 @@ public class DownloadService extends Service {
     private void updateNotification(Download download) {
         //Cancel notification for done/none/error downloads
         if (download.state == Download.DownloadState.NONE || download.state.getValue() >= 3) {
-            notificationManager.cancel(NOTIFICATION_ID_START + download.id);
+            notificationManager.cancel(NOTIFICATION_ID_START + 1 + download.id);
             return;
         }
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, DownloadService.NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(download.title)
                 .setSmallIcon(R.drawable.ic_logo)
-                .setPriority(NotificationCompat.PRIORITY_MIN);
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setGroup(NOTIFICATION_GROUP_KEY);
 
         //Show progress when downloading
         if (download.state == Download.DownloadState.DOWNLOADING) {
@@ -719,7 +825,7 @@ public class DownloadService extends Service {
         }
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            notificationManager.notify(NOTIFICATION_ID_START + download.id, notificationBuilder.build());
+            notificationManager.notify(NOTIFICATION_ID_START + 1 + download.id, notificationBuilder.build());
         }
 
     }
@@ -749,6 +855,30 @@ public class DownloadService extends Service {
                 //Start/Resume
                 case SERVICE_START_DOWNLOAD:
                     running = true;
+
+                    // Attempt to start foreground service HERE
+                    try {
+                        ServiceCompat.startForeground(
+                                DownloadService.this, 
+                                NOTIFICATION_ID_START,
+                                new  NotificationCompat.Builder(context, DownloadService.NOTIFICATION_CHANNEL_ID)
+                                    .setContentTitle("Downloading...")
+                                    .setSmallIcon(R.drawable.ic_logo)
+                                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                                    .setGroup(NOTIFICATION_GROUP_KEY)
+                                    .setGroupSummary(true)
+                                    .build(),
+                                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC : 0
+                        );
+                         Log.i("DownloadService", "Foreground service started via SERVICE_START_DOWNLOAD.");
+
+                    } catch (Exception e) {
+                        Log.e("DownloadService", "ForegroundServiceStartNotAllowedException or other error starting foreground from handleMessage", e);
+                        ServiceCompat.stopForeground(DownloadService.this, ServiceCompat.STOP_FOREGROUND_REMOVE);
+                        running = false; // Maybe reset state if start fails?
+                        updateState(); // Update UI about the failure
+                    }
+
                     if (downloads.isEmpty())
                         loadDownloads();
                     updateQueue();
@@ -765,6 +895,7 @@ public class DownloadService extends Service {
                 //Stop downloads
                 case SERVICE_STOP_DOWNLOADS:
                     stop();
+                    ServiceCompat.stopForeground(DownloadService.this, ServiceCompat.STOP_FOREGROUND_REMOVE);
                     break;
 
                 //Remove download

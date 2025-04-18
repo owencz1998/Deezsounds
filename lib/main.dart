@@ -1,12 +1,13 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:custom_navigator/custom_navigator.dart';
+import 'package:alchemy/ui/user_screen.dart';
 import 'package:lottie/lottie.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
-import 'package:deezer/ui/favorite_screen.dart';
-import 'package:deezer/ui/restartable.dart';
-import 'package:deezer/ui/settings_screen.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/ui/library_screen.dart';
+import 'package:alchemy/ui/restartable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
@@ -28,7 +29,6 @@ import 'service/service_locator.dart';
 import 'settings.dart';
 import 'translations.i18n.dart';
 import 'ui/home_screen.dart';
-import 'ui/library.dart';
 import 'ui/login_screen.dart';
 import 'ui/player_bar.dart';
 import 'ui/updater.dart';
@@ -50,38 +50,26 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    loadSplash();
-  }
-
-// Load the splash screen for some duration
-  Future<Timer> loadSplash() async {
-    return Timer(
-      const Duration(milliseconds: 800),
-      onDoneLoading,
-    );
-  }
-
-  onDoneLoading() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: ((context) => const LoginMainWrapper()),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: Lottie.asset('assets/animations/logo_closing.json',
-            repeat: false,
-            frameRate: FrameRate(25),
-            fit: BoxFit.cover,
-            width: MediaQuery.of(context).orientation == Orientation.portrait
-                ? MediaQuery.of(context).size.width * 0.5
-                : MediaQuery.of(context).size.height * 0.5,
-            height: MediaQuery.of(context).orientation == Orientation.portrait
-                ? MediaQuery.of(context).size.width * 0.5
-                : MediaQuery.of(context).size.height * 0.5));
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Center(
+          child: Lottie.asset('assets/animations/logo_closing.json',
+              repeat: true,
+              frameRate: FrameRate(60),
+              fit: MediaQuery.of(context).orientation == Orientation.portrait
+                  ? BoxFit.fitWidth
+                  : BoxFit.fitHeight,
+              width: MediaQuery.of(context).orientation == Orientation.portrait
+                  ? MediaQuery.of(context).size.width * 0.2
+                  : MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).orientation == Orientation.portrait
+                  ? MediaQuery.of(context).size.height
+                  : MediaQuery.of(context).size.height * 0.3)),
+    );
   }
 }
 
@@ -107,24 +95,24 @@ void main() async {
 
   await prepareRun();
 
-  runApp(const Restartable(child: ReFreezerApp()));
+  runApp(const Restartable(child: AlchemyApp()));
 }
 
 Future<void> prepareRun() async {
   await initializeLogging();
-  Logger.root.info('Starting ReFreezer App...');
+  Logger.root.info('Starting Alchemy...');
   settings = await Settings().loadSettings();
   cache = await Cache.load();
 }
 
-class ReFreezerApp extends StatefulWidget {
-  const ReFreezerApp({super.key});
+class AlchemyApp extends StatefulWidget {
+  const AlchemyApp({super.key});
 
   @override
-  _ReFreezerAppState createState() => _ReFreezerAppState();
+  _AlchemyAppState createState() => _AlchemyAppState();
 }
 
-class _ReFreezerAppState extends State<ReFreezerApp> {
+class _AlchemyAppState extends State<AlchemyApp> {
   @override
   void initState() {
     //Make update theme global
@@ -146,7 +134,9 @@ class _ReFreezerAppState extends State<ReFreezerApp> {
       systemNavigationBarColor: settings.themeData.bottomAppBarTheme.color,
       systemNavigationBarIconBrightness:
           settings.isDark ? Brightness.light : Brightness.dark,
+      statusBarColor: Colors.transparent,
     ));
+    settings.save();
   }
 
   Locale? _locale() {
@@ -158,7 +148,7 @@ class _ReFreezerAppState extends State<ReFreezerApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Deezer',
+      title: 'Alchemy',
       shortcuts: <ShortcutActivator, Intent>{
         ...WidgetsApp.defaultShortcuts,
         LogicalKeySet(LogicalKeyboardKey.select):
@@ -187,7 +177,7 @@ class _ReFreezerAppState extends State<ReFreezerApp> {
         },
         child: I18n(
           initialLocale: _locale(),
-          child: const SplashScreen(),
+          child: const LoginMainWrapper(),
         ),
       ),
       navigatorKey: mainNavigatorKey,
@@ -263,10 +253,9 @@ class _MainScreenState extends State<MainScreen>
   late final AppLifecycleListener _lifeCycleListener;
   final List<Widget> _screens = [
     const HomeScreen(),
-    const LibraryScreen(),
-    const FavoriteScreen(),
     const SearchScreen(),
-    const SettingsScreen()
+    const LibraryScreen(),
+    const UserScreen(),
   ];
   Future<void>? _initialization;
   int _selected = 0;
@@ -313,9 +302,10 @@ class _MainScreenState extends State<MainScreen>
     //Restore saved queue
     _loadSavedQueue();
 
-    GetIt.I<AudioPlayerHandler>().mediaItem.listen((event) {
+    GetIt.I<AudioPlayerHandler>().playbackState.listen((event) {
       playerBarState.setPlayerBarState(
-          GetIt.I<AudioPlayerHandler>().mediaItem.hasValue &&
+          GetIt.I<AudioPlayerHandler>().playbackState.value.processingState !=
+                  AudioProcessingState.idle &&
               GetIt.I<AudioPlayerHandler>().mediaItem.value != null);
     });
   }
@@ -485,12 +475,18 @@ class _MainScreenState extends State<MainScreen>
     FocusNode screenFocusNode = FocusNode(); // for CustomNavigator
     screenFocusNode.requestFocus();
 
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor,
+    ));
+
     return FutureBuilder(
       future: _initialization,
       builder: (context, snapshot) {
         // Check _initialization status
         if (snapshot.connectionState == ConnectionState.done) {
           // When _initialization is done, render app
+
           return OrientationBuilder(
             builder: (context, orientation) {
               return KeyboardListener(
@@ -506,7 +502,9 @@ class _MainScreenState extends State<MainScreen>
                               child: Theme(
                                   data: Theme.of(context).copyWith(
                                       canvasColor: Theme.of(context)
-                                          .scaffoldBackgroundColor),
+                                          .scaffoldBackgroundColor,
+                                      splashColor: Colors.transparent,
+                                      highlightColor: Colors.transparent),
                                   child: BottomNavigationBar(
                                     type: BottomNavigationBarType.fixed,
                                     unselectedItemColor:
@@ -526,14 +524,14 @@ class _MainScreenState extends State<MainScreen>
                                       setState(() {
                                         _selected = index;
                                       });
-                                      //Fix statusbar
+
                                       SystemChrome.setSystemUIOverlayStyle(
-                                          const SystemUiOverlayStyle(
+                                          SystemUiOverlayStyle(
                                         statusBarColor: Colors.transparent,
                                       ));
                                     },
                                     selectedItemColor:
-                                        settings.primaryColor.withOpacity(0.8),
+                                        settings.primaryColor.withAlpha(200),
                                     showUnselectedLabels: true,
                                     selectedLabelStyle:
                                         TextStyle(color: settings.primaryColor),
@@ -541,32 +539,49 @@ class _MainScreenState extends State<MainScreen>
                                         color: Settings.secondaryText),
                                     items: <BottomNavigationBarItem>[
                                       BottomNavigationBarItem(
-                                          activeIcon: const Icon(
-                                              DeezerIcons.house_fill),
-                                          icon: const Icon(DeezerIcons.house),
+                                          activeIcon: const Padding(
+                                            padding: EdgeInsets.only(top: 4),
+                                            child:
+                                                Icon(AlchemyIcons.house_fill),
+                                          ),
+                                          icon: const Padding(
+                                            padding: EdgeInsets.only(top: 4),
+                                            child: Icon(AlchemyIcons.house),
+                                          ),
                                           label: 'Home'.i18n),
                                       BottomNavigationBarItem(
-                                          activeIcon: const Icon(
-                                              DeezerIcons.compass_fill),
-                                          icon: const Icon(DeezerIcons.compass),
-                                          label: 'Explore'.i18n),
-                                      BottomNavigationBarItem(
-                                          activeIcon: const Icon(
-                                              DeezerIcons.heart_fill),
-                                          icon: const Icon(DeezerIcons.heart),
-                                          label: 'Favorites'.i18n),
-                                      BottomNavigationBarItem(
-                                        activeIcon:
-                                            const Icon(DeezerIcons.search_fill),
-                                        icon: const Icon(DeezerIcons.search),
+                                        activeIcon: const Padding(
+                                          padding: EdgeInsets.only(top: 4),
+                                          child: Icon(AlchemyIcons.search_fill),
+                                        ),
+                                        icon: const Padding(
+                                          padding: EdgeInsets.only(top: 4),
+                                          child: Icon(AlchemyIcons.search),
+                                        ),
                                         label: 'Search'.i18n,
                                       ),
                                       BottomNavigationBarItem(
-                                          activeIcon:
-                                              const Icon(DeezerIcons.settings),
-                                          icon:
-                                              const Icon(DeezerIcons.settings),
-                                          label: 'Settings'.i18n)
+                                          activeIcon: const Padding(
+                                            padding: EdgeInsets.only(top: 4),
+                                            child:
+                                                Icon(AlchemyIcons.heart_fill),
+                                          ),
+                                          icon: const Padding(
+                                            padding: EdgeInsets.only(top: 4),
+                                            child: Icon(AlchemyIcons.heart),
+                                          ),
+                                          label: 'Library'.i18n),
+                                      BottomNavigationBarItem(
+                                          activeIcon: const Padding(
+                                            padding: EdgeInsets.only(top: 4),
+                                            child:
+                                                Icon(AlchemyIcons.human_fill),
+                                          ),
+                                          icon: const Padding(
+                                            padding: EdgeInsets.only(top: 4),
+                                            child: Icon(AlchemyIcons.human),
+                                          ),
+                                          label: 'Profile'.i18n),
                                     ],
                                   )))
                           : null,
@@ -584,35 +599,29 @@ class _MainScreenState extends State<MainScreen>
                                         destinations: [
                                           NavigationRailDestination(
                                               selectedIcon: const Icon(
-                                                  DeezerIcons.house_fill),
-                                              icon:
-                                                  const Icon(DeezerIcons.house),
+                                                  AlchemyIcons.house_fill),
+                                              icon: const Icon(
+                                                  AlchemyIcons.house),
                                               label: Text('Home'.i18n)),
                                           NavigationRailDestination(
-                                              selectedIcon: const Icon(
-                                                  DeezerIcons.compass_fill),
-                                              icon: const Icon(
-                                                  DeezerIcons.compass),
-                                              label: Text('Explore'.i18n)),
-                                          NavigationRailDestination(
-                                              selectedIcon: const Icon(
-                                                  DeezerIcons.heart_fill),
-                                              icon:
-                                                  const Icon(DeezerIcons.heart),
-                                              label: Text('Favorites'.i18n)),
-                                          NavigationRailDestination(
                                             selectedIcon: const Icon(
-                                                DeezerIcons.search_fill),
+                                                AlchemyIcons.search_fill),
                                             icon:
-                                                const Icon(DeezerIcons.search),
+                                                const Icon(AlchemyIcons.search),
                                             label: Text('Search'.i18n),
                                           ),
                                           NavigationRailDestination(
                                               selectedIcon: const Icon(
-                                                  DeezerIcons.settings),
+                                                  AlchemyIcons.heart_fill),
                                               icon: const Icon(
-                                                  DeezerIcons.settings),
-                                              label: Text('Settings'.i18n))
+                                                  AlchemyIcons.heart),
+                                              label: Text('Library'.i18n)),
+                                          NavigationRailDestination(
+                                              selectedIcon: const Icon(
+                                                  AlchemyIcons.human_fill),
+                                              icon: const Icon(
+                                                  AlchemyIcons.human),
+                                              label: Text('Profile'.i18n)),
                                         ],
                                         selectedIndex: _selected,
                                         onDestinationSelected:
@@ -632,9 +641,9 @@ class _MainScreenState extends State<MainScreen>
                                           setState(() {
                                             _selected = index;
                                           });
-                                          //Fix statusbar
+
                                           SystemChrome.setSystemUIOverlayStyle(
-                                              const SystemUiOverlayStyle(
+                                              SystemUiOverlayStyle(
                                             statusBarColor: Colors.transparent,
                                           ));
                                         },
@@ -691,13 +700,7 @@ class _MainScreenState extends State<MainScreen>
           );
         } else {
           // While audio_service is initializing
-          return Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          );
+          return SplashScreen();
         }
       },
     );

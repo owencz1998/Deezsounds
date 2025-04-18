@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
 
 import '../api/deezer.dart';
 import '../api/definitions.dart';
@@ -15,10 +15,10 @@ import '../translations.i18n.dart';
 import '../ui/error.dart';
 
 class LyricsScreen extends StatefulWidget {
-  final Lyrics? lyrics;
-  final String trackId;
+  final Lyrics? parentLyrics;
+  final Track track;
 
-  const LyricsScreen({this.lyrics, required this.trackId, super.key});
+  const LyricsScreen({this.parentLyrics, required this.track, super.key});
 
   @override
   _LyricsScreenState createState() => _LyricsScreenState();
@@ -49,19 +49,18 @@ class _LyricsScreenState extends State<LyricsScreen> {
 
     //Track change = exit lyrics
     _mediaItemSub = GetIt.I<AudioPlayerHandler>().mediaItem.listen((event) {
-      if (event?.id != widget.trackId) Navigator.of(context).pop();
+      if (event?.id != widget.track.id) Navigator.of(context).pop();
     });
   }
 
   Future _load() async {
-    if (widget.lyrics?.isLoaded() == true) {
-      _updateLyricsState(widget.lyrics!);
-      return;
-    }
-
     try {
-      Lyrics l = await deezerAPI.lyrics(widget.trackId);
-      _updateLyricsState(l);
+      if (widget.parentLyrics?.id == null) {
+        Lyrics l = await deezerAPI.lyrics(widget.track);
+        _updateLyricsState(l);
+      } else {
+        _updateLyricsState(widget.parentLyrics!);
+      }
     } catch (e) {
       _timer?.cancel();
       setState(() {
@@ -71,24 +70,24 @@ class _LyricsScreenState extends State<LyricsScreen> {
     }
   }
 
-  void _updateLyricsState(Lyrics lyrics) {
+  void _updateLyricsState(Lyrics l) {
     String screenTitle = 'Lyrics'.i18n;
 
-    if (lyrics.isSynced()) {
+    if (l.isSynced()) {
       _startSyncTimer();
-    } else if ((lyrics.isUnsynced())) {
+    } else if ((l.isUnsynced())) {
       screenTitle = 'Unsynchronized lyrics'.i18n;
       _timer?.cancel();
     }
 
-    if (lyrics.errorMessage != null) {
+    if (l.errorMessage != null) {
       Logger.root.warning(
-          'Error loading lyrics for track id ${widget.trackId}: ${lyrics.errorMessage}');
+          'Error loading lyrics for track id ${widget.track.id}: ${l.errorMessage}');
     }
 
     setState(() {
       appBarTitle = screenTitle;
-      this.lyrics = lyrics;
+      lyrics = l;
       _loading = false;
       _error = false;
     });
@@ -103,15 +102,17 @@ class _LyricsScreenState extends State<LyricsScreen> {
         progress = [
           progress[1],
           min(
-              GetIt.I<AudioPlayerHandler>()
-                      .playbackState
-                      .value
-                      .position
-                      .inSeconds /
-                  (lyrics?.syncedLyrics?.first.offset?.inSeconds ?? 1),
+              (lyrics?.syncedLyrics?.first.offset?.inSeconds ?? 0) == 0
+                  ? 0
+                  : GetIt.I<AudioPlayerHandler>()
+                          .playbackState
+                          .value
+                          .position
+                          .inSeconds /
+                      (lyrics?.syncedLyrics?.first.offset?.inSeconds ?? 1),
               1)
         ];
-        if (progress == [1, 1]) timer.cancel();
+        if (progress == [1, 1] || progress[0] > progress[1]) timer.cancel();
       });
 
       //Update current lyric index
@@ -199,50 +200,52 @@ class _LyricsScreenState extends State<LyricsScreen> {
                     children: [CircularProgressIndicator()],
                   ),
                 ),
-
-              SizedBox(
-                height: MediaQuery.of(context).size.height / 2 - height / 2,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Stack(
-                    children: [
-                      SizedBox(
-                        width: 84,
-                        height: 84,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Icon(DeezerIcons.microphone),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 84,
-                        height: 84,
-                        child: TweenAnimationBuilder<double>(
-                          tween: Tween(begin: progress[0], end: progress[1]),
-                          duration: Duration(milliseconds: 350),
-                          builder: (context, value, _) =>
-                              CircularProgressIndicator(
-                            value: value,
-                            strokeWidth: 1,
-                            color:
-                                Theme.of(context).textTheme.bodyMedium?.color,
+              if (lyrics?.isSynced() ?? false)
+                SizedBox(
+                  height: MediaQuery.of(context).size.height / 2 - height / 2,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Stack(
+                      children: [
+                        SizedBox(
+                          width: 84,
+                          height: 84,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Icon(AlchemyIcons.microphone),
                           ),
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          width: 84,
+                          height: 84,
+                          child: TweenAnimationBuilder<double>(
+                            tween: Tween(begin: progress[0], end: progress[1]),
+                            duration: Duration(milliseconds: 350),
+                            builder: (context, value, _) =>
+                                CircularProgressIndicator(
+                              value: value,
+                              strokeWidth: 1,
+                              color:
+                                  Theme.of(context).textTheme.bodyMedium?.color,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
               // Synced Lyrics
               if (lyrics != null && lyrics!.syncedLyrics?.isNotEmpty == true)
                 ...List.generate(lyrics!.syncedLyrics!.length, (i) {
                   return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Container(
+                          padding: EdgeInsets.all(4.0),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
-                            color: (_currentIndex == i)
-                                ? Colors.grey.withOpacity(0.25)
+                            color: (_currentIndex == i &&
+                                    lyrics!.syncedLyrics![i].text != '')
+                                ? Colors.grey.withAlpha(75)
                                 : Colors.transparent,
                           ),
                           height: height,
@@ -290,7 +293,9 @@ class _LyricsScreenState extends State<LyricsScreen> {
                   ),
                 ),
               Container(
-                height: MediaQuery.of(context).size.height / 2 - height / 2,
+                height: lyrics?.isSynced() ?? false
+                    ? MediaQuery.of(context).size.height / 2 - height / 2
+                    : 8,
               ),
             ],
           ),
@@ -320,7 +325,7 @@ class _LyricsScreenState extends State<LyricsScreen> {
                                   ? Navigator.of(context).pop()
                                   : null;
                             },
-                            icon: Icon(DeezerIcons.cross)),
+                            icon: Icon(AlchemyIcons.cross)),
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -354,11 +359,24 @@ class _LyricsScreenState extends State<LyricsScreen> {
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 6.0),
                         child: IconButton(
-                            onPressed: () {},
-                            icon: Icon(
-                              DeezerIcons.heart,
-                              color: Colors.white.withOpacity(0),
-                            )),
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return StatefulBuilder(
+                                        builder: (context, setState) {
+                                      return AlertDialog(
+                                        title: Text('About these lyrics'.i18n),
+                                        content: Text(
+                                          'These lyrics are provided by ${lyrics?.provider == LyricsProvider.DEEZER ? 'Deezzer' : lyrics?.provider == LyricsProvider.LRCLIB ? 'LRCLib' : lyrics?.provider == LyricsProvider.LYRICFIND ? 'LyricFind' : ''}.\n You can change your prefered lyric provider in your settings.'
+                                              .i18n,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      );
+                                    });
+                                  });
+                            },
+                            icon: Icon(AlchemyIcons.information)),
                       ),
                     ]),
               ),

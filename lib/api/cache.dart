@@ -15,6 +15,27 @@ late Cache cache;
 //Cache for miscellaneous things
 @JsonSerializable()
 class Cache {
+  @JsonKey(defaultValue: '')
+  String favoritesPlaylistId = '';
+
+  @JsonKey(defaultValue: [])
+  List<Track> favoriteTracks = [];
+
+  @JsonKey(defaultValue: [])
+  List<Playlist> favoritePlaylists = [];
+
+  @JsonKey(defaultValue: '')
+  String userName = '';
+
+  @JsonKey(defaultValue: '')
+  String userEmail = '';
+
+  @JsonKey(defaultValue: {})
+  Map<String, dynamic> userPicture = ImageDetails().toJson();
+
+  @JsonKey(defaultValue: null)
+  int? userColor;
+
   //ID's of tracks that are in library
   List<String>? libraryTracks = [];
 

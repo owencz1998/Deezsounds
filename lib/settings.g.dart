@@ -12,7 +12,6 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
     )
       ..language = json['language'] as String?
       ..ignoreInterruptions = json['ignoreInterruptions'] as bool? ?? false
-      ..enableEqualizer = json['enableEqualizer'] as bool? ?? false
       ..wifiQuality =
           $enumDecodeNullable(_$AudioQualityEnumMap, json['wifiQuality']) ??
               AudioQuality.MP3_320
@@ -63,7 +62,7 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
                 'art'
               ]
       ..theme =
-          $enumDecodeNullable(_$ThemesEnumMap, json['theme']) ?? Themes.Deezer
+          $enumDecodeNullable(_$ThemesEnumMap, json['theme']) ?? Themes.Alchemy
       ..useSystemTheme = json['useSystemTheme'] as bool? ?? false
       ..colorGradientBackground =
           json['colorGradientBackground'] as bool? ?? true
@@ -78,6 +77,15 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
       ..deezerCountry = json['deezerCountry'] as String? ?? 'US'
       ..logListen = json['logListen'] as bool? ?? false
       ..proxyAddress = json['proxyAddress'] as String?
+      ..blindTestType =
+          $enumDecodeNullable(_$BlindTestTypeEnumMap, json['blindTestType']) ??
+              BlindTestType.DEEZER
+      ..lyricsProviders = (json['lyricsProviders'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          ['DEEZER', 'LRCLIB', 'LYRICFIND']
+      ..advancedLRCLib = json['advancedLRCLib'] as bool? ?? false
+      ..lyricfindKey = json['lyricfindKey'] as String? ?? ''
       ..lastFMUsername = json['lastFMUsername'] as String?
       ..lastFMPassword = json['lastFMPassword'] as String?
       ..spotifyClientId = json['spotifyClientId'] as String?
@@ -90,7 +98,6 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
 Map<String, dynamic> _$SettingsToJson(Settings instance) => <String, dynamic>{
       'language': instance.language,
       'ignoreInterruptions': instance.ignoreInterruptions,
-      'enableEqualizer': instance.enableEqualizer,
       'arl': instance.arl,
       'wifiQuality': _$AudioQualityEnumMap[instance.wifiQuality]!,
       'mobileQuality': _$AudioQualityEnumMap[instance.mobileQuality]!,
@@ -125,6 +132,10 @@ Map<String, dynamic> _$SettingsToJson(Settings instance) => <String, dynamic>{
       'deezerCountry': instance.deezerCountry,
       'logListen': instance.logListen,
       'proxyAddress': instance.proxyAddress,
+      'blindTestType': _$BlindTestTypeEnumMap[instance.blindTestType]!,
+      'lyricsProviders': instance.lyricsProviders,
+      'advancedLRCLib': instance.advancedLRCLib,
+      'lyricfindKey': instance.lyricfindKey,
       'lastFMUsername': instance.lastFMUsername,
       'lastFMPassword': instance.lastFMPassword,
       'spotifyClientId': instance.spotifyClientId,
@@ -140,10 +151,16 @@ const _$AudioQualityEnumMap = {
 };
 
 const _$ThemesEnumMap = {
-  Themes.Light: 'Light',
-  Themes.Dark: 'Dark',
+  Themes.Alchemy: 'Alchemy',
   Themes.Deezer: 'Deezer',
+  Themes.Spotify: 'Spotify',
+  Themes.Light: 'Light',
   Themes.Black: 'Black',
+};
+
+const _$BlindTestTypeEnumMap = {
+  BlindTestType.ALCHEMY: 'ALCHEMY',
+  BlindTestType.DEEZER: 'DEEZER',
 };
 
 SpotifyCredentialsSave _$SpotifyCredentialsSaveFromJson(

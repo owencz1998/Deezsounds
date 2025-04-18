@@ -31,7 +31,7 @@ public class DownloadsDatabase extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE Downloads (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT, " +
                 "private INTEGER, quality INTEGER, state INTEGER, trackId TEXT, md5origin TEXT, " +
-                "mediaVersion TEXT, title TEXT, image TEXT, trackToken TEXT, streamTrackId TEXT);");
+                "mediaVersion TEXT, title TEXT, image TEXT, trackToken TEXT, streamTrackId TEXT, isEpisode INTEGER, url TEXT);");
     }
 
 

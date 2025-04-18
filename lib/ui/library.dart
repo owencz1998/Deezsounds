@@ -6,269 +6,22 @@ import 'package:fluttericon/octicons_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logging/logging.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
-import 'package:deezer/main.dart';
-import 'package:deezer/utils/connectivity.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/main.dart';
+import 'package:alchemy/utils/connectivity.dart';
 
 import '../api/cache.dart';
 import '../api/deezer.dart';
 import '../api/definitions.dart';
 import '../api/download.dart';
-import '../api/importer.dart';
 import '../service/audio_service.dart';
 import '../settings.dart';
 import '../translations.i18n.dart';
 import '../ui/details_screens.dart';
-import '../ui/downloads_screen.dart';
 import '../ui/elements.dart';
 import '../ui/error.dart';
-import '../ui/importer_screen.dart';
 import '../ui/tiles.dart';
 import 'menu.dart';
-import 'settings_screen.dart';
-
-class LibraryAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const LibraryAppBar({super.key});
-
-  @override
-  Size get preferredSize => AppBar().preferredSize;
-
-  @override
-  Widget build(BuildContext context) {
-    return FreezerAppBar(
-      'Explore'.i18n,
-      actions: <Widget>[
-        IconButton(
-          icon: Icon(
-            DeezerIcons.download,
-            semanticLabel: 'Download'.i18n,
-          ),
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const DownloadsScreen()));
-          },
-        ),
-        IconButton(
-          icon: Icon(
-            DeezerIcons.settings,
-            semanticLabel: 'Settings'.i18n,
-          ),
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const SettingsScreen()));
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class LibraryScreen extends StatelessWidget {
-  const LibraryScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const LibraryAppBar(),
-      body: ListView(
-        children: <Widget>[
-          Container(
-            height: 4.0,
-          ),
-          if (!downloadManager.running && downloadManager.queueSize > 0)
-            ListTile(
-              title: Text('Downloads'.i18n),
-              leading:
-                  const LeadingIcon(DeezerIcons.download, color: Colors.grey),
-              subtitle: Text(
-                  'Downloading is currently stopped, click here to resume.'
-                      .i18n),
-              onTap: () {
-                downloadManager.start();
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const DownloadsScreen()));
-              },
-            ),
-          ListTile(
-            title: Text('Shuffle'.i18n),
-            leading: const LeadingIcon(DeezerIcons.shuffle,
-                color: Color(0xffeca704)),
-            onTap: () async {
-              List<Track> tracks = (await isConnected())
-                  ? await deezerAPI.libraryShuffle()
-                  : await downloadManager.allOfflineTracks();
-              GetIt.I<AudioPlayerHandler>().playFromTrackList(
-                  tracks,
-                  tracks[0].id!,
-                  QueueSource(
-                      id: 'libraryshuffle',
-                      source: 'libraryshuffle',
-                      text: 'Library shuffle'.i18n));
-            },
-          ),
-          const FreezerDivider(),
-          ListTile(
-            title: Text('Tracks'.i18n),
-            leading:
-                const LeadingIcon(Icons.audiotrack, color: Color(0xffbe3266)),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const LibraryTracks()));
-            },
-          ),
-          ListTile(
-            title: Text('Albums'.i18n),
-            leading:
-                const LeadingIcon(DeezerIcons.album, color: Color(0xff4b2e7e)),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const LibraryAlbums()));
-            },
-          ),
-          ListTile(
-            title: Text('Artists'.i18n),
-            leading: const LeadingIcon(Icons.recent_actors,
-                color: Color(0xff384697)),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const LibraryArtists()));
-            },
-          ),
-          ListTile(
-            title: Text('Playlists'.i18n),
-            leading: const LeadingIcon(Icons.playlist_play,
-                color: Color(0xff0880b5)),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const LibraryPlaylists()));
-            },
-          ),
-          const FreezerDivider(),
-          ListTile(
-            title: Text('History'.i18n),
-            leading: const LeadingIcon(Icons.history, color: Color(0xff009a85)),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const HistoryScreen()));
-            },
-          ),
-          const FreezerDivider(),
-          ListTile(
-            title: Text('Import'.i18n),
-            leading: const LeadingIcon(Icons.import_export,
-                color: Color(0xff2ba766)),
-            subtitle: Text('Import playlists from Spotify'.i18n),
-            onTap: () {
-              //Show progress
-              if (importer.done || importer.busy) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const ImporterStatusScreen()));
-                return;
-              }
-
-              //Pick importer dialog
-              showDialog(
-                  context: context,
-                  builder: (context) => SimpleDialog(
-                        title: Text('Importer'.i18n),
-                        children: [
-                          ListTile(
-                            leading: const Icon(FontAwesome5.spotify),
-                            title: Text('Spotify v1'.i18n),
-                            subtitle: Text(
-                                'Import Spotify playlists up to 100 tracks without any login.'
-                                    .i18n),
-                            enabled:
-                                false, // Spotify reworked embedded playlist. Source format is changed and data no longer contains ISRC.
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SpotifyImporterV1()));
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(FontAwesome5.spotify),
-                            title: Text('Spotify v2'.i18n),
-                            subtitle: Text(
-                                'Import any Spotify playlist, import from own Spotify library. Requires free account.'
-                                    .i18n),
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SpotifyImporterV2()));
-                            },
-                          )
-                        ],
-                      ));
-            },
-          ),
-          ExpansionTile(
-            title: Text('Statistics'.i18n),
-            leading: const LeadingIcon(Icons.insert_chart, color: Colors.grey),
-            children: <Widget>[
-              FutureBuilder(
-                future: downloadManager.getStats(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) return const ErrorScreen();
-                  if (!snapshot.hasData) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 4.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[CircularProgressIndicator()],
-                      ),
-                    );
-                  }
-                  List<String> data = snapshot.data!;
-                  return Column(
-                    children: <Widget>[
-                      ListTile(
-                        title: Text('Offline tracks'.i18n),
-                        leading: const Icon(Icons.audiotrack),
-                        trailing: Text(data[0]),
-                      ),
-                      ListTile(
-                        title: Text('Offline albums'.i18n),
-                        leading: const Icon(DeezerIcons.album),
-                        trailing: Text(data[1]),
-                      ),
-                      ListTile(
-                        title: Text('Offline playlists'.i18n),
-                        leading: const Icon(Icons.playlist_add),
-                        trailing: Text(data[2]),
-                      ),
-                      ListTile(
-                        title: Text('Offline size'.i18n),
-                        leading: const Icon(Icons.sd_card),
-                        trailing: Text(data[3]),
-                      ),
-                      ListTile(
-                        title: Text('Free space'.i18n),
-                        leading: const Icon(Icons.disc_full),
-                        trailing: Text(data[4]),
-                      ),
-                    ],
-                  );
-                },
-              )
-            ],
-          ),
-          ListenableBuilder(
-              listenable: playerBarState,
-              builder: (BuildContext context, Widget? child) {
-                return AnimatedPadding(
-                  duration: Duration(milliseconds: 200),
-                  padding:
-                      EdgeInsets.only(bottom: playerBarState.state ? 80 : 0),
-                );
-              }),
-        ],
-      ),
-    );
-  }
-}
 
 class LibraryTracks extends StatefulWidget {
   const LibraryTracks({super.key});
@@ -344,8 +97,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
         //Load tracks as a playlist
         Playlist? favPlaylist;
         try {
-          favPlaylist =
-              await deezerAPI.playlist(deezerAPI.favoritesPlaylistId ?? '');
+          favPlaylist = await deezerAPI.playlist(cache.favoritesPlaylistId);
         } catch (e) {
           if (kDebugMode) {
             print(e);
@@ -374,8 +126,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
 
       List<Track>? t;
       try {
-        t = await deezerAPI.playlistTracksPage(
-            deezerAPI.favoritesPlaylistId ?? '', pos);
+        t = await deezerAPI.playlistTracksPage(cache.favoritesPlaylistId, pos);
       } catch (e) {
         if (kDebugMode) {
           print(e);
@@ -418,7 +169,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
     if (tracks.isEmpty || tracks.length < (trackCount ?? 0)) {
       late Playlist p;
       try {
-        p = await deezerAPI.fullPlaylist(deezerAPI.favoritesPlaylistId ?? '');
+        p = await deezerAPI.fullPlaylist(cache.favoritesPlaylistId);
       } catch (e) {
         if (kDebugMode) {
           print(e);
@@ -487,7 +238,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
                       MenuSheet().showDownloadStartedToast();
                     },
                     child: Icon(
-                      DeezerIcons.download,
+                      AlchemyIcons.download,
                       size: 25,
                     )),
               );
@@ -538,7 +289,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
                 ),
               ],
               child: Icon(
-                DeezerIcons.sort,
+                AlchemyIcons.sort,
                 size: 32.0,
                 semanticLabel: 'Sort'.i18n,
               ),
@@ -570,7 +321,7 @@ class _LibraryTracksState extends State<LibraryTracks> {
                                   : tracks,
                               t.id!,
                               QueueSource(
-                                  id: deezerAPI.favoritesPlaylistId,
+                                  id: cache.favoritesPlaylistId,
                                   text: 'Favorites'.i18n,
                                   source: 'playlist'));
                         },
@@ -676,7 +427,7 @@ class _LibraryAlbumsState extends State<LibraryAlbums> {
             ),
             PopupMenuButton(
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: const Icon(DeezerIcons.sort, size: 32.0),
+              child: const Icon(AlchemyIcons.sort, size: 32.0),
               onSelected: (SortType s) async {
                 setState(() => _sort.type = s);
                 //Save to cache
@@ -874,6 +625,80 @@ class _AlbumListState extends State<AlbumList> {
   }
 }
 
+class LibraryShows extends StatefulWidget {
+  const LibraryShows({super.key});
+
+  @override
+  _LibraryShowsState createState() => _LibraryShowsState();
+}
+
+class _LibraryShowsState extends State<LibraryShows> {
+  final ScrollController _scrollController = ScrollController();
+  List<Show> libraryShows = [];
+
+  void _loadShows() async {
+    //List<Show> offlineShows = await downloadManager.getOfflineShows();
+    if (await isConnected()) {
+      List<Show> onlineShows = await deezerAPI.getUserShows();
+      if (mounted) {
+        setState(() {
+          libraryShows.addAll(onlineShows);
+        });
+      }
+    } else {
+      List<Show> offlineShows = await downloadManager.getOfflineShows();
+      if (mounted) {
+        setState(() {
+          libraryShows.addAll(offlineShows);
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadShows();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: FreezerAppBar(
+          'Podcasts'.i18n,
+        ),
+        body: DraggableScrollbar.rrect(
+          controller: _scrollController,
+          backgroundColor: Theme.of(context).primaryColor,
+          child: ListView(
+            controller: _scrollController,
+            children: <Widget>[
+              Container(height: 8.0),
+              ...List.generate(
+                  libraryShows.length,
+                  (int i) => ShowTile(
+                        libraryShows[i],
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  ShowScreen(libraryShows[i])));
+                        },
+                      )),
+              ListenableBuilder(
+                  listenable: playerBarState,
+                  builder: (BuildContext context, Widget? child) {
+                    return AnimatedPadding(
+                      duration: Duration(milliseconds: 200),
+                      padding: EdgeInsets.only(
+                          bottom: playerBarState.state ? 80 : 0),
+                    );
+                  }),
+            ],
+          ),
+        ));
+  }
+}
+
 class LibraryArtists extends StatefulWidget {
   const LibraryArtists({super.key});
 
@@ -1004,7 +829,7 @@ class _LibraryArtistsState extends State<LibraryArtists> {
                   child: Text('Popularity'.i18n, style: popupMenuTextStyle()),
                 ),
               ],
-              child: const Icon(DeezerIcons.sort, size: 32.0),
+              child: const Icon(AlchemyIcons.sort, size: 32.0),
             ),
             Container(width: 8.0),
           ],
@@ -1078,9 +903,9 @@ class _LibraryPlaylistsState extends State<LibraryPlaylists> {
       case SortType.DEFAULT:
         break;
       case SortType.USER:
-        playlists.sort((a, b) => (a.user?.name ?? deezerAPI.userName!)
+        playlists.sort((a, b) => (a.user?.id ?? deezerAPI.userId!)
             .toLowerCase()
-            .compareTo((b.user?.name ?? deezerAPI.userName!).toLowerCase()));
+            .compareTo((b.user?.id ?? deezerAPI.userId!).toLowerCase()));
         break;
       case SortType.TRACK_COUNT:
         playlists.sort((a, b) => b.trackCount! - a.trackCount!);
@@ -1136,9 +961,9 @@ class _LibraryPlaylistsState extends State<LibraryPlaylists> {
   }
 
   Playlist get favoritesPlaylist => Playlist(
-      id: deezerAPI.favoritesPlaylistId,
+      id: cache.favoritesPlaylistId,
       title: 'Favorites'.i18n,
-      user: User(name: deezerAPI.userName),
+      user: User(name: cache.userName),
       image: ImageDetails(thumbUrl: 'assets/favorites_thumb.jpg'),
       tracks: [],
       trackCount: 1,
@@ -1193,7 +1018,7 @@ class _LibraryPlaylistsState extends State<LibraryPlaylists> {
                   child: Text('Alphabetic'.i18n, style: popupMenuTextStyle()),
                 ),
               ],
-              child: const Icon(DeezerIcons.sort, size: 32.0),
+              child: const Icon(AlchemyIcons.sort, size: 32.0),
             ),
             Container(width: 8.0),
           ],
@@ -1244,21 +1069,6 @@ class _LibraryPlaylistsState extends State<LibraryPlaylists> {
                     CircularProgressIndicator(),
                   ],
                 ),
-
-              //Favorites playlist
-              PlaylistTile(
-                favoritesPlaylist,
-                onTap: () async {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          PlaylistDetails(favoritesPlaylist)));
-                },
-                onHold: () {
-                  MenuSheet m = MenuSheet();
-                  favoritesPlaylist.library = true;
-                  m.defaultPlaylistMenu(favoritesPlaylist, context: context);
-                },
-              ),
 
               if (_playlists != null)
                 ...List.generate(_sorted.length, (int i) {

@@ -1,13 +1,18 @@
+import 'package:alchemy/ui/catcher_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:alchemy/settings.dart';
+import 'package:alchemy/ui/cached_image.dart';
+import 'package:alchemy/ui/settings_screen.dart';
+import 'package:alchemy/utils/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:fluttericon/typicons_icons.dart';
 import 'package:get_it/get_it.dart';
-import 'package:deezer/fonts/deezer_icons.dart';
-import 'package:deezer/main.dart';
-import 'package:deezer/settings.dart';
+import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/main.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 
 import '../api/cache.dart';
 import '../api/deezer.dart';
@@ -22,8 +27,6 @@ import '../ui/menu.dart';
 import '../utils/navigator_keys.dart';
 import './error.dart';
 import './tiles.dart';
-import 'downloads_screen.dart';
-import 'settings_screen.dart';
 
 openScreenByURL(String url) async {
   DeezerLinkResponse? res = await deezerAPI.parseLink(url);
@@ -50,6 +53,8 @@ openScreenByURL(String url) async {
       mainNavigatorKey.currentState
           ?.push(MaterialPageRoute(builder: (context) => PlaylistDetails(p)));
       break;
+    case DeezerLinkType.GAME:
+      return;
   }
 }
 
@@ -62,14 +67,15 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   String? _query;
-  bool _offline = false;
-  bool _loading = false;
+  bool _online = true;
+  //bool _loading = false;
   final TextEditingController _controller = TextEditingController();
   final FocusNode _keyboardListenerFocusNode = FocusNode();
   final FocusNode _textFieldFocusNode = FocusNode();
   List _suggestions = [];
   bool _cancel = false;
   bool _showCards = true;
+  bool _hasFocus = false;
 
   void _submit(BuildContext context, {String? query}) async {
     if (query != null) {
@@ -78,7 +84,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     //URL
     if (_query != null && _query!.startsWith('http')) {
-      setState(() => _loading = true);
+      //setState(() => _loading = true);
       try {
         await openScreenByURL(_query!);
       } catch (e) {
@@ -86,15 +92,30 @@ class _SearchScreenState extends State<SearchScreen> {
           print(e);
         }
       }
-      setState(() => _loading = false);
+      //setState(() => _loading = false);
       return;
     }
 
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => SearchResultsScreen(
               _query ?? '',
-              offline: _offline,
+              offline: !_online,
             )));
+  }
+
+  void _load() async {
+    if (mounted) {
+      //setState(() {_loading = true;});
+    }
+
+    bool netStatus = await isConnected();
+
+    if (mounted) {
+      setState(() {
+        _online = netStatus;
+        //_loading = false;
+      });
+    }
   }
 
   @override
@@ -104,10 +125,12 @@ class _SearchScreenState extends State<SearchScreen> {
     Connectivity().checkConnectivity().then((res) {
       if (res.isEmpty || res.contains(ConnectivityResult.none)) {
         setState(() {
-          _offline = true;
+          _online = true;
         });
       }
     });
+
+    _load();
 
     super.initState();
   }
@@ -159,44 +182,62 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: FreezerAppBar(
-        'Search'.i18n,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              DeezerIcons.download,
-              semanticLabel: 'Download'.i18n,
-            ),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const DownloadsScreen()));
-            },
-          ),
-          IconButton(
-            icon: Icon(
-              DeezerIcons.settings,
-              semanticLabel: 'Settings'.i18n,
-            ),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const SettingsScreen()));
-            },
-          ),
-        ],
-      ),
-      body: FocusScope(
-        child: ListView(
-          children: <Widget>[
-            Container(height: 4.0),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                      child: Stack(
-                    alignment: const Alignment(1.0, 0.0),
-                    children: [
-                      KeyboardListener(
+      body: SafeArea(
+        child: FocusScope(
+          child: ListView(
+            padding: const EdgeInsets.only(top: 12.0),
+            children: <Widget>[
+              ListTile(
+                contentPadding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.05),
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(60),
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    alignment: Alignment.centerLeft,
+                    child: SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: CachedImage(
+                        url: ImageDetails.fromJson(cache.userPicture).fullUrl ??
+                            '',
+                        circular: true,
+                      ),
+                    ),
+                  ),
+                ),
+                title: const Center(
+                  child: Text(
+                    'Discover',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                trailing: SizedBox(
+                  height: 60,
+                  width: 60,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      splashRadius: 20,
+                      alignment: Alignment.center,
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => SettingsScreen()));
+                      },
+                      icon: const Icon(AlchemyIcons.settings),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(
+                  MediaQuery.of(context).size.width * 0.05,
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: KeyboardListener(
                         focusNode: _keyboardListenerFocusNode,
                         onKeyEvent: (event) {
                           // For Android TV: quit search textfield
@@ -207,263 +248,377 @@ class _SearchScreenState extends State<SearchScreen> {
                             }
                           }
                         },
-                        child: TextField(
-                          onChanged: (String s) {
-                            setState(() {
-                              _showCards = false;
-                              _query = s;
-                            });
-                            _loadSuggestions();
-                          },
-                          onTap: () {
-                            setState(() => _showCards = false);
-                          },
-                          focusNode: _textFieldFocusNode,
-                          decoration: InputDecoration(
-                            labelText: 'Search or paste URL'.i18n,
-                            hintStyle: TextStyle(color: settings.primaryColor),
-                            fillColor:
-                                Theme.of(context).bottomAppBarTheme.color,
-                            filled: true,
-                            focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey)),
-                            enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey)),
+                        child: Container(
+                          clipBehavior: Clip.hardEdge,
+                          decoration: ShapeDecoration(
+                            shape: SmoothRectangleBorder(
+                              borderRadius: SmoothBorderRadius(
+                                cornerRadius: 20,
+                                cornerSmoothing: 0.4,
+                              ),
+                              side: _hasFocus
+                                  ? BorderSide(
+                                      color: settings.theme == Themes.Light
+                                          ? Colors.black.withAlpha(100)
+                                          : Colors.white.withAlpha(100),
+                                      width: 1.5)
+                                  : BorderSide.none,
+                            ),
                           ),
-                          controller: _controller,
-                          textInputAction: TextInputAction.search,
-                          onSubmitted: (String s) {
-                            _submit(context, query: s);
-                            _textFieldFocusNode.unfocus();
-                          },
+                          child: TextField(
+                            onChanged: (String s) {
+                              setState(() {
+                                _showCards = false;
+                                _query = s;
+                              });
+                              _loadSuggestions();
+                            },
+                            onTap: () {
+                              setState(() {
+                                _showCards = false;
+                                _hasFocus = true;
+                              });
+                            },
+                            focusNode: _textFieldFocusNode,
+                            decoration: InputDecoration(
+                              hintText: 'Search',
+                              hintStyle: TextStyle(
+                                  color: settings.theme == Themes.Light
+                                      ? Colors.black.withAlpha(100)
+                                      : Colors.white.withAlpha(100)),
+                              prefixIcon: Icon(
+                                AlchemyIcons
+                                    .search, // Replace with AlchemyIcons.search if available
+                                color: settings.theme == Themes.Light
+                                    ? Colors.black.withAlpha(100)
+                                    : Colors.white.withAlpha(100),
+                                size: 20,
+                              ),
+                              suffixIcon: IconButton(
+                                // Added suffixIcon
+                                icon: Icon(Icons.clear,
+                                    color: _hasFocus
+                                        ? settings.theme == Themes.Light
+                                            ? Colors.black
+                                            : Colors.white
+                                        : settings.theme == Themes.Light
+                                            ? Colors.black.withAlpha(100)
+                                            : Colors.white.withAlpha(100),
+                                    size: 16),
+                                splashRadius:
+                                    20, // Adjust splash radius as needed
+                                onPressed: () {
+                                  _controller.clear(); // Clear text field
+                                  _textFieldFocusNode
+                                      .unfocus(); // Release focus
+                                  setState(() {
+                                    _showCards = true;
+                                    _hasFocus = false;
+                                    _query = '';
+                                  });
+                                },
+                              ),
+                              fillColor: settings.theme == Themes.Light
+                                  ? Colors.black.withAlpha(30)
+                                  : Colors.white.withAlpha(30),
+                              filled: true,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 18.0,
+                                  horizontal: 20.0), // Added contentPadding
+                            ),
+                            controller: _controller,
+                            textInputAction: TextInputAction.search,
+                            onSubmitted: (String s) {
+                              _submit(context, query: s);
+                              _textFieldFocusNode.unfocus();
+                            },
+                            style: TextStyle(
+                                color: settings.theme == Themes.Light
+                                    ? Colors.black
+                                    : Colors.white),
+                            cursorColor: settings.theme == Themes.Light
+                                ? Colors.black
+                                : Colors.white,
+                          ),
                         ),
                       ),
-                      Focus(
-                          canRequestFocus:
-                              false, // Focus is moving to cross, and hangs out there,
-                          descendantsAreFocusable:
-                              false, // so we disable focusing on it at all
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                width: 40.0,
-                                child: IconButton(
-                                  splashRadius: 20.0,
-                                  icon: Icon(
-                                    Icons.clear,
-                                    semanticLabel: 'Clear'.i18n,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _suggestions = [];
-                                      _query = '';
-                                    });
-                                    _controller.clear();
-                                  },
-                                ),
-                              ),
-                            ],
-                          ))
-                    ],
-                  )),
-                ],
-              ),
-            ),
-            Container(height: 8.0),
-            ListTile(
-              title: Text('Offline search'.i18n),
-              leading: const Icon(Icons.offline_pin),
-              trailing: Switch(
-                value: _offline,
-                onChanged: (v) {
-                  setState(() => _offline = !_offline);
-                },
-              ),
-            ),
-            if (_loading) const LinearProgressIndicator(),
-            const FreezerDivider(),
-
-            //"Browse" Cards
-            if (_showCards) ...[
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                child: Text(
-                  'Quick access',
-                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  SearchBrowseCard(
-                    color: const Color(0xff11b192),
-                    text: 'Flow'.i18n,
-                    icon: const Icon(Typicons.waves),
-                    onTap: () async {
-                      // No channel for Flow...
-                      await GetIt.I<AudioPlayerHandler>()
-                          .playFromSmartTrackList(SmartTrackList(id: 'flow'));
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.05),
+                child: SizedBox(
+                  height: 84,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () {
+                      Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(
+                              builder: (context) => CatcherScreen()));
                     },
+                    child: Container(
+                      clipBehavior: Clip.hardEdge,
+                      decoration: ShapeDecoration(
+                          shape: SmoothRectangleBorder(
+                            borderRadius: SmoothBorderRadius(
+                              cornerRadius: 20,
+                              cornerSmoothing: 0.4,
+                            ),
+                            side: BorderSide(
+                                color: settings.primaryColor, width: 1.5),
+                          ),
+                          color: settings.primaryColor.withAlpha(100)),
+                      alignment: Alignment.centerLeft,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12.0),
+                        //visualDensity: VisualDensity.compact,
+                        leading: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              AlchemyIcons.wave,
+                              size: 32,
+                            ),
+                          ],
+                        ),
+                        title: Text(
+                          'What is playing ?',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 14),
+                        ),
+                        subtitle: Text(
+                          'Identify the music playing around you.',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ),
                   ),
-                  SearchBrowseCard(
-                    color: const Color(0xff7c42bb),
-                    text: 'Shows'.i18n,
-                    icon: const Icon(FontAwesome5.podcast),
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => Scaffold(
-                        appBar: FreezerAppBar('Shows'.i18n),
-                        body: SingleChildScrollView(
-                            child: HomePageScreen(
-                                channel: DeezerChannel(target: 'shows'))),
-                      ),
-                    )),
-                  )
-                ],
+                ),
               ),
-              Container(height: 4.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  SearchBrowseCard(
-                    color: const Color(0xffff555d),
-                    icon: const Icon(FontAwesome5.chart_line),
-                    text: 'Charts'.i18n,
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => Scaffold(
-                        appBar: FreezerAppBar('Charts'.i18n),
-                        body: SingleChildScrollView(
-                            child: HomePageScreen(
-                                channel:
-                                    DeezerChannel(target: 'channels/charts'))),
+              if (_showCards && !_online)
+                Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(
+                        AlchemyIcons.offline,
+                        size: 30,
+                        color: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.color
+                            ?.withAlpha(150),
                       ),
-                    )),
+                      Text(
+                        'Oops, we are offline'.i18n,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.color
+                                ?.withAlpha(150),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                  SearchBrowseCard(
-                    color: const Color(0xff2c4ea7),
-                    text: 'Browse'.i18n,
-                    icon: Image.asset('assets/browse_icon.png', width: 26.0),
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => Scaffold(
-                        appBar: FreezerAppBar('Browse'.i18n),
-                        body: SingleChildScrollView(
-                            child: HomePageScreen(
-                                channel:
-                                    DeezerChannel(target: 'channels/explore'))),
-                      ),
-                    )),
-                  )
-                ],
-              )
-            ],
+                ),
 
-            //History
-            if (!_showCards &&
-                (cache.searchHistory?.length ?? 0) > 0 &&
-                (_query ?? '').length < 2)
-              ...List.generate(
-                  cache.searchHistory!.length > 10
-                      ? 10
-                      : cache.searchHistory!.length, (int i) {
-                dynamic data = cache.searchHistory![i].data;
-                switch (cache.searchHistory![i].type) {
-                  case SearchHistoryItemType.TRACK:
-                    return TrackTile(
-                      data,
-                      onTap: () {
-                        List<Track> queue = cache.searchHistory!
-                            .where((h) => h.type == SearchHistoryItemType.TRACK)
-                            .map<Track>((t) => t.data)
-                            .toList();
-                        GetIt.I<AudioPlayerHandler>().playFromTrackList(
-                            queue,
-                            data.id,
-                            QueueSource(
-                                text: 'Search history'.i18n,
-                                source: 'searchhistory',
-                                id: 'searchhistory'));
+              //"Browse" Cards
+              if (_showCards && _online) ...[
+                const Padding(
+                  padding:
+                      EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  child: Text(
+                    'Quick access',
+                    style:
+                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SearchBrowseCard(
+                      color: const Color(0xff11b192),
+                      text: 'Flow'.i18n,
+                      icon: const Icon(Typicons.waves),
+                      onTap: () async {
+                        // No channel for Flow...
+                        await GetIt.I<AudioPlayerHandler>()
+                            .playFromSmartTrackList(SmartTrackList(id: 'flow'));
                       },
-                      onHold: () {
-                        MenuSheet m = MenuSheet();
-                        m.defaultTrackMenu(data, context: context);
-                      },
-                      trailing: _removeHistoryItemWidget(i),
-                    );
-                  case SearchHistoryItemType.ALBUM:
-                    return AlbumTile(
-                      data,
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => AlbumDetails(data)));
-                      },
-                      onHold: () {
-                        MenuSheet m = MenuSheet();
-                        m.defaultAlbumMenu(data, context: context);
-                      },
-                      trailing: _removeHistoryItemWidget(i),
-                    );
-                  case SearchHistoryItemType.ARTIST:
-                    return ArtistHorizontalTile(
-                      data,
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => ArtistDetails(data)));
-                      },
-                      onHold: () {
-                        MenuSheet m = MenuSheet();
-                        m.defaultArtistMenu(data, context: context);
-                      },
-                      trailing: _removeHistoryItemWidget(i),
-                    );
-                  case SearchHistoryItemType.PLAYLIST:
-                    return PlaylistTile(
-                      data,
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => PlaylistDetails(data)));
-                      },
-                      onHold: () {
-                        MenuSheet m = MenuSheet();
-                        m.defaultPlaylistMenu(data, context: context);
-                      },
-                      trailing: _removeHistoryItemWidget(i),
-                    );
-                }
-              }),
+                    ),
+                    SearchBrowseCard(
+                      color: const Color(0xff7c42bb),
+                      text: 'Shows'.i18n,
+                      icon: const Icon(FontAwesome5.podcast),
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => Scaffold(
+                          appBar: FreezerAppBar('Shows'.i18n),
+                          body: SingleChildScrollView(
+                              child: HomePageScreen(
+                                  channel: DeezerChannel(target: 'shows'))),
+                        ),
+                      )),
+                    )
+                  ],
+                ),
+                Container(height: 4.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SearchBrowseCard(
+                      color: const Color(0xffff555d),
+                      icon: const Icon(FontAwesome5.chart_line),
+                      text: 'Charts'.i18n,
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => Scaffold(
+                          appBar: FreezerAppBar('Charts'.i18n),
+                          body: SingleChildScrollView(
+                              child: HomePageScreen(
+                                  channel: DeezerChannel(
+                                      target: 'channels/charts'))),
+                        ),
+                      )),
+                    ),
+                    SearchBrowseCard(
+                      color: const Color(0xff2c4ea7),
+                      text: 'Browse'.i18n,
+                      icon: Image.asset('assets/browse_icon.png', width: 26.0),
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => Scaffold(
+                          appBar: FreezerAppBar('Browse'.i18n),
+                          body: SingleChildScrollView(
+                              child: HomePageScreen(
+                                  channel: DeezerChannel(
+                                      target: 'channels/explore'))),
+                        ),
+                      )),
+                    )
+                  ],
+                )
+              ],
 
-            //Clear history
-            if (cache.searchHistory != null && cache.searchHistory!.length > 2)
-              ListTile(
-                title: Text('Clear search history'.i18n),
-                leading: const Icon(Icons.clear_all),
-                onTap: () {
-                  cache.searchHistory = [];
-                  cache.save();
-                  setState(() {});
-                },
-              ),
-
-            //Suggestions
-            ...List.generate(
-                _suggestions.length,
-                (i) => ListTile(
-                      title: Text(_suggestions[i]),
-                      leading: const Icon(DeezerIcons.search),
-                      onTap: () {
-                        setState(() => _query = _suggestions[i]);
-                        _submit(context);
-                      },
-                    )),
-            ListenableBuilder(
-                listenable: playerBarState,
-                builder: (BuildContext context, Widget? child) {
-                  return AnimatedPadding(
-                    duration: Duration(milliseconds: 200),
-                    padding:
-                        EdgeInsets.only(bottom: playerBarState.state ? 80 : 0),
-                  );
+              //History
+              if (!_showCards &&
+                  (cache.searchHistory?.length ?? 0) > 0 &&
+                  (_query ?? '').length < 2)
+                ...List.generate(
+                    cache.searchHistory!.length > 10
+                        ? 10
+                        : cache.searchHistory!.length, (int i) {
+                  dynamic data = cache.searchHistory![i].data;
+                  switch (cache.searchHistory![i].type) {
+                    case SearchHistoryItemType.TRACK:
+                      return TrackTile(
+                        data,
+                        onTap: () {
+                          List<Track> queue = cache.searchHistory!
+                              .where(
+                                  (h) => h.type == SearchHistoryItemType.TRACK)
+                              .map<Track>((t) => t.data)
+                              .toList();
+                          GetIt.I<AudioPlayerHandler>().playFromTrackList(
+                              queue,
+                              data.id,
+                              QueueSource(
+                                  text: 'Search history'.i18n,
+                                  source: 'searchhistory',
+                                  id: 'searchhistory'));
+                        },
+                        onHold: () {
+                          MenuSheet m = MenuSheet();
+                          m.defaultTrackMenu(data, context: context);
+                        },
+                        trailing: _removeHistoryItemWidget(i),
+                      );
+                    case SearchHistoryItemType.ALBUM:
+                      return AlbumTile(
+                        data,
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => AlbumDetails(data)));
+                        },
+                        onHold: () {
+                          MenuSheet m = MenuSheet();
+                          m.defaultAlbumMenu(data, context: context);
+                        },
+                        trailing: _removeHistoryItemWidget(i),
+                      );
+                    case SearchHistoryItemType.ARTIST:
+                      return ArtistHorizontalTile(
+                        data,
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ArtistDetails(data)));
+                        },
+                        onHold: () {
+                          MenuSheet m = MenuSheet();
+                          m.defaultArtistMenu(data, context: context);
+                        },
+                        trailing: _removeHistoryItemWidget(i),
+                      );
+                    case SearchHistoryItemType.PLAYLIST:
+                      return PlaylistTile(
+                        data,
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => PlaylistDetails(data)));
+                        },
+                        onHold: () {
+                          MenuSheet m = MenuSheet();
+                          m.defaultPlaylistMenu(data, context: context);
+                        },
+                        trailing: _removeHistoryItemWidget(i),
+                      );
+                  }
                 }),
-          ],
+
+              //Clear history
+              if (cache.searchHistory != null &&
+                  cache.searchHistory!.length > 2)
+                ListTile(
+                  title: Text('Clear search history'.i18n),
+                  leading: const Icon(Icons.clear_all),
+                  onTap: () {
+                    cache.searchHistory = [];
+                    cache.save();
+                    setState(() {});
+                  },
+                ),
+
+              //Suggestions
+              if (!_showCards)
+                ...List.generate(
+                    _suggestions.length,
+                    (i) => ListTile(
+                          title: Text(_suggestions[i]),
+                          leading: const Icon(AlchemyIcons.search),
+                          onTap: () {
+                            setState(() => _query = _suggestions[i]);
+                            _submit(context);
+                          },
+                        )),
+              ListenableBuilder(
+                  listenable: playerBarState,
+                  builder: (BuildContext context, Widget? child) {
+                    return AnimatedPadding(
+                      duration: Duration(milliseconds: 200),
+                      padding: EdgeInsets.only(
+                          bottom: playerBarState.state ? 80 : 0),
+                    );
+                  }),
+            ],
+          ),
         ),
       ),
     );
@@ -526,7 +681,8 @@ class SearchResultsScreen extends StatelessWidget {
     if (offline ?? false) {
       return await downloadManager.search(query);
     }
-    return await deezerAPI.search(query);
+    SearchResults sr = await deezerAPI.search(query);
+    return sr;
   }
 
   @override
@@ -825,11 +981,14 @@ class SearchResultsScreen extends StatelessWidget {
                     ),
                     onTap: () async {
                       //Load entire show, then play
-                      List<ShowEpisode> episodes =
-                          await deezerAPI.allShowEpisodes(e.show!.id ?? '');
+                      Show show = await deezerAPI.show(e.show?.id ?? '');
                       await GetIt.I<AudioPlayerHandler>().playShowEpisode(
-                          e.show!, episodes,
-                          index: episodes.indexWhere((ep) => e.id == ep.id));
+                        show,
+                        show.episodes ?? [],
+                        index: show.episodes?.indexWhere(
+                                (ShowEpisode ep) => e.id == ep.id) ??
+                            0,
+                      );
                     },
                   );
                 }),
@@ -1027,11 +1186,14 @@ class EpisodeListScreen extends StatelessWidget {
               ),
               onTap: () async {
                 //Load entire show, then play
-                List<ShowEpisode> episodes =
-                    await deezerAPI.allShowEpisodes(e.show!.id ?? '');
+                Show show = await deezerAPI.show(e.show?.id ?? '');
                 await GetIt.I<AudioPlayerHandler>().playShowEpisode(
-                    e.show!, episodes,
-                    index: episodes.indexWhere((ep) => e.id == ep.id));
+                  show,
+                  show.episodes ?? [],
+                  index: show.episodes
+                          ?.indexWhere((ShowEpisode ep) => e.id == ep.id) ??
+                      0,
+                );
               },
             );
           },

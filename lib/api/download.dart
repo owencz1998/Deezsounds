@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:disk_space_plus/disk_space_plus.dart';
+//import 'package:disk_space_plus/disk_space_plus.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,7 +26,7 @@ class DownloadManager {
   static const MethodChannel platform =
       MethodChannel('definitely.not.deezer/native');
   static const EventChannel eventChannel =
-      EventChannel('definitely.not.deezer/downloads');
+      EventChannel('definitely.not.deezer/events');
 
   bool running = false;
   int queueSize = 0;
@@ -48,12 +48,6 @@ class DownloadManager {
   }
 
   Future init() async {
-    //Remove old DB
-    File oldDbFile = File(p.join((await getDatabasesPath()), 'offline.db'));
-    if (await oldDbFile.exists()) {
-      await oldDbFile.delete();
-    }
-
     String dbPath = p.join((await getDatabasesPath()), 'offline2.db');
     //Open db
     db = await openDatabase(dbPath, version: 1,
@@ -68,6 +62,10 @@ class DownloadManager {
         id TEXT PRIMARY KEY, name TEXT, albums TEXT, topTracks TEXT, picture TEXT, fans INTEGER, albumCount INTEGER, offline INTEGER, library INTEGER, radio INTEGER)''');
       b.execute('''CREATE TABLE Playlists (
         id TEXT PRIMARY KEY, title TEXT, tracks TEXT, image TEXT, duration INTEGER, userId TEXT, userName TEXT, fans INTEGER, library INTEGER, description TEXT)''');
+      b.execute('''CREATE TABLE Shows (
+        id TEXT PRIMARY KEY, name TEXT, authors TEXT, description TEXT, fans INTEGER, isExplicit INTEGER, isLibrary INTEGER, offline INTEGER, art TEXT)''');
+      b.execute('''CREATE TABLE Episodes (
+        id TEXT PRIMARY KEY, title TEXT, description TEXT, url TEXT, duration INTEGER, publishedDate TEXT, episodeCover TEXT, isExplicit INTEGER, offline INTEGER, showId TEXT)''');
       await b.commit();
     });
 
@@ -101,7 +99,7 @@ class DownloadManager {
       String path = p.join(offlinePath!, track.id);
       File trackFile = File(path);
       if (await trackFile.exists()) {
-        String newPath = _generatePath(track, false);
+        String newPath = _generatePath(track.id!, false);
         await trackFile.copy(newPath);
       }
       Fluttertoast.showToast(
@@ -131,6 +129,24 @@ class DownloadManager {
             conflictAlgorithm: ConflictAlgorithm.ignore);
       }
     }
+    return batch;
+  }
+
+  //Insert track and metadata to DB
+  Future _addShowEpisodeToDB(
+      Batch batch, ShowEpisode episode, bool overwriteShow,
+      {Show? show}) async {
+    batch.insert('Episodes', episode.toSQL(off: true),
+        conflictAlgorithm: overwriteShow
+            ? ConflictAlgorithm.replace
+            : ConflictAlgorithm.ignore);
+    Show s =
+        show ?? await deezerAPI.show(episode.show?.id ?? '', page: 0, nb: 0);
+    s.episodes?.add(episode);
+    batch.insert('Shows', s.toSQL(off: true),
+        conflictAlgorithm: overwriteShow
+            ? ConflictAlgorithm.replace
+            : ConflictAlgorithm.ignore);
     return batch;
   }
 
@@ -263,6 +279,23 @@ class DownloadManager {
       track = await deezerAPI.track(track.id!);
     }
 
+    //Get path
+    String path = _generatePath(track.id!, private, isSingleton: isSingleton);
+    if (!(await File(path).exists())) {
+      await platform.invokeMethod('addDownloads', [
+        await Download.jsonFromTrack(track, path,
+            private: private, quality: quality)
+      ]);
+
+      await start();
+
+      // Wait for the download to complete
+      bool downloadSuccess = await _waitForDownloadCompletion(track.id!);
+      if (!downloadSuccess) {
+        return false; // Exit if the download failed
+      }
+    }
+
     //Add to DB
     if (private) {
       Batch b = db!.batch();
@@ -274,15 +307,65 @@ class DownloadManager {
       DefaultCacheManager().getSingleFile(track.albumArt?.full ?? '');
     }
 
+    return true;
+  }
+
+  // Helper function to wait for download completion
+  Future<bool> _waitForDownloadCompletion(String trackId) async {
+    // Listen to the service events to check the download state
+    Completer<bool> completer = Completer<bool>();
+    late StreamSubscription subscription;
+
+    subscription = serviceEvents.stream.listen((event) {
+      if (event['action'] == 'onProgress') {
+        for (var download in event['data']) {
+          if (download['trackId'] == trackId &&
+              download['state'] == DownloadState.DONE.index) {
+            completer.complete(true);
+            subscription.cancel();
+          } else if (download['trackId'] == trackId &&
+              download['state'] == DownloadState.ERROR.index) {
+            completer.complete(false);
+            subscription.cancel();
+          }
+        }
+      }
+    });
+
+    return completer.future;
+  }
+
+  Future<bool> addOfflineEpisode(ShowEpisode episode,
+      {private = true, isSingleton = false, Show? show}) async {
+    //Permission
+    if (!private && !(await checkPermission())) return false;
+
     //Get path
-    String path = _generatePath(track, private, isSingleton: isSingleton);
+    String path = _generatePath(episode.id!, private, isSingleton: isSingleton);
     if (!(await File(path).exists())) {
-      await platform.invokeMethod('addDownloads', [
-        await Download.jsonFromTrack(track, path,
-            private: private, quality: quality)
-      ]);
+      await platform.invokeMethod('addDownloads',
+          [await Download.jsonFromEpisode(episode, path, private: private)]);
+
+      await start();
+
+      // Wait for the download to complete
+      bool downloadSuccess = await _waitForDownloadCompletion(episode.id!);
+      if (!downloadSuccess) {
+        return false; // Exit if the download failed
+      }
     }
-    await start();
+
+    //Add to DB
+    if (private) {
+      Batch b = db!.batch();
+      b = await _addShowEpisodeToDB(b, episode, true, show: show);
+      await b.commit();
+
+      //Cache art
+      DefaultCacheManager().getSingleFile(episode.episodeCover?.thumb ?? '');
+      DefaultCacheManager().getSingleFile(episode.episodeCover?.full ?? '');
+    }
+
     return true;
   }
 
@@ -320,7 +403,7 @@ class DownloadManager {
     //Create downloads
     List<Map> out = [];
     for (Track t in (album.tracks ?? [])) {
-      String tPath = _generatePath(t, private);
+      String tPath = _generatePath(t.id!, private);
       if (!(await File(tPath).exists())) {
         out.add(await Download.jsonFromTrack(t, tPath,
             private: private, quality: quality));
@@ -368,7 +451,7 @@ class DownloadManager {
     for (int i = 0; i < (playlist.tracks?.length ?? 0); i++) {
       Track t = playlist.tracks![i];
       String tPath = _generatePath(
-        t,
+        t.id!,
         private,
         playlistName: playlist.title,
         playlistTrackNumber: i,
@@ -415,7 +498,7 @@ class DownloadManager {
       for (int i = 0; i < toDowload.length; i++) {
         Track t = toDowload[i];
         String tPath = _generatePath(
-          t,
+          t.id!,
           true,
           playlistName: playlist.title,
           playlistTrackNumber: i,
@@ -526,6 +609,61 @@ class DownloadManager {
     album.artists = artists;
 
     return album;
+  }
+
+  Future<Show?> getOfflineShow(String id) async {
+    List rawShows = await db!.query('Shows', where: 'id == ?', whereArgs: [id]);
+    if (rawShows.isEmpty) return null;
+    Show show = Show.fromSQL(rawShows[0]);
+
+    List<ShowEpisode> episodes = [];
+    List rawEps =
+        await db!.query('Episodes', where: 'showId == ?', whereArgs: [id]);
+
+    //Load each episode
+    for (Map rawEp in rawEps) {
+      var offlineEp = ShowEpisode.fromSQL(rawEp);
+      if (offlineEp.id != null) episodes.add(offlineEp);
+    }
+
+    show.episodes = episodes;
+    return show;
+  }
+
+  //Get all offline shows
+  Future<List<Show>> getOfflineShows() async {
+    List rawShows = await db!.query('Shows', where: 'offline == 1');
+    List<Show> out = [];
+    //Load each show
+    for (Map rawShow in rawShows) {
+      var offlineShow = Show.fromSQL(rawShow);
+      if (offlineShow.id != null) out.add(offlineShow);
+    }
+    return out;
+  }
+
+  //Get offline album with meta
+  Future<List<ShowEpisode>> getOfflineEpisodes(String showId) async {
+    List rawEps =
+        await db!.query('Episodes', where: 'showId == ?', whereArgs: [showId]);
+    List<ShowEpisode> out = [];
+    //Load each show
+    for (Map rawEp in rawEps) {
+      var offlineEp = ShowEpisode.fromSQL(rawEp);
+      if (offlineEp.id != null) out.add(offlineEp);
+    }
+    return out;
+  }
+
+  Future<List<ShowEpisode>> getAllOfflineEpisodes() async {
+    List rawEps = await db!.query('Episodes');
+    List<ShowEpisode> out = [];
+    //Load each show
+    for (Map rawEp in rawEps) {
+      var offlineEp = ShowEpisode.fromSQL(rawEp);
+      if (offlineEp.id != null) out.add(offlineEp);
+    }
+    return out;
   }
 
   //Get offline artist METADATA, not tracks
@@ -682,13 +820,14 @@ class DownloadManager {
   }
 
   //Generate track download path
-  String _generatePath(Track track, bool private,
+  String _generatePath(String id, bool private,
       {String? playlistName,
       int? playlistTrackNumber,
+      int? diskNumber,
       bool isSingleton = false}) {
     String path;
     if (private) {
-      path = p.join(offlinePath!, track.id);
+      path = p.join(offlinePath!, id);
     } else {
       //Download path
       path = settings.downloadPath ?? '';
@@ -702,8 +841,8 @@ class DownloadManager {
       //Album folder / with disk number
       if (settings.albumFolder) {
         if (settings.albumDiscFolder) {
-          path = p.join(path,
-              '%album%' + ' - Disk ' + (track.diskNumber ?? 1).toString());
+          path = p.join(
+              path, '%album%' + ' - Disk ' + (diskNumber ?? 1).toString());
         } else {
           path = p.join(path, '%album%');
         }
@@ -735,7 +874,8 @@ class DownloadManager {
     int? playlistCount = Sqflite.firstIntValue(
         (await db!.rawQuery('SELECT COUNT(*) FROM Playlists')));
     //Free space
-    double diskSpace = await DiskSpacePlus.getFreeDiskSpace ?? 0;
+    //double diskSpace = await DiskSpacePlus.getFreeDiskSpace ?? 0;
+    double diskSpace = 0;
     //Used space
     List<FileSystemEntity> offlineStat =
         await Directory(offlinePath!).list().toList();
@@ -743,7 +883,7 @@ class DownloadManager {
     for (var fs in offlineStat) {
       offlineSize += (await fs.stat()).size;
     }
-    //Return in list, //TODO: Make into class in future
+    //Return in list
     return ([
       trackCount.toString(),
       albumCount.toString(),
@@ -807,26 +947,31 @@ class Download {
   String? title;
   String? image;
   int? quality;
+  bool? isEpisode;
+  String? url;
   //Dynamic
   DownloadState? state;
   int? received;
   int? filesize;
 
-  Download(
-      {this.id,
-      this.path,
-      this.private,
-      this.trackId,
-      this.streamTrackId,
-      this.trackToken,
-      this.md5origin,
-      this.mediaVersion,
-      this.title,
-      this.image,
-      this.state,
-      this.received,
-      this.filesize,
-      this.quality});
+  Download({
+    this.id,
+    this.path,
+    this.private,
+    this.trackId,
+    this.streamTrackId,
+    this.trackToken,
+    this.md5origin,
+    this.mediaVersion,
+    this.title,
+    this.image,
+    this.state,
+    this.received,
+    this.filesize,
+    this.quality,
+    this.isEpisode,
+    this.url,
+  });
 
   //Get progress between 0 - 1
   double get progress {
@@ -836,14 +981,16 @@ class Download {
 
   factory Download.fromJson(Map<dynamic, dynamic> data) {
     return Download(
-        path: data['path'],
-        image: data['image'],
-        private: data['private'],
-        trackId: data['trackId'],
-        id: data['id'],
-        state: DownloadState.values[data['state']],
-        title: data['title'],
-        quality: data['quality']);
+      path: data['path'],
+      image: data['image'],
+      private: data['private'],
+      trackId: data['trackId'],
+      id: data['id'],
+      state: DownloadState.values[data['state']],
+      title: data['title'],
+      quality: data['quality'],
+      isEpisode: data['isEpisode'] == 1,
+    );
   }
 
   //Change values from "update json"
@@ -881,7 +1028,22 @@ class Download {
           : settings.getQualityInt((quality ?? settings.downloadQuality)),
       'title': t.title,
       'path': path,
-      'image': t.albumArt?.thumb
+      'image': t.albumArt?.thumb,
+      'isEpisode': false,
+    };
+  }
+
+  static Future<Map> jsonFromEpisode(ShowEpisode e, String path,
+      {private = true}) async {
+    return {
+      'private': private,
+      'trackId': e.id,
+      'url': e.url,
+      'title': e.title,
+      'path': path,
+      'image': e.episodeCover?.thumb,
+      'quality': 1,
+      'isEpisode': true,
     };
   }
 }
