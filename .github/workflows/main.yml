@@ -14,25 +14,36 @@ jobs:
     if: ${{ github.event.pull_request.draft == false && (github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'noci')) }}
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
       with:
         submodules: recursive
-    - uses: cachix/install-nix-action@v27
-    - uses: DeterminateSystems/magic-nix-cache-action@main
-    - uses: nicknovitski/nix-develop@v1
+
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
 
     - name: Build debug APK
-      run: ./gradlew androidApp:packageDebug
-    - name: Build release APK
-      run: ./gradlew androidApp:packageRelease
+      run: ./gradlew androidApp:assembleDebug
 
-    - name: Upload universal debug APK artifact
+    - name: Build release APK
+      run: ./gradlew androidApp:assembleRelease
+
+    - name: List APKs
+      run: ls -R androidApp/build/outputs/apk/
+
+    - name: Upload debug APK
       uses: actions/upload-artifact@v3
       with:
         name: spmp-android-debug
         path: androidApp/build/outputs/apk/debug/*.apk
 
-    - name: Upload universal release APK artifact
+    - name: Upload release APK
       uses: actions/upload-artifact@v3
       with:
         name: spmp-android-release
