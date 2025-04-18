@@ -26,13 +26,15 @@ jobs:
         java-version: '17'
 
     - name: Make gradlew executable
-      run: chmod +x ./gradlew
+      run: chmod +x androidApp/gradlew
 
     - name: Build debug APK
-      run: ./gradlew androidApp:assembleDebug
+      run: androidApp/gradlew assembleDebug
+      working-directory: androidApp
 
     - name: Build release APK
-      run: ./gradlew androidApp:assembleRelease
+      run: androidApp/gradlew assembleRelease
+      working-directory: androidApp
 
     - name: List APKs
       run: ls -R androidApp/build/outputs/apk/
