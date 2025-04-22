@@ -5,7 +5,7 @@
 [![Latest commit](https://img.shields.io/github/last-commit/PetitPrinc3/Alchemy)](../../commit/master)
 [![License](https://img.shields.io/github/license/PetitPrinc3/Deezer?flat)](./LICENSE)
 
-[![Flutter](https://img.shields.io/badge/Flutter-v3.29.2-blue?logo=flutter)](https://flutter.dev/)
+[![Flutter](https://img.shields.io/badge/Flutter-v3.29.3-blue?logo=flutter)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-v3.7.2-blue?logo=dart)](https://dart.dev/)
 [![Android API](https://img.shields.io/badge/Android%20API-35-green?logo=android)](https://developer.android.com/about/versions/14)
 [![Java JDK](https://img.shields.io/badge/Java%20JDK-17-blue?logo=openjdk)](https://openjdk.java.net/projects/jdk/17/)
@@ -21,6 +21,7 @@
 *   Sing along to the songs you love with synchronized lyrics;
 *   Download tracks, playlists, and albums for offline listening;
 *   Challenge yourself with playlist-based blind tests;
+*   Identify the music around you with ACR Cloud song recognition;
 *   Export downloaded tracks to local storage;
 *   Import your playlists from Spotify;
 *   Customize themes, accent colors, and more.

@@ -797,7 +797,8 @@ class _RepeatButtonState extends State<RepeatButton> {
 
 class ActionControls extends StatefulWidget {
   final double iconSize;
-  const ActionControls(this.iconSize, {super.key});
+  final Track? track;
+  const ActionControls(this.iconSize, {this.track, super.key});
 
   @override
   _ActionControls createState() => _ActionControls();
@@ -805,9 +806,12 @@ class ActionControls extends StatefulWidget {
 
 class _ActionControls extends State<ActionControls> {
   AudioPlayerHandler audioHandler = GetIt.I<AudioPlayerHandler>();
+  late Track t;
+
   Icon get libraryIcon {
-    if (cache.checkTrackFavorite(
-        Track.fromMediaItem(audioHandler.mediaItem.value!))) {
+    if (audioHandler.mediaItem.value != null
+        ? cache.checkTrackFavorite(t)
+        : false) {
       return Icon(
         AlchemyIcons.heart_fill,
         size: widget.iconSize,
@@ -822,8 +826,21 @@ class _ActionControls extends State<ActionControls> {
   }
 
   @override
+  void initState() {
+    if (mounted) {
+      setState(() {
+        t = widget.track ??
+            (audioHandler.mediaItem.value != null
+                ? Track.fromMediaItem(audioHandler.mediaItem.value!)
+                : Track());
+      });
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    String? id = Track.fromMediaItem(audioHandler.mediaItem.value!).id;
+    String? id = t.id;
     return Container(
       padding: EdgeInsets.only(top: 8),
       child: Row(
@@ -856,27 +873,18 @@ class _ActionControls extends State<ActionControls> {
                 semanticLabel: 'Options'.i18n,
               ),
               onPressed: () {
-                Track t = Track.fromMediaItem(
-                    GetIt.I<AudioPlayerHandler>().mediaItem.value!);
                 MenuSheet m = MenuSheet(navigateCallback: () {
                   Navigator.of(context).pop();
                 });
-                if (GetIt.I<AudioPlayerHandler>()
-                        .mediaItem
-                        .value!
-                        .extras?['show'] ==
-                    null) {
+                if (audioHandler.mediaItem.value?.extras?['show'] == null) {
                   m.defaultTrackMenu(t,
                       context: context,
                       options: [m.sleepTimer(context), m.wakelock(context)]);
                 } else {
                   m.defaultShowEpisodeMenu(
-                      Show.fromJson(jsonDecode(GetIt.I<AudioPlayerHandler>()
-                          .mediaItem
-                          .value!
-                          .extras?['show'])),
-                      ShowEpisode.fromMediaItem(
-                          GetIt.I<AudioPlayerHandler>().mediaItem.value!),
+                      Show.fromJson(jsonDecode(
+                          audioHandler.mediaItem.value?.extras?['show'])),
+                      ShowEpisode.fromMediaItem(audioHandler.mediaItem.value!),
                       context: context,
                       options: [m.sleepTimer(context), m.wakelock(context)]);
                 }
@@ -888,20 +896,15 @@ class _ActionControls extends State<ActionControls> {
             onPressed: () async {
               cache.libraryTracks ??= [];
 
-              if (cache.checkTrackFavorite(
-                  Track.fromMediaItem(audioHandler.mediaItem.value!))) {
+              if (cache.checkTrackFavorite(t)) {
                 //Remove from library
-                setState(() => cache.libraryTracks
-                    ?.remove(audioHandler.mediaItem.value!.id));
-                await deezerAPI
-                    .removeFavorite(audioHandler.mediaItem.value!.id);
+                setState(() => cache.libraryTracks?.remove(t.id));
+                await deezerAPI.removeFavorite(t.id ?? '');
                 await cache.save();
               } else {
                 //Add
-                setState(() =>
-                    cache.libraryTracks?.add(audioHandler.mediaItem.value!.id));
-                await deezerAPI
-                    .addFavoriteTrack(audioHandler.mediaItem.value!.id);
+                setState(() => cache.libraryTracks?.add(t.id ?? ''));
+                await deezerAPI.addFavoriteTrack(t.id ?? '');
                 await cache.save();
               }
             },
@@ -1204,7 +1207,8 @@ class _SeekBarState extends State<SeekBar> {
 
   double get duration {
     if (audioHandler.mediaItem.value == null) return 1.0;
-    return audioHandler.mediaItem.value!.duration!.inMilliseconds.toDouble();
+    return audioHandler.mediaItem.value?.duration?.inMilliseconds.toDouble() ??
+        0;
   }
 
   @override

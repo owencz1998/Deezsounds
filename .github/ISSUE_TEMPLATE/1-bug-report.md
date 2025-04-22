@@ -1,5 +1,5 @@
 ---
-name: "🐞 Bug Report"
+name: ":collision: Bug Report"
 about: "Report an issue to help the project improve."
 title: "[Bug] "
 labels: "Type: Bug"
@@ -7,52 +7,23 @@ assignees: ''
 
 ---
 
-# **🐞 Bug Report**
+# **:collision: Bug Report**
+<!-- All issues sould be redacted in english (or french) or they will not be addressed -->
+<!-- All issues sould be detailed enough for developers to reproduce the bug or they will not be addressed -->
+<!-- Duplicate issues will not be addressed and closed automatically -->
 
-## **Describe the bug**
-<!-- A clear and concise description of what the bug is. -->
-
-*
-
----
+## **Bug description**
 
 ### **Is this a regression?**
-<!-- Did this behaviour used to work in the previous version? -->
-<!-- Yes, the last version in which this bug was not present was: ... -->
-
----
+* [ ] Yes
+* [ ] No
 
 ### **To Reproduce**
 
-<!-- Steps to reproduce the error:
-(e.g.:)
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error -->
-
-<!-- Write the steps here (add or remove as many steps as needed)-->
-
-1.
-2.
-3.
-4.
-
----
-
 ### **Expected behaviour**
-<!-- A clear and concise description of what you expected to happen. -->
-
-*
-
----
 
 ### **Screenshots**
-<!-- If applicable, add screenshots or videos to help explain your problem. -->
-
----
 
 ### **Additional context**
-<!-- Add any other context or additional information about the problem here.-->
-
-*
+* Version (commit or release) :
+* Device (name and OS) :

@@ -122,6 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .fullUrl ??
                               '',
                           circular: true,
+                          width: 60,
                         ),
                 ),
               ),
