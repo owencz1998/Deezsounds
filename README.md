@@ -49,6 +49,8 @@ Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yours
     <img src="./assets/screenshots/blindTrackTest.png" width=100>
     <img src="./assets/screenshots/blindArtistTest.png" width=100>
     <img src="./assets/screenshots/blindResults.png" width=100>
+    <img src="./assets/screenshots/song_catcher.png" width=100>
+    <img src="./assets/screenshots/song_catcher_results.png" width=100>
 </p>
 <p align="center">
     <img src="./assets/screenshots/artist_landscape.png" height=150>
@@ -64,9 +66,9 @@ Get Alchemy running: Follow [these instructions](./HOWTO.md) to compile it yours
 ## :building_construction: Upcoming Features
 
 *   Move all gateway light API calls to mobile gateway API;
-*   Implement a song catcher;
-*   Implement notification tile `onTap` redirections;
+*   Implement a song catcher history;
 *   Continue the Search page UI refactor;
+*   Implement notification tile `onTap` redirections;
 *   Create notification settings;
 *   Implement a profile edition screen;
 *   Make a "create playlist from queue" option;

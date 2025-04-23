@@ -112,14 +112,20 @@ class MenuSheet {
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text(
-                                  track.title ?? '',
-                                  maxLines: 1,
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      fontSize: 20.0,
-                                      fontWeight: FontWeight.bold),
+                                Expanded(
+                                  child: Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 8),
+                                    child: Text(
+                                      track.title ?? '',
+                                      maxLines: 1,
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                          fontSize: 20.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
                                 ),
                                 if (isOffline)
                                   Icon(

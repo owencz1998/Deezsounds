@@ -12,7 +12,7 @@ subprojects {
 
     // This will make sure all the sub projects have an android namespace,
     // if not it will read it from AndroidManifest.xml
-    // Also sets the compileSdk to 34 and the target javaVersion to 17 
+    // Also sets the compileSdk to 35 and the target javaVersion to 17 
     // (needs to be changed manually to the latest in the future)
     afterEvaluate {
         println("Processing submodule: ${project.name}")
@@ -42,8 +42,6 @@ subprojects {
                         jvmTarget = javaVersion.toString()
                     }
                 }
-//                println("Setting java version to ${javaVersion.toString()} which is $javaVersion")
-//                println("Setting compileSdk and targetSdk to $androidApiVersion")
             }
         }
     }

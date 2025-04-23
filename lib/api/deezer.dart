@@ -162,7 +162,7 @@ class DeezerAPI {
     return body;
   }
 
-  Future getGatewayAuth() async {
+  Future<bool> getGatewayAuth() async {
     final initKeyBytes = utf8.encode(deezerMobileKey);
     final encrypt.Key initKey = encrypt.Key(initKeyBytes);
     final initEncrypter = encrypt.Encrypter(
@@ -221,6 +221,12 @@ class DeezerAPI {
     dynamic arlRes = jsonDecode(arlReq.body);
 
     gatewayARL = arlRes['results']['ARL'];
+
+    if (gatewaySID != null && gatewayARL != null) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   //Call private gateway API
@@ -255,8 +261,8 @@ class DeezerAPI {
     // In case of error "Invalid CSRF token" retrieve new one and retry the same call
     // Except for "deezer.getUserData" method, which would cause infinite loop
     if (body['error'].isNotEmpty &&
-        body['error'].containsKey('VALID_TOKEN_REQUIRED') &&
-        (method != 'deezer.getUserData' && await rawAuthorize())) {
+        body['error'].containsKey('NEED_API_AUTH_REQUIRED') &&
+        (method != 'deezer.getUserData' && await getGatewayAuth())) {
       return callGwLightApi(method, params: params, gatewayInput: gatewayInput);
     }
     return body;

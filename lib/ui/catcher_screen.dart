@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:alchemy/fonts/alchemy_icons.dart';
+import 'package:alchemy/service/audio_service.dart';
 import 'package:alchemy/settings.dart';
 import 'package:alchemy/ui/cached_image.dart';
 import 'package:alchemy/ui/elements.dart';
@@ -17,7 +18,9 @@ import 'package:alchemy/api/deezer.dart';
 import 'package:alchemy/api/definitions.dart';
 import 'package:alchemy/utils/env.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get_it/get_it.dart';
 import 'package:i18n_extension/default.i18n.dart';
+import 'package:logging/logging.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class CatcherScreen extends StatefulWidget {
@@ -387,7 +390,7 @@ class _CatcherScreen extends State<CatcherScreen>
       if (status != null && status['code'] == 0) {
         final metadata = resultData['metadata'];
 
-        if (recognitionType == RecognitionType.Songs) {
+        if (metadata['music'] != null) {
           final musicList = metadata?['music'] as List?;
 
           if (musicList != null && musicList.isNotEmpty) {
@@ -422,28 +425,31 @@ class _CatcherScreen extends State<CatcherScreen>
               });
             }
           }
-        } else {
+        } else if (metadata['humming'] != null) {
           final musicList = metadata?['humming'] as List?;
 
           if (musicList != null && musicList.isNotEmpty) {
             final trackInfo = musicList[0];
-            Uri metadataApiUri = Uri.https(
-                'eu-api-v2.acrcloud.com',
-                '/api/external-metadata/tracks',
-                {'acr_id': trackInfo['acrid']});
-            final externalMetadata = trackInfo['external_metadata'];
-            final deezerMetadata = externalMetadata?['deezer'];
-            final String? deezerTrackId =
-                deezerMetadata?['track']?['id']?.toString();
+            String? trackTitle = trackInfo['title'];
+            List<dynamic>? trackArtists =
+                ((trackInfo['artists'] as List<dynamic>?)?.where(
+                    (dynamic artistInfos) =>
+                        (artistInfos['roles'] as List<dynamic>?)
+                            ?.contains('MainArtist') ??
+                        false))?.toList();
 
-            if (deezerTrackId != null && deezerTrackId.isNotEmpty) {
+            String? trackArtist = (trackArtists?.isNotEmpty ?? false)
+                ? (trackArtists?[0])['name']
+                : trackInfo['artists']?[0]?['name'];
+
+            if (trackTitle != null) {
               if (mounted) {
                 setState(() {
                   _statusMessage = 'Track identified! Fetching details...';
                 });
               }
 
-              await _fetchTrackDetails(deezerTrackId);
+              await _fetchHumsDetails(trackTitle, trackArtist ?? '');
               return;
             } else {
               if (mounted) {
@@ -506,6 +512,75 @@ class _CatcherScreen extends State<CatcherScreen>
     }
   }
 
+  Future<void> _fetchHumsDetails(String trackTitle, String trackArtist) async {
+    try {
+      if (!mounted || !_isFetchingTrack) {
+        return;
+      }
+
+      Map<String, dynamic> jsonResult =
+          await deezerAPI.callGwApi('search_music', params: {
+        'QUERY': "'$trackTitle' '$trackArtist'",
+        'FILTER': 'TRACK',
+        'OUTPUT': 'TRACK',
+        'NB': '1',
+        'START': '0',
+      });
+
+      Logger.root.info(jsonResult);
+
+      Track track;
+
+      if (jsonResult['results']['data'] != null &&
+          jsonResult['results']['data'].isNotEmpty) {
+        try {
+          track = Track.fromPrivateJson(jsonResult['results']['data'][0]);
+        } catch (_) {
+          track =
+              Track(title: trackTitle, artists: [Artist(name: trackArtist)]);
+        }
+      } else {
+        track = Track(title: trackTitle, artists: [Artist(name: trackArtist)]);
+      }
+
+      Logger.root.info(track.toJson());
+
+      if (mounted && _isFetchingTrack) {
+        setState(() {
+          _identifiedTrack = track;
+          _statusMessage = 'Track details loaded';
+          _isFetchingTrack = false;
+          _lastError = '';
+          startAnimation();
+        });
+      } else if (mounted) {
+        setState(() {
+          _isFetchingTrack = false;
+          if (_identifiedTrack == null) {
+            _statusMessage = 'Tap to recognize';
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted && _isFetchingTrack) {
+        setState(() {
+          _identifiedTrack = null;
+          _lastError = 'Failed to fetch track details from Deezer';
+          _statusMessage = 'Error loading details';
+          _isFetchingTrack = false;
+        });
+      } else if (mounted) {
+        setState(() {
+          _isFetchingTrack = false;
+          if (_identifiedTrack == null && _lastError.isEmpty) {
+            _statusMessage = 'Ready to listen';
+          }
+        });
+      }
+      reverseAnimation();
+    }
+  }
+
   Future<void> _fetchTrackDetails(String trackId) async {
     try {
       if (!mounted || !_isFetchingTrack) {
@@ -546,6 +621,7 @@ class _CatcherScreen extends State<CatcherScreen>
           }
         });
       }
+      reverseAnimation();
     }
   }
 
@@ -625,6 +701,7 @@ class _CatcherScreen extends State<CatcherScreen>
                     ),
                     maximumSize: Size(128, 38),
                     minimumSize: Size(128, 38),
+                    backgroundColor: Theme.of(context).primaryColor,
                   ),
                   child: Text(
                     recognitionType == RecognitionType.Songs
@@ -651,7 +728,7 @@ class _CatcherScreen extends State<CatcherScreen>
           ),
           if (_identifiedTrack != null)
             GestureDetector(
-              onVerticalDragDown: (DragDownDetails e) {
+              onVerticalDragStart: (DragStartDetails e) {
                 reverseAnimation();
               },
               child: AnimatedBuilder(
@@ -685,33 +762,86 @@ class _CatcherScreen extends State<CatcherScreen>
                         Transform.translate(
                           offset: Offset(0, verticalOffset),
                           child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Transform(
-                                  transform: Matrix4.identity()
-                                    ..setEntry(3, 2, 0.001)
-                                    ..rotateY(_rotateAnimation.value),
-                                  alignment: FractionalOffset.center,
-                                  child: child,
-                                ),
-                                Padding(padding: EdgeInsets.only(bottom: 12)),
-                                Text(_identifiedTrack?.title ?? '',
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20)),
-                                Text(_identifiedTrack?.artists?[0].name ?? '',
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w300,
-                                        fontSize: 16)),
-                                ActionControls(24.0),
-                              ],
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 24),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (_identifiedTrack?.albumArt?.fullUrl !=
+                                      null)
+                                    Transform(
+                                      transform: Matrix4.identity()
+                                        ..setEntry(3, 2, 0.001)
+                                        ..rotateY(_rotateAnimation.value),
+                                      alignment: FractionalOffset.center,
+                                      child: child,
+                                    ),
+                                  Padding(padding: EdgeInsets.only(bottom: 12)),
+                                  Text(_identifiedTrack?.title ?? '',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20)),
+                                  Text(_identifiedTrack?.artists?[0].name ?? '',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w300,
+                                          fontSize: 16)),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 24),
+                                    child: ActionControls(24.0),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      GetIt.I<AudioPlayerHandler>()
+                                          .playFromTrackList(
+                                        [_identifiedTrack ?? Track()],
+                                        _identifiedTrack?.id ?? '',
+                                        QueueSource(
+                                            id: _identifiedTrack?.id,
+                                            text: 'Favorites'.i18n,
+                                            source: 'track'),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      shape: SmoothRectangleBorder(
+                                        borderRadius: SmoothBorderRadius(
+                                          cornerRadius: 10,
+                                          cornerSmoothing: 1,
+                                        ),
+                                      ),
+                                      maximumSize: Size(128, 38),
+                                      minimumSize: Size(128, 38),
+                                      backgroundColor:
+                                          Theme.of(context).primaryColor,
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          AlchemyIcons.play,
+                                          size: 14,
+                                        ),
+                                        SizedBox(
+                                          width: 8,
+                                        ),
+                                        Text(
+                                          'Play',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -742,6 +872,20 @@ class _CatcherScreen extends State<CatcherScreen>
                       width: MediaQuery.of(context).size.width * 0.6,
                     ),
                   ),
+                ),
+              ),
+            ),
+          if (_identifiedTrack != null)
+            SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.05, vertical: 8),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  iconSize: 24,
+                  onPressed: reverseAnimation,
+                  icon: const Icon(AlchemyIcons.cross),
+                  tooltip: 'Close'.i18n,
                 ),
               ),
             ),
@@ -899,7 +1043,7 @@ class _StatusDisplay extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (isProcessing && statusMessage == 'Listening for music...'.i18n)
+          if (isProcessing)
             const Padding(
               padding: EdgeInsets.only(bottom: 16),
               child: MinimalistSoundWave(

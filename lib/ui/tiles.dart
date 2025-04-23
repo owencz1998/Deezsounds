@@ -334,10 +334,11 @@ class SimpleTrackTile extends StatelessWidget {
       trailing: PlayerMenuButton(track),
       onTap: () {
         GetIt.I<AudioPlayerHandler>().playFromTrackList(
-            playlist?.tracks ?? [track],
-            track.id ?? '',
-            QueueSource(
-                id: playlist?.id, text: 'Favorites'.i18n, source: 'playlist'));
+          playlist?.tracks ?? [track],
+          track.id ?? '',
+          QueueSource(
+              id: playlist?.id, text: 'Favorites'.i18n, source: 'playlist'),
+        );
       },
       onLongPress: () {
         MenuSheet m = MenuSheet();
