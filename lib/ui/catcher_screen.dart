@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:alchemy/api/cache.dart';
 import 'package:alchemy/fonts/alchemy_icons.dart';
 import 'package:alchemy/service/audio_service.dart';
 import 'package:alchemy/settings.dart';
@@ -8,6 +9,7 @@ import 'package:alchemy/ui/elements.dart';
 import 'package:alchemy/ui/menu.dart';
 import 'package:alchemy/ui/player_screen.dart';
 import 'package:alchemy/ui/settings_screen.dart';
+import 'package:alchemy/ui/tiles.dart';
 import 'package:awesome_ripple_animation/awesome_ripple_animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -561,6 +563,10 @@ class _CatcherScreen extends State<CatcherScreen>
           }
         });
       }
+      if (_identifiedTrack != null) {
+        cache.recognitionHistory.add(_identifiedTrack!);
+        cache.save();
+      }
     } catch (e) {
       if (mounted && _isFetchingTrack) {
         setState(() {
@@ -604,6 +610,10 @@ class _CatcherScreen extends State<CatcherScreen>
             _statusMessage = 'Tap to recognize';
           }
         });
+      }
+      if (_identifiedTrack != null) {
+        cache.recognitionHistory.add(_identifiedTrack!);
+        cache.save();
       }
     } catch (e) {
       if (mounted && _isFetchingTrack) {
@@ -722,7 +732,7 @@ class _CatcherScreen extends State<CatcherScreen>
                 onClose: () =>
                     Navigator.of(context, rootNavigator: true).maybePop(),
                 onHistory: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const SettingsScreen())),
+                    builder: (context) => const RecognitionHistoryScreen())),
               ),
             ),
           ),
@@ -1106,5 +1116,97 @@ class _AcrCloudAttribution extends StatelessWidget {
                   fontSize: 12,
                   color: textColor)),
         ]));
+  }
+}
+
+class RecognitionHistoryScreen extends StatefulWidget {
+  const RecognitionHistoryScreen({super.key});
+  @override
+  _RecognitionHistoryScreenState createState() =>
+      _RecognitionHistoryScreenState();
+}
+
+class _RecognitionHistoryScreenState extends State<RecognitionHistoryScreen> {
+  List<Track> history = cache.recognitionHistory;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.only(top: 12.0),
+          children: <Widget>[
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * 0.05),
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(60),
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: IconButton(
+                      splashRadius: 20,
+                      alignment: Alignment.center,
+                      onPressed: () {
+                        Navigator.of(context).maybePop();
+                      },
+                      icon: const Icon(AlchemyIcons.arrow_start),
+                    ),
+                  ),
+                ),
+              ),
+              title: const Center(
+                child: Text(
+                  'History',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              trailing: SizedBox(
+                height: 60,
+                width: 60,
+              ),
+            ),
+            ...List.generate(
+                history.length,
+                (int index) => TrackTile(
+                      history[index],
+                      onTap: () {
+                        GetIt.I<AudioPlayerHandler>().playFromTrackList(
+                            history,
+                            history[index].id ?? '',
+                            QueueSource(
+                                id: history[index].id,
+                                text: 'Recognition history',
+                                source: 'Recognition'));
+                      },
+                      onHold: () {
+                        MenuSheet mi = MenuSheet();
+                        mi.defaultTrackMenu(history[index], context: context);
+                      },
+                      trailing: IconButton(
+                          onPressed: () {
+                            if (mounted) {
+                              setState(() {
+                                history.removeAt(index);
+                                cache.recognitionHistory = history;
+                                cache.save();
+                              });
+                            }
+                          },
+                          icon: Icon(AlchemyIcons.cross)),
+                    ))
+          ],
+        ),
+      ),
+    );
   }
 }

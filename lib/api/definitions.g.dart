@@ -10,7 +10,7 @@ Track _$TrackFromJson(Map<String, dynamic> json) => Track(
       id: json['id'] as String?,
       title: json['title'] as String?,
       duration: json['duration'] == null
-          ? null
+          ? Duration.zero
           : Duration(microseconds: (json['duration'] as num).toInt()),
       album: json['album'] == null
           ? null
@@ -43,7 +43,7 @@ Map<String, dynamic> _$TrackToJson(Track instance) => <String, dynamic>{
       'title': instance.title,
       'album': instance.album,
       'artists': instance.artists,
-      'duration': instance.duration?.inMicroseconds,
+      'duration': instance.duration.inMicroseconds,
       'albumArt': instance.albumArt,
       'trackNumber': instance.trackNumber,
       'offline': instance.offline,

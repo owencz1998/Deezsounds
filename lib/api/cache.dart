@@ -45,6 +45,9 @@ class Cache {
   String? loggedTrackId;
 
   @JsonKey(defaultValue: [])
+  List<Track> recognitionHistory = [];
+
+  @JsonKey(defaultValue: [])
   List<Track> history = [];
 
   //All sorting cached

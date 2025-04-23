@@ -21,7 +21,7 @@ class Track {
   String? title;
   Album? album;
   List<Artist>? artists;
-  Duration? duration;
+  Duration duration;
   ImageDetails? albumArt;
   int? trackNumber;
   bool? offline;
@@ -39,7 +39,7 @@ class Track {
   Track(
       {this.id,
       this.title,
-      this.duration,
+      this.duration = Duration.zero,
       this.album,
       this.playbackDetails,
       this.albumArt,
@@ -121,7 +121,7 @@ class Track {
         id: mi.id,
         albumArt: ImageDetails(
             fullUrl: mi.artUri.toString(), thumbUrl: mi.extras?['thumb']),
-        duration: mi.duration,
+        duration: mi.duration ?? Duration.zero,
         playbackDetails: playbackDetails,
         lyrics: LyricsFull.fromJson(
             jsonDecode(((mi.extras ?? {})['lyrics']) ?? '{}')),
