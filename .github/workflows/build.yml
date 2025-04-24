@@ -18,9 +18,9 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0'  # Set your Flutter version
+          flutter-version: '3.19.0'  # Adjust to your Flutter version
 
-      - name: Flutter pub get
+      - name: Install dependencies
         run: flutter pub get
 
       - name: Analyze project
@@ -38,13 +38,17 @@ jobs:
       - name: Build Web
         run: flutter build web
 
-      # iOS builds require macOS runners (expensive & not available on free tier)
+      # Optional: Uncomment to build iOS on macOS runner (costs money on GitHub Actions)
       # - name: Build iOS (no codesign)
       #   runs-on: macos-latest
       #   steps:
-      #     - uses: actions/checkout@v3
-      #     - uses: subosito/flutter-action@v2
+      #     - name: Checkout source
+      #       uses: actions/checkout@v3
+      #     - name: Setup Flutter
+      #       uses: subosito/flutter-action@v2
       #       with:
       #         flutter-version: '3.19.0'
-      #     - run: flutter pub get
-      #     - run: flutter build ios --no-codesign
+      #     - name: Install dependencies
+      #       run: flutter pub get
+      #     - name: Build iOS
+      #       run: flutter build ios --no-codesign
