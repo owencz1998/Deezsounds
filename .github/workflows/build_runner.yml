@@ -1,39 +1,40 @@
-name: Flutter Build
+name: Flutter CI
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
-    name: Build Flutter App
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # In case you use git submodules
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0' # or any version your app uses
+          flutter-version: '3.19.0'
+
+      - name: Enable Flutter web (optional)
+        run: flutter config --enable-web
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Analyze code
+      - name: Upgrade dependencies
+        run: flutter pub upgrade
+
+      - name: Build generated files (build_runner)
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Analyze
         run: flutter analyze
 
       - name: Run tests
         run: flutter test
-
-      - name: Build APK
-        run: flutter build apk --debug
-
-      # Uncomment this section if you're building for iOS (macOS only)
-      # - name: Build iOS
-      #   run: flutter build ios --no-codesign
